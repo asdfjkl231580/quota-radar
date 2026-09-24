@@ -38,7 +38,7 @@ const L = {
     since: "距上次送额度已过去", next: "官方下次：尚未公布", source: "原帖 ↗", last: "上次", units: ["天", "时", "分"],
     recent: "最近记录", viewAll: "查看全部 →", faq: "常见问题", all: "全部 →", openAlone: "单独打开 ↗",
     footer: "只收录官方消息 · 不预测下次", menu: "菜单", tz: "时区",
-    kinds: { reset: "全员重置", banked: "重置卡", boost: "提额" }, lowBadge: "待补证",
+    kinds: { reset: "全员重置", banked: "重置卡", boost: "提额", teaser: "预告" }, lowBadge: "待补证", autoBadge: "待整理", teaserLbl: "预告", viewOnX: "在 X 上看 ↗", tweetCard: "原帖",
     tlTitle: "官方送额度记录", tlDesc: "Codex 与 Claude 官方每一次全员重置、重置卡、提额公告，附原帖与适用套餐。", items: "条", filters: ["全部", "Codex", "Claude"],
     scopeLbl: "适用", original: "英文原文", moreBtn: (n) => `展开更早的 ${n} 条`,
     pTitle: { codex: `Codex 什么时候重置？官方送额度记录 | ${site.name}`, claude: `Claude 额度什么时候恢复？官方重置记录 | ${site.name}` },
@@ -58,7 +58,7 @@ const L = {
     since: "Since the last quota grant", next: "Next: not announced", source: "Source ↗", last: "Last", units: ["d", "h", "m"],
     recent: "Recent", viewAll: "View all →", faq: "FAQ", all: "All →", openAlone: "Open ↗",
     footer: "Official announcements only · No predictions", menu: "Menu", tz: "Time zone",
-    kinds: { reset: "Full reset", banked: "Banked reset", boost: "Quota boost" }, lowBadge: "unconfirmed",
+    kinds: { reset: "Full reset", banked: "Banked reset", boost: "Quota boost", teaser: "Heads-up" }, lowBadge: "unconfirmed", autoBadge: "auto", teaserLbl: "Heads-up", viewOnX: "View on X ↗", tweetCard: "Source post",
     tlTitle: "Official quota grants", tlDesc: "Every official full reset, banked reset and quota boost for Codex and Claude, with source posts and eligible plans.", items: "events", filters: ["All", "Codex", "Claude"],
     scopeLbl: "Eligible", original: "Original post", moreBtn: (n) => `Show ${n} older`,
     pTitle: { codex: "When does Codex reset? Official quota grants | Quota Radar", claude: "When does Claude quota reset? Official record | Quota Radar" },
@@ -151,23 +151,32 @@ const SVG_Q = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const SVG_CHEV = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>`;
 const SVG_BURGER = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
 
-const badge = (T, e) => `<span class="badge ${e.kind}">${T.kinds[e.kind]}</span>${e.confidence === "low" ? ` <span class="badge low">${T.lowBadge}</span>` : ""}`;
+const AUTHORS = readJson("authors.json", {});
+const badge = (T, e) => `<span class="badge ${e.kind}">${T.kinds[e.kind]}</span>${e.confidence === "low" ? ` <span class="badge low">${T.lowBadge}</span>` : ""}${e.confidence === "auto" ? ` <span class="badge auto">${T.autoBadge}</span>` : ""}`;
+const REAL = (e) => e.kind !== "teaser";
+function tweetCard(T, e) {
+  const h = e.account.replace(/^@/, ""); const au = AUTHORS[h] || { name: h, handle: h, avatar: "" };
+  const av = au.avatar ? `<img src="${esc(au.avatar)}" alt="" width="36" height="36" loading="lazy">` : `<span class="ini">${esc(h[0].toUpperCase())}</span>`;
+  return `<div class="tweet"><div class="au">${av}<div><b>${esc(au.name)}</b><span>@${esc(h)}</span></div></div><p class="tx">${esc(e.textEn)}</p><div class="ft"><span>${timeEl(T, e.announcedAt, "full")}</span><a href="${esc(e.sourceUrl)}" target="_blank" rel="noopener">${T.viewOnX}</a></div></div>`;
+}
 const timeEl = (T, iso, mode = "md") => `<time datetime="${iso}" data-ts="${iso}" data-mode="${mode}">${esc(T.dateFallback(iso, mode))}</time>`;
 const href = (T, p) => (T.base + p).replace(/\/$/, "") || "/";
 
 function statusCard(T, p) {
-  const last = events.find((e) => e.provider === p);
+  const last = events.find((e) => e.provider === p && REAL(e));
+  const tz = events.find((e) => e.provider === p && e.kind === "teaser");
+  const teaserLine = tz && tz.announcedAt > last.announcedAt ? `<div class="teaser-line">${T.teaserLbl}：${esc(T.summary(tz))} <a href="${esc(tz.sourceUrl)}" target="_blank" rel="noopener">↗</a></div>` : "";
   return `<section class="card ${p}" aria-label="${PROVIDERS[p].zh}">
   <div class="head"><span class="logo" aria-hidden="true">${LOGO[p]}</span><span class="name">${PROVIDERS[p].zh}</span>${badge(T, last)}</div>
   <div class="lbl">${T.since}</div>
   <div class="counter" data-since="${last.announcedAt}"><span>--</span><i>${T.units[0]}</i><span>--</span><i>${T.units[1]}</i><span>--</span><i>${T.units[2]}</i></div>
-  <div class="last">${T.last}：${timeEl(T, last.announcedAt, "full")} · <span class="tzname">${T.tzFallback}</span></div>
+  <div class="last">${T.last}：${timeEl(T, last.announcedAt, "full")} · <span class="tzname">${T.tzFallback}</span></div>${teaserLine}
   <div class="foot"><span>${T.next}</span><a href="${esc(last.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a></div>
 </section>`;
 }
 function recentPanel(T, n = 4) {
   return `<section class="panel" aria-label="${T.recent}"><div class="ph">${SVG_CLOCK}${T.recent}<a class="more" href="${href(T, "/timeline")}">${T.viewAll}</a></div>
-<div class="rows">${events.slice(0, n).map((e) => `<a class="row" href="${href(T, "/timeline")}#e${e.id}"><span class="d">${timeEl(T, e.announcedAt, "date")}</span><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${badge(T, e)}</span></a>`).join("")}</div></section>`;
+<div class="rows">${events.filter(REAL).slice(0, n).map((e) => `<a class="row" href="${href(T, "/timeline")}#e${e.id}"><span class="d">${timeEl(T, e.announcedAt, "date")}</span><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${badge(T, e)}</span></a>`).join("")}</div></section>`;
 }
 function faqPanel(T) {
   return `<section class="panel" aria-label="${T.faq}"><div class="ph">${SVG_Q}${T.faq}<a class="more" href="${href(T, "/faq")}">${T.all}</a></div>
@@ -178,7 +187,7 @@ function timeline(T, list, { filters = false, initial = 30 } = {}) {
   <div class="d"><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${timeEl(T, e.announcedAt, "full")}</span>${badge(T, e)}</div>
   <div class="t">${esc(T.summary(e))}</div>
   <div class="s">${T.scopeLbl}：${esc(T.scope(e))}${T.detail(e) ? " · " + esc(T.detail(e)) : ""} · ${esc(e.account)} · <a href="${esc(e.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a>${(e.extraLinks || []).map((u, k) => ` <a href="${esc(u)}" target="_blank" rel="noopener">${T.source.replace(" ↗", "")} ${k + 2} ↗</a>`).join("")}</div>
-  <details><summary>${T.original}</summary><blockquote>${esc(e.textEn)}</blockquote></details>
+  <details><summary>${T.tweetCard}</summary>${tweetCard(T, e)}</details>
 </li>`).join("\n");
   const f = filters ? `<div class="filters"><button class="on" data-f="all">${T.filters[0]}</button><button data-f="codex">${T.filters[1]}</button><button data-f="claude">${T.filters[2]}</button></div>` : "";
   const more = list.length > initial ? `<button class="more-btn">${T.moreBtn(list.length - initial)}</button>` : "";
@@ -238,7 +247,7 @@ for (const T of [L.zh, L.en]) {
   const file = (rel) => (dir ? dir + "/" : "") + rel;
   const hero = `<section class="hero">
   <div><h2>${T.hero1}<br><span class="b">${T.hero2}</span></h2><p class="sub">${esc(T.tagline)}</p></div>
-  <div class="art ${T.code === "zh" ? "" : "plain"}"><span class="bolt" aria-hidden="true"></span><picture>${T.code === "zh" ? `<source media="(min-width:769px)" srcset="/assets/radar-mascot-sign.png">` : ""}<img src="/assets/radar-mascot.png" alt="${esc(T.mascotAlt)}" width="1168" height="791"></picture>${T.code === "zh" ? "" : `<span class="sticker" aria-hidden="true">${T.sticker}</span>`}</div>
+  <div class="art"><span class="bolt" aria-hidden="true"></span><picture><source media="(min-width:769px)" srcset="${T.code === "zh" ? "/assets/radar-mascot-sign.png" : "/assets/radar-mascot-sign-en.png"}"><img src="/assets/radar-mascot.png" alt="${esc(T.mascotAlt)}" width="1168" height="791"></picture></div>
 </section>`;
   out(file("index.html"), page(T, { title: T.title, desc: T.desc, path: "/", active: "/",
     body: `${hero}<div class="quota-grid">${statusCard(T, "codex")}${statusCard(T, "claude")}</div><div class="info-grid">${recentPanel(T, 4)}${faqPanel(T)}</div>`,
@@ -274,7 +283,7 @@ ${events.slice(0, 50).map((e) => `<item><title>${esc(`[${PROVIDERS[e.provider].z
 
 // ───────── 机器可读（共用）─────────
 const base = site.url.replace(/\/$/, "");
-out("api/events.json", JSON.stringify({ site: site.name, url: site.url, updatedAt: updatedAt || BUILT, kinds: Object.fromEntries(Object.entries(KINDS).map(([k, v]) => [k, { zh: v.zh, en: L.en.kinds[k] }])),
+out("api/events.json", JSON.stringify({ site: site.name, url: site.url, updatedAt: updatedAt || BUILT, kinds: Object.fromEntries(Object.entries(KINDS).map(([k, v]) => [k, { zh: v.zh, en: L.en.kinds[k] || k }])),
   events: events.map(({ textEn, ...e }) => ({ ...e, en: enSummary({ ...e, textEn }), scopeEn: scopeEn(e.scope) })) }, null, 1));
 const urls = [];
 for (const T of [L.zh, L.en]) for (const u of ["/", "/timeline", "/codex", "/claude", "/faq", ...FAQ[T.code].map((f) => `/q/${f.slug}`)]) urls.push(href(T, u));

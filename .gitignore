@@ -4,3 +4,5 @@ node_modules/
 data/fetch-log.jsonl
 .DS_Store
 .vercel
+data/sentinel.log
+data/sentinel-launchd.log

@@ -1,0 +1,25 @@
+{
+ "thsottiaux": {
+  "name": "Tibo",
+  "handle": "thsottiaux",
+  "avatar": "/assets/avatars/thsottiaux.jpg",
+  "verified": true
+ },
+ "OpenAIDevs": {
+  "name": "OpenAIDevs",
+  "handle": "OpenAIDevs",
+  "avatar": ""
+ },
+ "ClaudeDevs": {
+  "name": "ClaudeDevs",
+  "handle": "ClaudeDevs",
+  "avatar": "/assets/avatars/ClaudeDevs.jpg",
+  "verified": true
+ },
+ "lydiahallie": {
+  "name": "Lydia Hallie ✨",
+  "handle": "lydiahallie",
+  "avatar": "/assets/avatars/lydiahallie.jpg",
+  "verified": true
+ }
+}

@@ -11,6 +11,8 @@
 - 前期调研：`~/Documents/2026年9月23日－Codex重置网站研究项目工程/`
 
 ## 开发命令
+- **哨兵（第二刀主链路）**：`node scripts/sentinel.mjs [--tikhub] [--dry] [--no-deploy] [--no-feishu]`：两参考站接口→（可选 TikHub）→fxtwitter 核原帖→能分类的自动上线并 build+vercel --prod→飞书。分类规则在文件头注释，77 条回测 73 对 3 待办 1 混合。自动上线的条目 confidence=auto，页面标「待整理」，随后 `review.mjs edit <id> --zh "..." --scope "..."` 补中文，edit 会自动把 auto 改成 high 并去掉「待整理」标，然后 `node scripts/build.mjs && vercel --prod`。
+- 定时：`ops/com.xiaoyuan.quota-radar.sentinel.plist`（10 分钟一次，整点那次带 --tikhub），装法见 ops/README.md
 - 抓新线索：`node scripts/fetch.mjs`（TikHub 计费约 $0.01/账号；`--no-feishu` 不推飞书；`--dry` 不写盘）
 - 人工确认：`node scripts/review.mjs list` / `approve <id> --kind reset --zh "..."` / `reject <id>`
 - 构建：`node scripts/build.mjs`
@@ -26,7 +28,8 @@
 
 ## 架构约束
 - 只收录官方账号原帖（`data/watch.json`），每条事件必须有 sourceUrl、scope、verifiedAt；未核实不进 events.json
-- 事件分类只有三种：reset（全员重置）／banked（重置卡）／boost（提额省额）
+- 事件分类四种：reset（全员重置）／banked（重置卡）／boost（提额）／teaser（预告，只人工收录，不进卡片计数，卡片下方显示一行）
+- 原帖卡片数据在 `data/authors.json`，头像存 `site/assets/avatars/`（X 图片域名国内打不开）
 - 页面上不出现「预测概率」「下次重置时间」，只写「官方尚未公布」
 - TikHub 密钥在钥匙串 `TikHub-API`；ADMIN_TOKEN 读主仓 `.env.local`
 - 中文一句话在 approve 时人工写。`--draft` 走自建智能体 /api/chat 实测 25 秒起步且带命理 RAG 引用，不适合，默认不用

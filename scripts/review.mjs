@@ -55,6 +55,7 @@ if (!cmd || cmd === "list") {
   const e = ef.events.find((x) => x.id === id);
   if (!e) throw new Error("events 里没有 " + id);
   for (const k of ["zh", "detail", "scope", "kind", "provider", "confidence"]) if (opt[k]) e[k] = opt[k];
+  if (e.confidence === "auto" && opt.zh) { e.confidence = "high"; e.verifiedBy = "人工核实 + 原帖"; }   // 补了中文即视为人工核过
   e.verifiedAt = today; ef.updatedAt = new Date().toISOString();
   writeJson("events.json", ef);
   console.log("已更新 " + id);
