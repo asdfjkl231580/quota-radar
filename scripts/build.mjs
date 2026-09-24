@@ -234,6 +234,7 @@ function page(T, { title, desc, path: p, active, body, jsonld }) {
 <link rel="alternate" hreflang="x-default" href="${esc(base + (T.code === "zh" ? href(T, p) : (T.other.base + p).replace(/\/$/, "") || "/"))}">
 <link rel="alternate" type="application/rss+xml" title="${esc(T.name)}" href="${T.code === "zh" ? "/rss.xml" : "/en/rss.xml"}">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(url)}"><meta property="og:type" content="website"><meta property="og:image" content="${esc(base)}/assets/share.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${esc(base)}/assets/share.jpg"><meta itemprop="image" content="${esc(base)}/assets/share.jpg"><meta itemprop="name" content="${esc(title)}"><meta itemprop="description" content="${esc(desc)}">
+${site.verify && site.verify.baidu ? `<meta name="baidu-site-verification" content="${esc(site.verify.baidu)}">` : ""}
 <meta name="theme-color" content="#FFEA00">
 <link rel="icon" href="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#FFEA00"/><circle cx="16" cy="16" r="7" fill="#1467F5"/><circle cx="16" cy="16" r="2.5" fill="#fff"/></svg>')}">
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
@@ -312,6 +313,8 @@ out("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${base}/sitemap.xml\n`);
 out("404.html", page(L.zh, { title: `页面不存在 | ${site.name}`, desc: "页面不存在", path: "/404", active: "",
   body: `<article class="q" style="margin-top:12px"><h1>这一页不存在</h1><p>可能链接打错了，或者这条记录已合并。</p><p><a href="/">回首页</a> · <a href="/timeline">全部记录</a> · <a href="/en">English</a></p></article>` }));
 for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^[0-9a-f]{32}\.txt$/.test(f)) out(f, fs.readFileSync(path.join(ROOT, "site", f), "utf8"));
+// 百度站长验证文件原样进根目录（vercel.json 已关 cleanUrls，.html→308 的规则放过 baidu_verify_）
+for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^baidu_verify_.*\.html$/.test(f)) out(f, fs.readFileSync(path.join(ROOT, "site", f), "utf8"));
 if (fs.existsSync(path.join(ROOT, "site/assets"))) fs.cpSync(path.join(ROOT, "site/assets"), path.join(DIST, "assets"), { recursive: true });
 
 console.log(`构建完成：${events.length} 条事件，${urls.length} 个页面（中英）→ dist/`);

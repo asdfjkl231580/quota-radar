@@ -1,7 +1,6 @@
 {
   "buildCommand": "node scripts/build.mjs",
   "outputDirectory": "dist",
-  "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
     {
@@ -20,7 +19,7 @@
   ],
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/:path((?!baidu_verify_).*)",
       "has": [
         {
           "type": "host",
@@ -29,6 +28,26 @@
       ],
       "destination": "https://airesetclock.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/:path((?!baidu_verify_).*)\\.html",
+      "destination": "/:path",
+      "permanent": true
+    },
+    {
+      "source": "/:path*/index",
+      "destination": "/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/:path*.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/:path*/index.html"
     }
   ]
 }
