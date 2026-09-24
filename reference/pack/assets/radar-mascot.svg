@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="360" viewBox="0 0 520 360">
+<defs>
+  <style>
+    .ink{stroke:#111;stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+  </style>
+</defs>
+<g fill="none">
+  <!-- dish -->
+  <path d="M295 42 C392 14 458 74 451 152 C448 190 423 219 387 230 C318 251 250 199 255 128 C258 86 271 60 295 42Z" fill="#1467F5" class="ink"/>
+  <path d="M275 94 C326 128 376 150 435 166" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  <path d="M319 53 C309 107 298 159 275 208" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  <path d="M399 40 l21 -25 M447 67 l32 -6 M453 120 l30 14" class="ink"/>
+  <path d="M432 184 l26 8 -16 24" fill="#FFEA00" class="ink"/>
+  <!-- body -->
+  <ellipse cx="250" cy="210" rx="110" ry="88" fill="#fff" class="ink"/>
+  <circle cx="216" cy="196" r="10" fill="#111"/>
+  <circle cx="282" cy="196" r="10" fill="#111"/>
+  <path d="M224 233 Q249 252 276 232" class="ink"/>
+  <!-- megaphone -->
+  <path d="M128 188 L78 158 L49 170 L49 214 L78 226 L128 198 Z" fill="#FFEA00" class="ink"/>
+  <ellipse cx="129" cy="193" rx="31" ry="48" fill="#1467F5" class="ink"/>
+  <ellipse cx="129" cy="193" rx="16" ry="30" fill="#111"/>
+  <path d="M80 227 l20 54" class="ink"/>
+  <!-- arms/legs -->
+  <path d="M166 244 Q128 256 107 236" class="ink"/>
+  <path d="M333 247 Q359 261 377 252" class="ink"/>
+  <path d="M211 287 l-12 46 M280 287 l15 46" class="ink"/>
+  <!-- yellow rays -->
+  <path d="M465 224 l24 -20 M474 247 l31 -1" stroke="#FFEA00" stroke-width="12" stroke-linecap="round"/>
+</g>
+</svg>

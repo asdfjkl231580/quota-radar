@@ -1,0 +1,43 @@
+{
+  "colors": {
+    "blue": "#1467F5",
+    "blueDark": "#0D52D9",
+    "yellow": "#FFEA00",
+    "yellow2": "#FFF200",
+    "black": "#111111",
+    "white": "#FFFFFF",
+    "panel": "#F7F8FA",
+    "border": "#E7E7E7",
+    "muted": "#727272"
+  },
+  "desktop": {
+    "canvas": [
+      1440,
+      900
+    ],
+    "contentWidth": 1200,
+    "sidePadding": 32,
+    "headerHeight": 72,
+    "heroHeight": 250,
+    "cardRadius": 20,
+    "gap": 20
+  },
+  "mobile": {
+    "canvas": [
+      390,
+      844
+    ],
+    "sidePadding": 16,
+    "headerHeight": 58,
+    "cardRadius": 18,
+    "gap": 14
+  },
+  "typography": {
+    "cn": "Noto Sans SC / PingFang SC / Microsoft YaHei",
+    "latin": "Inter / Helvetica Neue / Arial",
+    "heroDesktop": 64,
+    "heroMobile": 34,
+    "quotaDesktop": 68,
+    "quotaMobile": 42
+  }
+}

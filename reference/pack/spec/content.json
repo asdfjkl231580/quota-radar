@@ -1,0 +1,72 @@
+{
+  "site": {
+    "name": "额度雷达",
+    "subtitle": "Codex、Claude 什么时候送额度，一眼看清",
+    "heroTitleLine1": "AI 额度动态",
+    "heroTitleLine2": "一眼看清",
+    "heroNote": "好消息，马上通知！",
+    "footer": "只收录官方消息 · 不预测下次"
+  },
+  "navigation": [
+    "首页",
+    "Codex",
+    "Claude",
+    "常见问题"
+  ],
+  "statusCards": [
+    {
+      "id": "codex",
+      "name": "Codex",
+      "eventType": "重置卡",
+      "elapsed": {
+        "days": 1,
+        "hours": 12,
+        "minutes": 36
+      },
+      "elapsedLabel": "距上次送额度已过去",
+      "next": "尚未公布",
+      "sourceLabel": "原帖 ↗"
+    },
+    {
+      "id": "claude",
+      "name": "Claude",
+      "eventType": "提额省额",
+      "elapsed": {
+        "days": 1,
+        "hours": 5,
+        "minutes": 49
+      },
+      "elapsedLabel": "距上次送额度已过去",
+      "next": "尚未公布",
+      "sourceLabel": "原帖 ↗"
+    }
+  ],
+  "recentEvents": [
+    [
+      "9月24日",
+      "Claude",
+      "提额省额"
+    ],
+    [
+      "9月23日",
+      "Codex",
+      "重置卡"
+    ],
+    [
+      "9月23日",
+      "Claude",
+      "重置卡"
+    ],
+    [
+      "9月12日",
+      "Codex",
+      "全员重置"
+    ]
+  ],
+  "faq": [
+    "额度消息来源可靠吗？",
+    "一般多久会再送额度？",
+    "所有人都会收到吗？",
+    "如何查看自己是否有额度？"
+  ]
+}

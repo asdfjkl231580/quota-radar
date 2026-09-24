@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+<defs>
+<style>
+  .cn{font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",Arial,sans-serif}
+  .bold{font-weight:800}.heavy{font-weight:900}.muted{fill:#727272}
+</style>
+</defs>
+<rect width="1440" height="900" fill="#fff"/>
+<!-- header -->
+<text x="120" y="52" class="cn heavy" font-size="28" fill="#111">额度雷达</text>
+<text x="120" y="73" class="cn" font-size="14" fill="#727272">Codex、Claude 什么时候送额度，一眼看清</text>
+<rect x="840" y="24" width="82" height="36" rx="10" fill="#1467F5"/>
+<text x="881" y="48" text-anchor="middle" class="cn bold" font-size="15" fill="#fff">首页</text>
+<text x="963" y="48" class="cn bold" font-size="15" fill="#111">Codex</text>
+<text x="1055" y="48" class="cn bold" font-size="15" fill="#111">Claude</text>
+<text x="1151" y="48" class="cn bold" font-size="15" fill="#111">常见问题</text>
+<line x1="120" y1="92" x2="1320" y2="92" stroke="#EFEFEF"/>
+<!-- hero -->
+<text x="120" y="185" class="cn heavy" font-size="66" fill="#111">AI 额度动态</text>
+<text x="120" y="258" class="cn heavy" font-size="66" fill="#1467F5">一眼看清</text>
+<path d="M122 279 C235 293 360 271 500 279" stroke="#FFEA00" stroke-width="11" stroke-linecap="round"/>
+<text x="122" y="314" class="cn" font-size="17" fill="#111">Codex、Claude 什么时候送额度，一眼看清</text>
+<g transform="translate(890,105) scale(.72)">
+  <path d="M295 42 C392 14 458 74 451 152 C448 190 423 219 387 230 C318 251 250 199 255 128 C258 86 271 60 295 42Z" fill="#1467F5" stroke="#111" stroke-width="12"/>
+  <path d="M275 94 C326 128 376 150 435 166" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  <path d="M319 53 C309 107 298 159 275 208" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="250" cy="210" rx="110" ry="88" fill="#fff" stroke="#111" stroke-width="12"/>
+  <circle cx="216" cy="196" r="10" fill="#111"/><circle cx="282" cy="196" r="10" fill="#111"/>
+  <path d="M224 233 Q249 252 276 232" fill="none" stroke="#111" stroke-width="12" stroke-linecap="round"/>
+  <path d="M128 188 L78 158 L49 170 L49 214 L78 226 L128 198 Z" fill="#FFEA00" stroke="#111" stroke-width="12"/>
+  <ellipse cx="129" cy="193" rx="31" ry="48" fill="#1467F5" stroke="#111" stroke-width="12"/>
+</g>
+<text x="1145" y="245" class="cn bold" font-size="20" fill="#111">好消息</text>
+<text x="1145" y="274" class="cn bold" font-size="20" fill="#111">马上通知！</text>
+<!-- cards -->
+<rect x="120" y="350" width="580" height="230" rx="22" fill="#1467F5"/>
+<rect x="740" y="350" width="580" height="230" rx="22" fill="#FFEA00"/>
+<text x="170" y="400" class="cn heavy" font-size="31" fill="#fff">Codex</text>
+<rect x="307" y="370" width="92" height="34" rx="10" fill="#fff"/>
+<text x="353" y="393" text-anchor="middle" class="cn bold" font-size="16" fill="#1467F5">重置卡</text>
+<text x="170" y="432" class="cn" font-size="15" fill="#fff">距上次送额度已过去</text>
+<text x="170" y="510" class="cn heavy" font-size="74" fill="#fff">01</text>
+<text x="260" y="510" class="cn bold" font-size="26" fill="#fff">天</text>
+<text x="320" y="510" class="cn heavy" font-size="74" fill="#fff">12</text>
+<text x="410" y="510" class="cn bold" font-size="26" fill="#fff">时</text>
+<text x="470" y="510" class="cn heavy" font-size="74" fill="#fff">36</text>
+<text x="560" y="510" class="cn bold" font-size="26" fill="#fff">分</text>
+<line x1="160" y1="532" x2="660" y2="532" stroke="#fff" stroke-opacity=".35"/>
+<text x="170" y="558" class="cn" font-size="16" fill="#fff">官方下次：尚未公布</text>
+<text x="610" y="558" class="cn bold" font-size="16" fill="#fff">原帖 ↗</text>
+
+<text x="790" y="400" class="cn heavy" font-size="31" fill="#111">Claude</text>
+<rect x="930" y="370" width="118" height="34" rx="10" fill="#111"/>
+<text x="989" y="393" text-anchor="middle" class="cn bold" font-size="16" fill="#FFEA00">提额省额</text>
+<text x="790" y="432" class="cn" font-size="15" fill="#111">距上次送额度已过去</text>
+<text x="790" y="510" class="cn heavy" font-size="74" fill="#111">01</text>
+<text x="880" y="510" class="cn bold" font-size="26" fill="#111">天</text>
+<text x="940" y="510" class="cn heavy" font-size="74" fill="#111">05</text>
+<text x="1030" y="510" class="cn bold" font-size="26" fill="#111">时</text>
+<text x="1090" y="510" class="cn heavy" font-size="74" fill="#111">49</text>
+<text x="1180" y="510" class="cn bold" font-size="26" fill="#111">分</text>
+<line x1="780" y1="532" x2="1280" y2="532" stroke="#111" stroke-opacity=".16"/>
+<text x="790" y="558" class="cn" font-size="16" fill="#111">官方下次：尚未公布</text>
+<text x="1230" y="558" class="cn bold" font-size="16" fill="#111">原帖 ↗</text>
+<!-- bottom modules -->
+<rect x="120" y="610" width="580" height="215" rx="20" fill="#F7F8FA" stroke="#E7E7E7"/>
+<rect x="740" y="610" width="580" height="215" rx="20" fill="#F7F8FA" stroke="#E7E7E7"/>
+<text x="160" y="650" class="cn heavy" font-size="24" fill="#111">最近记录</text>
+<text x="620" y="650" class="cn" font-size="14" fill="#727272">查看全部 →</text>
+<g class="cn" font-size="17" fill="#111">
+<text x="160" y="692">9月24日</text><text x="300" y="692">Claude</text><text x="500" y="692">提额省额</text>
+<text x="160" y="733">9月23日</text><text x="300" y="733">Codex</text><text x="500" y="733">重置卡</text>
+<text x="160" y="774">9月23日</text><text x="300" y="774">Claude</text><text x="500" y="774">重置卡</text>
+<text x="160" y="815">9月12日</text><text x="300" y="815">Codex</text><text x="500" y="815">全员重置</text>
+</g>
+<text x="780" y="650" class="cn heavy" font-size="24" fill="#111">常见问题</text>
+<g class="cn" font-size="17" fill="#111">
+<text x="780" y="692">额度消息来源可靠吗？</text><text x="1260" y="692">›</text>
+<text x="780" y="733">一般多久会再送额度？</text><text x="1260" y="733">›</text>
+<text x="780" y="774">所有人都会收到吗？</text><text x="1260" y="774">›</text>
+<text x="780" y="815">如何查看自己是否有额度？</text><text x="1260" y="815">›</text>
+</g>
+<text x="720" y="872" text-anchor="middle" class="cn" font-size="14" fill="#727272">只收录官方消息 · 不预测下次</text>
+</svg>
