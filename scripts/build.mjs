@@ -32,7 +32,7 @@ const L = {
   zh: {
     code: "zh", locale: "zh-CN", base: "", other: { code: "en", label: "EN", base: "/en" },
     name: site.name, tagline: site.tagline,
-    title: `${site.name} - Codex、Claude 官方额度动态`, desc: "整理 Codex 与 Claude 官方额度重置、重置卡和提额消息，中文快速查看官方额度动态。",
+    title: `Codex 什么时候重置？Claude 额度什么时候恢复？| ${site.name}`, desc: "官方每一次送额度、全员重置、重置卡的中文实时记录，附原帖与适用套餐。Codex、Claude 什么时候送额度，一眼看清。不预测。",
     nav: [["/", "首页"], ["/codex", "Codex"], ["/claude", "Claude"], ["/faq", "常见问题"]],
     hero1: "AI 额度动态", hero2: "一眼看清", sticker: "好消息<br>马上通知！", mascotAlt: "额度雷达吉祥物：拿着喇叭的雷达小人",
     since: "距上次送额度已过去", next: "官方下次：尚未公布", source: "原帖 ↗", last: "上次", units: ["天", "时", "分"],
@@ -52,7 +52,7 @@ const L = {
   en: {
     code: "en", locale: "en-US", base: "/en", other: { code: "zh", label: "中文", base: "" },
     name: "Quota Radar", tagline: "When Codex and Claude grant quota, at a glance",
-    title: "Quota Radar - Official Codex & Claude quota resets", desc: "Every official Codex and Claude quota reset, banked reset and quota boost, verified against the original posts on X. No predictions.",
+    title: "When does Codex reset? Claude quota reset tracker | Quota Radar", desc: "Every official Codex and Claude quota reset, banked reset and quota boost, verified against the original posts on X. No predictions.",
     nav: [["/", "Home"], ["/codex", "Codex"], ["/claude", "Claude"], ["/faq", "FAQ"]],
     hero1: "AI Quota Updates", hero2: "at a Glance", sticker: "Good news,<br>instantly!", mascotAlt: "Quota Radar mascot: a radar character holding a megaphone",
     since: "Since the last quota grant", next: "Next: not announced", source: "Source ↗", last: "Last", units: ["d", "h", "m"],
