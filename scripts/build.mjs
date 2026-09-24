@@ -238,7 +238,7 @@ for (const T of [L.zh, L.en]) {
   const file = (rel) => (dir ? dir + "/" : "") + rel;
   const hero = `<section class="hero">
   <div><h2>${T.hero1}<br><span class="b">${T.hero2}</span></h2><p class="sub">${esc(T.tagline)}</p></div>
-  <div class="art"><span class="bolt" aria-hidden="true"></span><img src="/assets/radar-mascot.png" alt="${esc(T.mascotAlt)}" width="520" height="360"><span class="sticker" aria-hidden="true">${T.sticker}</span></div>
+  <div class="art ${T.code === "zh" ? "" : "plain"}"><span class="bolt" aria-hidden="true"></span><picture>${T.code === "zh" ? `<source media="(min-width:769px)" srcset="/assets/radar-mascot-sign.png">` : ""}<img src="/assets/radar-mascot.png" alt="${esc(T.mascotAlt)}" width="1168" height="791"></picture>${T.code === "zh" ? "" : `<span class="sticker" aria-hidden="true">${T.sticker}</span>`}</div>
 </section>`;
   out(file("index.html"), page(T, { title: T.title, desc: T.desc, path: "/", active: "/",
     body: `${hero}<div class="quota-grid">${statusCard(T, "codex")}${statusCard(T, "claude")}</div><div class="info-grid">${recentPanel(T, 4)}${faqPanel(T)}</div>`,
