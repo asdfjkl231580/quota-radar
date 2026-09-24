@@ -1,0 +1,13 @@
+{
+  "name": "额度雷达",
+  "tagline": "Codex、Claude 什么时候送额度，中文一眼看清",
+  "url": "https://quota-radar.vercel.app",
+  "follow": {
+    "enabled": false,
+    "title": "新模型发布、官方送额度，第一时间通知你",
+    "desc": "关注后不用天天刷 X。",
+    "imagePath": "",
+    "link": "",
+    "linkText": ""
+  }
+}

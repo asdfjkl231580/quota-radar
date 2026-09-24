@@ -1,0 +1,6 @@
+dist/
+node_modules/
+.vercel/
+data/fetch-log.jsonl
+.DS_Store
+.vercel

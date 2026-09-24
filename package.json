@@ -1,0 +1,12 @@
+{
+  "name": "quota-radar",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch": "node scripts/fetch.mjs",
+    "review": "node scripts/review.mjs",
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "deploy": "node scripts/build.mjs && vercel --prod"
+  }
+}
