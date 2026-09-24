@@ -4,7 +4,9 @@
 - 名称：额度雷达（Codex / Claude 送额度时间线）
 - 目标：纯引流中文网页，转播官方在 X 上的送额度／重置／提额公告
 - 技术栈：零依赖 Node（>=18）静态生成，Vercel 静态部署
-- 关键路径：`data/events.json`（唯一真源）→ `scripts/build.mjs` → `dist/`
+- 关键路径：`data/events.json`（唯一真源）→ `scripts/build.mjs`（中文根路径 + `/en` 英文，文案字典 L、FAQ 两语言都在里面）→ `dist/`；样式 `site/styles.css`
+- 时区：所有时间用 `<time data-ts data-mode>` 输出，前端按选的时区（localStorage `qr_tz`，中文默认北京、英文默认本地）用 Intl 重排；服务端兜底中文北京、英文 UTC
+- 英文摘要：事件无 `en` 字段时自动取原帖前 150 字；要写好的英文一句话就在 events.json 加 `en`
 - 一页纸：`docs/plans/2026-09-24-一页纸-额度雷达.md`
 - 前期调研：`~/Documents/2026年9月23日－Codex重置网站研究项目工程/`
 
