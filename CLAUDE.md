@@ -18,7 +18,7 @@
 ## 视觉真源（2026-09-24 晚拍板）
 - 唯一视觉依据：`reference/full-reference.png`（GPT 出的交付规范板）+ 切出的 `desktop-reference.png` / `mobile-reference.png`；用户的文字规范在 `docs/design/UI交付规范V1.0.md`。高还原，不二次设计。
 - Design tokens 在 build.mjs 的 :root：蓝 #1467F5、黄 #FFEA00、黑 #111111、辅助字 #727272、面板 #F7F8FA、边框 #E7E7E7。
-- 英雄区标题/站名/贴纸用站酷高端黑子集 `site/assets/hero-font.woff2`（约 5KB，只含那十几个字；改字要重新子集：`python3 -m fontTools.subset ~/Library/Fonts/站酷高端黑修订151105.ttf --text="..." --output-file=site/assets/hero-font.woff2 --flavor=woff2`）。
+- 英雄区标题/站名/贴纸用「演示斜黑体」子集 `site/assets/hero-font.woff2`（4.5KB），卡片名与天时分数字用「阿里妈妈数黑体」子集 `num-font.woff2`（2KB）；两款均免费商用。改字要重新子集：`python3 -m fontTools.subset ~/Library/Fonts/演示斜黑体.otf --text="..." --output-file=site/assets/hero-font.woff2 --flavor=woff2`）。
 - 首页状态卡只放：名字、标签、「距上次送额度已过去」、天时分、「官方下次：尚未公布」、原帖。中文一句话不上首页，进 /timeline。
 - 验收截图：`docs/design/screenshots/home-<w>x<h>.png`，五个尺寸 1440/1280/390/375/430。
 

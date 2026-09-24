@@ -60,6 +60,7 @@ const FAQ = [
 // ───────── 样式：波普风零件字典 ─────────
 const CSS = `
 @font-face{font-family:"HeroCN";src:url(/assets/hero-font.woff2) format("woff2");font-weight:900;font-display:swap}
+@font-face{font-family:"NumCN";src:url(/assets/num-font.woff2) format("woff2");font-weight:900;font-display:swap}
 :root{--black:#111111;--white:#FFFFFF;--blue:#1467F5;--blue-dark:#0D52D9;--blue-light:#E3EDFF;--yellow:#FFEA00;--yellow-highlight:#FFF200;--red-orange:#FF543D;
 --text:#111111;--text-2:#727272;--text-3:#999999;--panel:#F7F8FA;--border:#E7E7E7;--page-bg:#FFFFFF;
 --fs-hero:60px;--fs-num:64px;--fs-name:26px;--fs-h3:20px;--fs-nav:15px;--fs-body:15px;--fs-aux:13px;
@@ -71,7 +72,7 @@ a{color:inherit}code{font:.92em ui-monospace,Menlo,monospace;background:var(--pa
 .page{width:min(1200px,calc(100% - 64px));margin:0 auto;min-width:0}
 /* Header */
 header.top{height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.brand{min-width:0}.brand h1{margin:0;font:900 26px/1.15 "HeroCN",var(--cn)}.brand h1 a{text-decoration:none}
+.brand{min-width:0}.brand h1{margin:0;font:900 26px/1.15 "HeroCN",var(--cn);letter-spacing:-.01em}.brand h1 a{text-decoration:none}
 .brand .tag{display:block;color:var(--text-2);font-size:var(--fs-aux);margin-top:2px}
 nav.main{display:flex;align-items:center;gap:6px;font-size:var(--fs-nav);font-weight:600}
 nav.main a{text-decoration:none;height:36px;display:inline-flex;align-items:center;padding:0 22px;border-radius:var(--r-btn);white-space:nowrap;color:var(--black)}
@@ -80,7 +81,7 @@ nav.main a.on{background:var(--blue);color:var(--white)}
 .burger svg{width:26px;height:26px}
 /* Hero */
 .hero{position:relative;display:grid;grid-template-columns:1fr 400px;align-items:center;gap:24px;min-height:290px;padding:8px 0 8px;overflow:visible}
-.hero h2{margin:0;font:900 var(--fs-hero)/1 "HeroCN",var(--cn);letter-spacing:.02em;transform:skewX(-6deg);transform-origin:left bottom}
+.hero h2{margin:0;font:900 var(--fs-hero)/1.02 "HeroCN",var(--cn);letter-spacing:-.01em}
 .hero h2 .b{color:var(--blue);position:relative;display:inline-block;padding:0 6px 0 0;z-index:0}
 .hero h2 .b::after{content:"";position:absolute;left:-2px;right:6px;bottom:-4px;height:.28em;background:var(--yellow);z-index:-1;transform:skew(-14deg) rotate(-1.5deg);border-radius:3px}
 .hero .sub{margin:22px 0 0;color:var(--text);font-size:15px}
@@ -96,10 +97,10 @@ nav.main a.on{background:var(--blue);color:var(--white)}
 .card .logo{width:48px;height:48px;border-radius:50%;background:var(--white);color:var(--blue);display:grid;place-items:center;flex:none}
 .card .logo svg{width:30px;height:30px}
 .card.claude .logo{background:var(--black);color:var(--yellow)}
-.card .name{font:800 var(--fs-name)/1.1 var(--en)}
+.card .name{font:900 var(--fs-name)/1.1 "NumCN",var(--en)}
 .card .lbl{font-size:15px;font-weight:600;margin-top:12px;opacity:.95}
-.card .counter{font:900 var(--fs-num)/1 var(--en);letter-spacing:-.02em;display:flex;align-items:baseline;flex-wrap:nowrap;gap:0 4px;font-variant-numeric:tabular-nums;margin-top:8px;white-space:nowrap}
-.card .counter i{font:800 calc(var(--fs-num)*.4)/1 var(--cn);font-style:normal;margin:0 14px 0 2px}
+.card .counter{font:900 var(--fs-num)/1 "NumCN",var(--en);letter-spacing:-.01em;display:flex;align-items:baseline;flex-wrap:nowrap;gap:0 4px;font-variant-numeric:tabular-nums;margin-top:8px;white-space:nowrap}
+.card .counter i{font:900 calc(var(--fs-num)*.4)/1 "NumCN",var(--cn);font-style:normal;margin:0 14px 0 2px}
 .card .counter i:last-child{margin-right:0}
 .card .foot{display:flex;justify-content:space-between;gap:8px;margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.4);font-size:14px;font-weight:700}
 .card.claude .foot{border-top-color:rgba(0,0,0,.2)}
@@ -163,7 +164,7 @@ footer a{color:var(--text-2)}
   nav.main.open{display:flex}nav.main a{height:44px}
   .burger{display:inline-grid;place-items:center}
   body{position:relative}
-  :root{--fs-hero:36px;--fs-num:40px;--fs-name:22px}
+  :root{--fs-hero:38px;--fs-num:42px;--fs-name:22px}
   .hero{grid-template-columns:1fr auto;gap:8px;min-height:0;padding:6px 0 4px}
   .hero h2{line-height:1.05}.hero h2 .b::after{height:.26em;bottom:-2px}
   .hero .sub{display:none}
