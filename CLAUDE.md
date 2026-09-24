@@ -20,7 +20,7 @@
 - 事件分类只有三种：reset（全员重置）／banked（重置卡）／boost（提额省额）
 - 页面上不出现「预测概率」「下次重置时间」，只写「官方尚未公布」
 - TikHub 密钥在钥匙串 `TikHub-API`；ADMIN_TOKEN 读主仓 `.env.local`
-- 中文摘要若用 AI 起草，只走自建智能体 yuaneightlife.com/api/chat（`--draft`），人工必改后才发布
+- 中文一句话在 approve 时人工写。`--draft` 走自建智能体 /api/chat 实测 25 秒起步且带命理 RAG 引用，不适合，默认不用
 
 ## 文档与记忆
 - 进度快照：`docs/progress.md`
@@ -28,5 +28,7 @@
 - 复盘记录：`docs/postmortem/`
 
 ## 已解决问题（持续补充）
+- 飞书通知必须用 Hermes profile `ops-watch-agent`（default 机器人不在群里，报 230002）。
+- 无头 Chrome `--window-size=390` 实际视口 500，验手机端要用 puppeteer setViewport。
 - 两个同类站「距上次重置」差 10 天：口径不同（一家把重置卡算进去）。本站分类展示，不合并。
 - didreset 的 summary 有时是站方改写不是原文，种子数据一律以 fxtwitter 返回的原帖为准。

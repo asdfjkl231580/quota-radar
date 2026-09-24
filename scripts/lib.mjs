@@ -75,7 +75,7 @@ export function sendFeishu(message) {
   const noProxy = [process.env.NO_PROXY, "open.feishu.cn", "msg-frontier.feishu.cn", ".feishu.cn"].filter(Boolean).join(",");
   const env = { ...process.env, NO_PROXY: noProxy, no_proxy: noProxy };
   for (const k of Object.keys(env)) if (/^(FEISHU_|LARK_)/.test(k) || ["HERMES_HOME", "HERMES_PROFILE"].includes(k)) delete env[k];
-  return execFileSync(HERMES_PY, ["-m", "hermes_cli.main", "--profile", process.env.HERMES_PROFILE || "default",
+  return execFileSync(HERMES_PY, ["-m", "hermes_cli.main", "--profile", process.env.XIAOYUAN_OPS_HERMES_PROFILE || "ops-watch-agent",
     "send", "--to", FEISHU_TARGET, "--json", "--file", "-"], { input: message, encoding: "utf8", timeout: 30000, env });
 }
 

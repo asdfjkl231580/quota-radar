@@ -1,6 +1,26 @@
 {
- "updatedAt": "2026-09-24T00:00:00Z",
+ "updatedAt": "2026-09-24T00:34:23.088Z",
  "events": [
+  {
+   "id": "2102871550974427462",
+   "provider": "claude",
+   "kind": "boost",
+   "announcedAt": "2026-09-23T21:23:41.000Z",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2102871550974427462",
+   "extraLinks": [
+    "https://x.com/ClaudeDevs/status/2102871554069774451",
+    "https://x.com/ClaudeDevs/status/2102871555244257518"
+   ],
+   "zh": "Claude Code 云端会话正式上线，现有订阅者一次性送试用额度：Pro 送 $100、Max 送 $250，10 月 7 日前领",
+   "detail": "额度独立于用量限额，只能用于云端会话；本地触顶可转云端继续。CLI 输入 /claim-credit 领取，需连接 GitHub。",
+   "scope": "Pro / Max 现有订阅者",
+   "textEn": "Cloud sessions are officially available and out of research preview! They let you keep Claude Code working, even when your laptop is closed.\n\nExisting subscribers get a one-time credit to try them: $100 on Pro, $250 on Max.",
+   "verified": true,
+   "verifiedBy": "人工核实 + 原帖",
+   "verifiedAt": "2026-09-24",
+   "confidence": "high"
+  },
   {
    "id": "2102463847714247142",
    "provider": "codex",
