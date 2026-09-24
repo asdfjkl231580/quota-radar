@@ -105,10 +105,11 @@ footer a{color:var(--text-2)}
   .burger{display:inline-grid;place-items:center}
   body{position:relative}
   :root{--fs-hero:38px;--fs-num:42px;--fs-name:22px}
-  .hero{grid-template-columns:1fr auto;gap:8px;min-height:0;padding:6px 0 4px}
+  .hero{grid-template-columns:minmax(0,1fr) auto;gap:6px;min-height:0;padding:6px 0 4px}
+  .hero h2{white-space:nowrap}
   .hero h2{line-height:1.05}.hero h2 .b::after{height:.26em;bottom:-2px}
   .hero .sub{display:none}
-  .hero .art,.hero .art.plain{width:210px;max-width:52%;padding-right:0;align-self:center;margin-top:-6px}
+  .hero .art,.hero .art.plain{width:180px;max-width:44%;padding-right:0;align-self:center;margin-top:-6px}
   .hero .sticker{display:none}.hero .bolt{display:none}
   .quota-grid{grid-template-columns:1fr;gap:14px;margin-top:8px}
   .card{min-height:150px;padding:18px 18px 14px}
