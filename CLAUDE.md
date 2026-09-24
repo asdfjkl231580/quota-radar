@@ -15,6 +15,13 @@
 - 本地预览：`node scripts/serve.mjs`（http://127.0.0.1:4537）
 - 部署：`vercel --prod`（在本目录执行，勿在别处 `--yes`）
 
+## 视觉真源（2026-09-24 晚拍板）
+- 唯一视觉依据：`reference/full-reference.png`（GPT 出的交付规范板）+ 切出的 `desktop-reference.png` / `mobile-reference.png`；用户的文字规范在 `docs/design/UI交付规范V1.0.md`。高还原，不二次设计。
+- Design tokens 在 build.mjs 的 :root：蓝 #1467F5、黄 #FFEA00、黑 #111111、辅助字 #727272、面板 #F7F8FA、边框 #E7E7E7。
+- 英雄区标题/站名/贴纸用站酷高端黑子集 `site/assets/hero-font.woff2`（约 5KB，只含那十几个字；改字要重新子集：`python3 -m fontTools.subset ~/Library/Fonts/站酷高端黑修订151105.ttf --text="..." --output-file=site/assets/hero-font.woff2 --flavor=woff2`）。
+- 首页状态卡只放：名字、标签、「距上次送额度已过去」、天时分、「官方下次：尚未公布」、原帖。中文一句话不上首页，进 /timeline。
+- 验收截图：`docs/design/screenshots/home-<w>x<h>.png`，五个尺寸 1440/1280/390/375/430。
+
 ## 架构约束
 - 只收录官方账号原帖（`data/watch.json`），每条事件必须有 sourceUrl、scope、verifiedAt；未核实不进 events.json
 - 事件分类只有三种：reset（全员重置）／banked（重置卡）／boost（提额省额）
