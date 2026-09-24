@@ -146,3 +146,5 @@ nav.main .lang{padding:0 12px;font-weight:700;color:var(--blue)}
 .tweet .ft{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:var(--text-2)}
 .tweet .ft a{font-weight:700;color:var(--blue);text-decoration:none}
 .tl summary{font-weight:600;color:var(--blue)}
+
+footer .fmeta{font-size:12px;color:var(--text-3)}footer .fmeta a{color:var(--text-3)}

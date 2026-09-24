@@ -37,7 +37,7 @@ const L = {
     hero1: "AI 额度动态", hero2: "一眼看清", sticker: "好消息<br>马上通知！", mascotAlt: "额度雷达吉祥物：拿着喇叭的雷达小人",
     since: "距上次送额度已过去", next: "官方下次：尚未公布", source: "原帖 ↗", last: "上次", units: ["天", "时", "分"],
     recent: "最近记录", viewAll: "查看全部 →", faq: "常见问题", all: "全部 →", openAlone: "单独打开 ↗",
-    footer: "只收录官方消息 · 不预测下次", menu: "菜单", tz: "时区",
+    footer: "只收录官方消息 · 不预测下次", menu: "菜单", tz: "时区", about: "关于", updated: "数据更新",
     kinds: { reset: "全员重置", banked: "重置卡", boost: "提额", teaser: "预告" }, lowBadge: "待补证", autoBadge: "待整理", teaserLbl: "预告", viewOnX: "在 X 上看 ↗", tweetCard: "原帖",
     tlTitle: "官方送额度记录", tlDesc: "Codex 与 Claude 官方每一次全员重置、重置卡、提额公告，附原帖与适用套餐。", items: "条", filters: ["全部", "Codex", "Claude"],
     scopeLbl: "适用", original: "英文原文", moreBtn: (n) => `展开更早的 ${n} 条`,
@@ -57,7 +57,7 @@ const L = {
     hero1: "AI Quota Updates", hero2: "at a Glance", sticker: "Good news,<br>instantly!", mascotAlt: "Quota Radar mascot: a radar character holding a megaphone",
     since: "Since the last quota grant", next: "Next: not announced", source: "Source ↗", last: "Last", units: ["d", "h", "m"],
     recent: "Recent", viewAll: "View all →", faq: "FAQ", all: "All →", openAlone: "Open ↗",
-    footer: "Official announcements only · No predictions", menu: "Menu", tz: "Time zone",
+    footer: "Official announcements only · No predictions", menu: "Menu", tz: "Time zone", about: "About", updated: "Updated",
     kinds: { reset: "Full reset", banked: "Banked reset", boost: "Quota boost", teaser: "Heads-up" }, lowBadge: "unconfirmed", autoBadge: "auto", teaserLbl: "Heads-up", viewOnX: "View on X ↗", tweetCard: "Source post",
     tlTitle: "Official quota grants", tlDesc: "Every official full reset, banked reset and quota boost for Codex and Claude, with source posts and eligible plans.", items: "events", filters: ["All", "Codex", "Claude"],
     scopeLbl: "Eligible", original: "Original post", moreBtn: (n) => `Show ${n} older`,
@@ -93,6 +93,22 @@ const FAQ = {
     { slug: "claude-edu-shenme-shihou-huifu", q: "When does Claude quota come back?", a: `<p>Claude subscriptions (including Claude Code) have two buckets: a rolling 5-hour session window and a weekly limit. The 5-hour window rolls from when you start; the weekly limit restores at your account's own weekly boundary.</p><p>Check yours with <code>/usage</code> in Claude Code or the usage page in claude.ai settings.</p><p>Anthropic occasionally resets both buckets for everyone, usually around model launches or incident fixes, announced by @ClaudeDevs on X. See the <a href="/en/claude">Claude page</a> for the full record.</p>` },
     { slug: "5-xiaoshi-chuang-he-zhou-edu", q: "5-hour window vs weekly limit?", a: `<p>Two independent buckets. The 5-hour window limits burst usage; the weekly limit caps the total. Hit either one and you wait.</p><p>Vendor "full resets" usually clear both: Claude posts say "5-hour and weekly", Codex posts say "100% weekly and 100% hourly". Redeeming a banked reset refreshes both buckets and moves your weekly reset date.</p><p>How much a message costs depends on model, task size, context length and tool calls. The official docs say you cannot back out a percentage from message counts.</p>` },
   ],
+};
+
+
+const ABOUT = {
+  zh: (a) => `<article class="q" style="margin-top:12px"><h1>关于额度雷达</h1>
+<p><b>这是什么。</b>OpenAI Codex 和 Anthropic Claude 的官方会不定期给用户送额度：全员重置、发重置卡、提额。这些消息只在 X 上发，国内看不到。这个站把每一条翻成中文、核对原帖、按时间排好，让你一眼看到「上次什么时候送的、送的什么、给谁」。</p>
+<p><b>数据规则。</b>只收录官方账号（@thsottiaux、@OpenAIDevs、@ClaudeDevs、@lydiahallie）的原帖；每条标注适用套餐和核验日期，能点回原帖；自动收录的条目会标「待整理」，人工核过后去掉；不做预测、不算概率，「官方下次」永远写「尚未公布」。</p>
+<p><b>谁在维护。</b>${esc(a.owner)}。${a.contact ? `联系：<a href="${esc(a.contact)}">${esc(a.contactLabel || a.contact)}</a>。` : ""}发现错误或漏掉的公告，欢迎告诉我们。</p>
+<p><b>数据开放。</b><a href="/api/events.json">JSON</a>、<a href="/rss.xml">RSS</a>，可自由引用，注明来源即可。</p>
+<p><b>不隶属。</b>本站与 OpenAI、Anthropic 无关，Codex、Claude 为各自公司的商标。</p></article>`,
+  en: (a) => `<article class="q" style="margin-top:12px"><h1>About Quota Radar</h1>
+<p><b>What this is.</b> OpenAI (Codex) and Anthropic (Claude) occasionally grant quota to users: full resets, banked resets, quota boosts. They announce it only on X. This site records every one, verified against the original post, so you can see at a glance when the last grant happened, what it was, and who got it.</p>
+<p><b>Rules.</b> Only original posts from official accounts (@thsottiaux, @OpenAIDevs, @ClaudeDevs, @lydiahallie). Every event lists eligible plans and a verification date and links to the source. Auto-collected events are marked until a human reviews them. No predictions, no probabilities: "next" always says "not announced".</p>
+<p><b>Who runs it.</b> ${esc(a.ownerEn || a.owner)}. ${a.contact ? `Contact: <a href="${esc(a.contact)}">${esc(a.contactLabel || a.contact)}</a>.` : ""} Spotted an error or a missing announcement? Tell us.</p>
+<p><b>Open data.</b> <a href="/api/events.json">JSON</a>, <a href="/en/rss.xml">RSS</a>. Free to reuse with attribution.</p>
+<p><b>Not affiliated</b> with OpenAI or Anthropic. Codex and Claude are trademarks of their respective owners.</p></article>`,
 };
 
 // ───────── 前端脚本：计数器 / 时区 / 菜单 / 筛选 ─────────
@@ -234,9 +250,10 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
 ${body}
 </main>
 ${followBlock()}
-<footer>${T.footer}</footer>
+<footer>${T.footer}<br><span class="fmeta">${T.updated}：${timeEl(T, updatedAt || BUILT, "full")} · <a href="${href(T, "/about")}">${T.about}</a> · <a href="/api/events.json">JSON</a> · <a href="${T.code === "zh" ? "/rss.xml" : "/en/rss.xml"}">RSS</a></span></footer>
 </div>
 <script>${JS}</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>`;
 }
@@ -274,6 +291,9 @@ for (const T of [L.zh, L.en]) {
       jsonld: { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: [{ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } }] } }));
   }
 
+  out(file("about.html"), page(T, { title: `${T.about} | ${T.name}`, desc: T.desc, path: "/about", active: "",
+    body: ABOUT[T.code](site.about || {}) }));
+
   // RSS（两种语言）
   const base = site.url.replace(/\/$/, "");
   out(file("rss.xml"), `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>${esc(T.name)}</title><link>${base}${T.base}</link><description>${esc(T.tagline)}</description><language>${T.locale}</language>
@@ -286,7 +306,7 @@ const base = site.url.replace(/\/$/, "");
 out("api/events.json", JSON.stringify({ site: site.name, url: site.url, updatedAt: updatedAt || BUILT, kinds: Object.fromEntries(Object.entries(KINDS).map(([k, v]) => [k, { zh: v.zh, en: L.en.kinds[k] || k }])),
   events: events.map(({ textEn, ...e }) => ({ ...e, en: enSummary({ ...e, textEn }), scopeEn: scopeEn(e.scope) })) }, null, 1));
 const urls = [];
-for (const T of [L.zh, L.en]) for (const u of ["/", "/timeline", "/codex", "/claude", "/faq", ...FAQ[T.code].map((f) => `/q/${f.slug}`)]) urls.push(href(T, u));
+for (const T of [L.zh, L.en]) for (const u of ["/", "/timeline", "/codex", "/claude", "/faq", "/about", ...FAQ[T.code].map((f) => `/q/${f.slug}`)]) urls.push(href(T, u));
 out("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${base}${u}</loc><lastmod>${BUILT.slice(0, 10)}</lastmod></url>`).join("")}</urlset>`);
 out("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${base}/sitemap.xml\n`);
 out("404.html", page(L.zh, { title: `页面不存在 | ${site.name}`, desc: "页面不存在", path: "/404", active: "",
