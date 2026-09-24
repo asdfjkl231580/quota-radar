@@ -118,7 +118,7 @@ nav.main a.on{background:var(--blue);color:var(--white)}
 .rows{background:var(--white);border-radius:12px;overflow:hidden}
 .row{display:grid;grid-template-columns:72px 76px auto;gap:12px;align-items:center;height:48px;padding:0 14px;border-bottom:1px solid var(--border);font-size:15px;text-decoration:none}
 .row:last-child{border-bottom:0}
-.row .d{color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}.row .p{font-weight:600;white-space:nowrap;font-family:var(--en)}
+.row .d{color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}.row .p{font-weight:600;white-space:nowrap;font-family:var(--en)}.row .p.codex{color:var(--blue)}
 .faq-rows{background:var(--white);border-radius:12px;overflow:hidden}
 .faq-rows details{border-bottom:1px solid var(--border)}.faq-rows details:last-child{border-bottom:0}
 .faq-rows summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:48px;padding:0 14px;font-size:15px;font-weight:500;cursor:pointer}
@@ -228,7 +228,7 @@ function statusCard(p) {
 
 function recentPanel(n = 4) {
   return `<section class="panel" aria-label="最近记录"><div class="ph">${SVG_CLOCK}最近记录<a class="more" href="/timeline">查看全部 →</a></div>
-<div class="rows">${events.slice(0, n).map((e) => `<a class="row" href="/timeline#e${e.id}"><span class="d">${bj(e.announcedAt, "md")}</span><span class="p">${PROVIDERS[e.provider].zh}</span><span>${badge(e)}</span></a>`).join("")}</div></section>`;
+<div class="rows">${events.slice(0, n).map((e) => `<a class="row" href="/timeline#e${e.id}"><span class="d">${bj(e.announcedAt, "md")}</span><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${badge(e)}</span></a>`).join("")}</div></section>`;
 }
 function faqPanel() {
   return `<section class="panel" aria-label="常见问题"><div class="ph">${SVG_Q}常见问题<a class="more" href="/faq">全部 →</a></div>
