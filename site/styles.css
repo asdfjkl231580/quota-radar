@@ -148,3 +148,19 @@ nav.main .lang{padding:0 12px;font-weight:700;color:var(--blue)}
 .tl summary{font-weight:600;color:var(--blue)}
 
 footer .fmeta{font-size:12px;color:var(--text-3)}footer .fmeta a{color:var(--text-3)}
+/* 分享 / 留言 */
+.qr-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:30}
+.qr-btn{border:1.5px solid var(--border);background:var(--white);color:var(--text);border-radius:var(--r-btn);padding:0 16px;height:40px;font:600 14px/1 var(--cn);cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.qr-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.qr-btn.on{background:var(--black);color:#fff;border-color:var(--black)}
+.qr-modal{position:fixed;inset:0;background:rgba(17,17,20,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center;padding:16px}
+@media(min-width:640px){.qr-modal{align-items:center}}
+.qr-box{position:relative;background:var(--white);border-radius:var(--r-card);padding:20px;width:min(560px,100%);max-height:92vh;overflow:auto}
+.qr-box h3{margin:0 0 12px;font:900 20px/1.2 var(--cn)}.qr-box h4{margin:18px 0 8px;font:800 15px/1.2 var(--cn)}
+.qr-x{position:absolute;right:12px;top:10px;border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer;color:var(--text-2)}
+.qr-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+.qr-prev{background:var(--panel);border-radius:12px;min-height:180px;display:flex;align-items:center;justify-content:center;margin-top:10px;overflow:hidden}
+.qr-img{max-width:100%;max-height:52vh;display:block}
+.qr-gen{color:var(--text-2);font-size:14px}.qr-tip{font-size:12px;color:var(--text-2);margin:8px 0}
+.qr-form textarea,.qr-form input{width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font:15px/1.5 var(--cn);margin-bottom:8px}
+.qr-form textarea:focus,.qr-form input:focus{outline:none;border-color:var(--blue)}
+.qr-msg{font-size:14px;color:var(--text-2)}

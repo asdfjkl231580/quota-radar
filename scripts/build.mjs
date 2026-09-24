@@ -215,6 +215,10 @@ function followBlock() {
   return `<section class="follow">${f.imagePath ? `<img src="${esc(f.imagePath)}" alt="">` : ""}<div><b>${esc(f.title)}</b><p>${esc(f.desc)}</p>${f.link ? `<p><a href="${esc(f.link)}">${esc(f.linkText || f.link)}</a></p>` : ""}</div></section>`;
 }
 
+function shareData(T) {
+  const pick = (p) => { const e = events.find((x) => x.provider === p && REAL(x)); return { kind: e.kind, since: e.announcedAt, zh: e.zh, en: enSummary(e).slice(0, 80) }; };
+  return { site: T.name, url: site.url + T.base, codex: pick("codex"), claude: pick("claude"), kinds: T.kinds };
+}
 function page(T, { title, desc, path: p, active, body, jsonld }) {
   const base = site.url.replace(/\/$/, "");
   const url = base + href(T, p);
@@ -253,7 +257,9 @@ ${body}
 ${followBlock()}
 <footer>${T.footer}<br><span class="fmeta">${T.updated}：${timeEl(T, updatedAt || BUILT, "full")} · <a href="${href(T, "/about")}">${T.about}</a> · <a href="/api/events.json">JSON</a> · <a href="${T.code === "zh" ? "/rss.xml" : "/en/rss.xml"}">RSS</a></span></footer>
 </div>
+<script type="application/json" id="share-data">${JSON.stringify(shareData(T))}</script>
 <script>${JS}</script>
+<script defer src="/share.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>`;
@@ -316,5 +322,6 @@ for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^[0-9a-f]{32}\.txt
 // 百度站长验证文件原样进根目录（vercel.json 已关 cleanUrls，.html→308 的规则放过 baidu_verify_）
 for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^baidu_verify_.*\.html$/.test(f)) out(f, fs.readFileSync(path.join(ROOT, "site", f), "utf8"));
 if (fs.existsSync(path.join(ROOT, "site/assets"))) fs.cpSync(path.join(ROOT, "site/assets"), path.join(DIST, "assets"), { recursive: true });
+fs.copyFileSync(path.join(ROOT, "site/share.js"), path.join(DIST, "share.js"));
 
 console.log(`构建完成：${events.length} 条事件，${urls.length} 个页面（中英）→ dist/`);
