@@ -47,7 +47,7 @@ nav.main a.on{background:var(--blue);color:var(--white)}
 .card .foot a{text-decoration:none;font-weight:800}
 /* 标签 */
 .badge{display:inline-flex;align-items:center;font-size:13px;font-weight:700;padding:3px 10px;border-radius:var(--r-badge);line-height:1.5;white-space:nowrap}
-.badge.banked{background:var(--blue-light);color:var(--blue)}.badge.boost{background:var(--yellow);color:var(--black)}.badge.reset{background:#EDEEF1;color:var(--black)}
+.badge.banked{background:var(--blue-light);color:var(--blue-dark)}.badge.boost{background:var(--yellow);color:var(--black)}.badge.reset{background:#EDEEF1;color:var(--black)}
 .badge.low{background:transparent;color:var(--text-2);border:1px dashed var(--border);font-weight:500}
 .card.codex .badge{background:var(--white);color:var(--blue)}.card.claude .badge{background:var(--black);color:var(--yellow)}
 /* 面板 */
@@ -127,7 +127,7 @@ footer a{color:var(--text-2)}
 /* 语言与时区切换 */
 nav.main .lang{padding:0 12px;font-weight:700;color:var(--blue)}
 .tzsel{height:36px;border:1px solid var(--border);border-radius:var(--r-btn);background:var(--white);color:var(--text);font:600 14px/1 var(--cn);padding:0 10px;margin-left:6px;max-width:150px}
-.card .last{font-size:13px;font-weight:600;opacity:.9;margin-top:10px}
+.card .last{font-size:13px;font-weight:600;margin-top:10px}
 .card .last time{font-variant-numeric:tabular-nums}
 @media(max-width:768px){.tzsel{margin:6px 0 0;height:44px;width:100%}}
 

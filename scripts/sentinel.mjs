@@ -102,12 +102,8 @@ if (pend.length) { pf.pending.push(...pend); writeJson("pending.json", pf); }
 writeJson("rejected.json", rf);
 
 if (auto.length && !args.has("--no-deploy")) {
-  try {
-    execFileSync("node", ["scripts/build.mjs"], { cwd: ROOT, stdio: "inherit" });
-    const vercel = ["/opt/homebrew/bin/vercel", "/usr/local/bin/vercel", path.join(process.env.HOME || "", ".npm-global/bin/vercel")].find((p) => fs.existsSync(p)) || "vercel";
-    execFileSync(vercel, ["--prod", "--yes"], { cwd: ROOT, stdio: "pipe", timeout: 240000, env: { ...process.env, PATH: (process.env.PATH || "") + ":/opt/homebrew/bin:/usr/local/bin" } });
-    log("已自动发布生产");
-  } catch (e) { log("自动发布失败: " + e.message.slice(0, 200)); }
+  try { execFileSync("node", ["scripts/deploy.mjs"], { cwd: ROOT, stdio: "inherit", timeout: 360000, env: { ...process.env, PATH: (process.env.PATH || "") + ":/Users/kenyuanlin/.npm-global/bin:/opt/homebrew/bin:/usr/local/bin" } }); log("已自动发布生产（含 IndexNow）"); }
+  catch (e) { log("自动发布失败: " + e.message.slice(0, 200)); }
 }
 if ((auto.length || pend.length) && !args.has("--no-feishu")) {
   const lines = [...auto.map((a) => `· 已上线 [${a.kind}] ${a.account} ${bj(a.announcedAt, "md")}：${a.textEn.slice(0, 70).replace(/\n/g, " ")}`), ...pend.map((p) => `· 待办 [${p.guess}] ${p.account} ${bj(p.announcedAt, "md")}：${p.textEn.slice(0, 70).replace(/\n/g, " ")}`)];
