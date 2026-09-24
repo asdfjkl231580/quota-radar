@@ -11,7 +11,7 @@ export const HOME = process.env.HOME || "/Users/kenyuanlin";
 export const KINDS = {
   reset: { zh: "全员重置", short: "重置", desc: "额度直接恢复，不用操作" },
   banked: { zh: "重置卡", short: "卡", desc: "存进账户，自己选时候点一下用" },
-  boost: { zh: "提额省额", short: "提额", desc: "限额上调或消耗变慢，不是重置" },
+  boost: { zh: "提额", short: "提额", desc: "限额上调、送额外额度或消耗变慢，不是重置" },
 };
 export const PROVIDERS = {
   codex: { zh: "Codex", full: "OpenAI Codex / ChatGPT", accent: "#2563EB" },
