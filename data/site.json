@@ -19,5 +19,8 @@
   },
   "verify": {
     "baidu": "codeva-eFGMpxlaRO"
+  },
+  "analytics": {
+    "baiduTongji": "9c19cda4488afe5c9ddaaa0d59e6e65f"
   }
 }
