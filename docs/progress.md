@@ -5,7 +5,7 @@
 - 第二刀（精准抓取）2026-09-24 晚完成：哨兵脚本 + 预告类型 + 原帖卡片 + 英文小人；定时任务文件待用户装
 
 ## 下一步
-- 用户：GSC 点验证（TXT 已加）→提交 sitemap；百度站长点「完成验证」（文件与 meta 两种都已上线，www 与主域均 200）→提交 sitemap；百度统计登录；Chrome 登录 Vercel/GitHub 后我接手统计开启与哨兵上云
+- 用户：GSC 点验证（TXT 已加）→提交 sitemap；百度站长点「完成验证」（文件与 meta 两种都已上线，www 与主域均 200）→提交 sitemap；百度统计代码已装全站（09-25），20 分钟后到「代码安装检查」点检测；Chrome 登录 Vercel/GitHub 后我接手统计开启与哨兵上云
 - 用户装哨兵 launchd；自动上线条目补中文
 - 第三刀：邮箱订阅（需用户开邮件服务账号）、登录/付费、微信群推送
 - 第三刀（订阅>200 再做）：登录、付费、微信群推送
@@ -14,6 +14,7 @@
 - 暂无
 
 ## 最近完成
+- 2026-09-25 百度统计接入全站（站点ID 存 data/site.json 的 analytics.baiduTongji）
 - 2026-09-24 百度站长验证就绪：验证文件根目录 200（www/主域）+ 全站 meta 标签；踩坑：Vercel cleanUrls 对任何 .html 先 308 且 Middleware 排在其后压不住，已关 cleanUrls 改 rewrite 自实现（.html→308 规则放过 baidu_verify_）
 - 2026-09-24 波普风换皮上线；域名 airesetclock.com 通过 CDP 操作腾讯云控制台加好 A/CNAME，HTTPS 生效
 - 2026-09-24 项目初始化、一页纸、76 条种子事件（fxtwitter 逐条核验）
