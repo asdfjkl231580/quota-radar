@@ -9,7 +9,8 @@ import { ROOT, readJson } from "./lib.mjs";
 const site = readJson("site.json");
 execFileSync("node", ["scripts/build.mjs"], { cwd: ROOT, stdio: "inherit" });
 const vercel = ["/Users/kenyuanlin/.npm-global/bin/vercel", "/opt/homebrew/bin/vercel", "/usr/local/bin/vercel"].find((p) => fs.existsSync(p)) || "vercel";
-const outp = execFileSync(vercel, ["--prod", "--yes"], { cwd: ROOT, encoding: "utf8", timeout: 300000, env: { ...process.env, PATH: (process.env.PATH || "") + ":/opt/homebrew/bin:/usr/local/bin" } });
+const vargs = ["--prod", "--yes"]; if (process.env.VERCEL_TOKEN) vargs.push("--token", process.env.VERCEL_TOKEN);
+const outp = execFileSync(vercel, vargs, { cwd: ROOT, encoding: "utf8", timeout: 300000, env: { ...process.env, PATH: (process.env.PATH || "") + ":/opt/homebrew/bin:/usr/local/bin" } });
 console.log(/READY/.test(outp) ? "已发布生产" : outp.slice(-300));
 if (!process.argv.includes("--no-indexnow")) {
   try {

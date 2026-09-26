@@ -73,6 +73,8 @@ export function adminToken() {
 const HERMES_PY = path.join(HOME, ".hermes/hermes-agent/venv/bin/python");
 const FEISHU_TARGET = process.env.XIAOYUAN_OPS_FEISHU_TARGET || "feishu:oc_92d89026626496bedc112c5d3f04f9f0";
 export function sendFeishu(message) {
+  // 云端（GitHub Actions）没有 Hermes，直接走飞书开放平台 API
+  if (!fs.existsSync(HERMES_PY) && process.env.FEISHU_APP_ID) return sendFeishuApi(message);
   const noProxy = [process.env.NO_PROXY, "open.feishu.cn", "msg-frontier.feishu.cn", ".feishu.cn"].filter(Boolean).join(",");
   const env = { ...process.env, NO_PROXY: noProxy, no_proxy: noProxy };
   for (const k of Object.keys(env)) if (/^(FEISHU_|LARK_)/.test(k) || ["HERMES_HOME", "HERMES_PROFILE"].includes(k)) delete env[k];
@@ -87,3 +89,12 @@ export async function fxTweet(screenName, id) {
   const t = j.tweet || {};
   return { text: t.text || "", createdAt: t.created_at ? new Date(t.created_at).toISOString() : null, author: t.author?.screen_name, url: t.url };
 }
+
+async function _feishuApi(message) {
+  const { FEISHU_APP_ID, FEISHU_APP_SECRET, FEISHU_TO_CHAT_ID } = process.env;
+  const tk = await (await fetch("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ app_id: FEISHU_APP_ID, app_secret: FEISHU_APP_SECRET }) })).json();
+  const r = await (await fetch("https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + tk.tenant_access_token }, body: JSON.stringify({ receive_id: FEISHU_TO_CHAT_ID, msg_type: "text", content: JSON.stringify({ text: message }) }) })).json();
+  if (r.code !== 0) throw new Error("feishu " + r.code + " " + r.msg);
+  return JSON.stringify(r.data);
+}
+export function sendFeishuApi(message) { return _feishuApi(message); }
