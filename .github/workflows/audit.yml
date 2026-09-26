@@ -1,0 +1,21 @@
+name: 周复核（全部记录逐条对原帖）
+on:
+  schedule:
+    - cron: "30 1 * * 1"   # 每周一 09:30 北京时间
+  workflow_dispatch:
+permissions: { contents: read }
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: 复核
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_TO_CHAT_ID: ${{ secrets.FEISHU_TO_CHAT_ID }}
+        run: node scripts/audit.mjs
