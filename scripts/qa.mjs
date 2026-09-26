@@ -119,6 +119,9 @@ for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间
   add("自动运行", "Vercel 定时器接口在线且拒绝外人调用", r.status === 401 ? "pass" : "fail", "状态 " + r.status + (r.status === 500 ? "（缺 GH_DISPATCH_TOKEN）" : ""));
 }
 
+// ③c 求重置计数（Upstash）
+{ const r = await fetch(BASE + "/api/beg", { cache: "no-store" }); const j = await r.json().catch(() => ({})); add("自动运行", "求重置计数接口在线（数据库连通）", j.ok ? "pass" : "fail", j.ok ? `Codex ${j.codex.count} 次（${j.codex.mode === "thanks" ? "谢谢重置" : "求重置"}）· Claude ${j.claude.count} 次` : "状态 " + r.status + " " + (j.error || "")); }
+
 // ④ 资源和接口
 {
   const srcs = new Set();

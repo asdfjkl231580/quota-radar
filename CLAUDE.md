@@ -16,6 +16,9 @@
 - 口径（2026-09-26 用户拍板）：将来时重置公告记 teaser（pendingReset），首页卡片三态——原帖有钟点→倒计时（expectedAt，到点按预告时间转正）；只说哪天→倒计时到那天（美西），那天过完无确认转正；没给时间→「官方已宣布，生效时间未公布」，**不自动转正**（9/26 宣布后 4 小时评论区仍没到账），等官方确认帖或回复（哨兵带 TikHub 时会查该账号回复，确认词命中即按回复时间转正），满 24 小时飞书提醒人工判断。时间由 lib.parseExpected 自动读，读错用 `review.mjs edit <id> --expect <ISO> [--precision day]` 改，`--pending` 改回预告。回测：`node scripts/qa.mjs`
 - 到账时间来源（2026-09-26 用户定：不用本人账号探针，已删除）：官方确认帖/回复 > codex-resets 执行证据（observed-<id> 记录的时间，或它把该条挪进 latest_reset 时以本站发现时间计）> 官方给的预告时间。
 - 线索源还包括 codex-resets.com 公开 API（/api/v1/status 的 scheduled_reset 用来核对预告时间），展示须注明来源（关于页已写）
+- **求重置按钮（2026-09-26）**：`api/beg.js` + `site/beg.js`，计数存 Upstash（Vercel 市场开的 quota-radar-kv，Free，iad1，变量 KV_REST_API_URL/TOKEN 自动注入，加密拉不到本地）。键 `beg|thanks:<provider>:<最近送额度id>`，新一轮自动从 0；24 小时内刚送过→「谢谢重置」。数字是点击次数不是人数，页面写「次」。同 IP 每分钟 ≤120。
+- **看门狗**：`api/cron.js` 每次触发前查哨兵上次成功，>40 分钟或触发失败 → 飞书告警（KV 键 alert:* 一小时去重）。公共函数在 `api/_kv.js`（下划线开头不暴露成接口）。
+- **统计**：Vercel Web Analytics 已开（Pro 含，免费档），脚本 /_vercel/insights/script.js 已埋。Google 首页已收录、sitemap 成功；百度 www 已验证（主域名加站卡在滑块人机验证，留用户）。
 - 抓新线索：`node scripts/fetch.mjs`（TikHub 计费约 $0.01/账号；`--no-feishu` 不推飞书；`--dry` 不写盘）
 - 人工确认：`node scripts/review.mjs list` / `approve <id> --kind reset --zh "..."` / `reject <id>`
 - 构建：`node scripts/build.mjs`
