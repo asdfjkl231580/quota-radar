@@ -103,13 +103,15 @@ const FAQ = {
 const ABOUT = {
   zh: (a) => `<article class="q" style="margin-top:12px"><h1>关于额度雷达</h1>
 <p><b>这是什么。</b>OpenAI Codex 和 Anthropic Claude 的官方会不定期给用户送额度：全员重置、发重置卡、提额。这些消息只在 X 上发，国内看不到。这个站把每一条翻成中文、核对原帖、按时间排好，让你一眼看到「上次什么时候送的、送的什么、给谁」。</p>
-<p><b>数据规则。</b>只收录官方账号（@thsottiaux、@OpenAIDevs、@ClaudeDevs、@lydiahallie）的原帖；每条标注适用套餐和核验日期，能点回原帖；自动收录的条目会标「待整理」，人工核过后去掉；不做预测、不算概率，「官方下次」永远写「尚未公布」。</p>
+<p><b>数据规则。</b>只收录官方账号（@thsottiaux、@OpenAIDevs、@ClaudeDevs、@lydiahallie）的原帖；每条标注适用套餐和核验日期，能点回原帖；自动收录的条目会标「待整理」，人工核过后去掉；官方只说「将重置」时记为预告，确认到账才算重置；官方给了具体时间才显示倒计时，否则写「尚未公布」；不做预测、不算概率。</p>
+<p><b>线索来源。</b>新公告的线索部分来自 <a href="https://codex-resets.com" target="_blank" rel="noopener">Codex Resets</a> 的公开接口，每条仍回 X 原帖核对后才收录。</p>
 <p><b>谁在维护。</b>${esc(a.owner)}。${a.contact ? `联系：<a href="${esc(a.contact)}">${esc(a.contactLabel || a.contact)}</a>。` : ""}发现错误或漏掉的公告，欢迎告诉我们。</p>
 <p><b>数据开放。</b><a href="/api/events.json">JSON</a>、<a href="/rss.xml">RSS</a>，可自由引用，注明来源即可。</p>
 <p><b>不隶属。</b>本站与 OpenAI、Anthropic 无关，Codex、Claude 为各自公司的商标。</p></article>`,
   en: (a) => `<article class="q" style="margin-top:12px"><h1>About Quota Radar</h1>
 <p><b>What this is.</b> OpenAI (Codex) and Anthropic (Claude) occasionally grant quota to users: full resets, banked resets, quota boosts. They announce it only on X. This site records every one, verified against the original post, so you can see at a glance when the last grant happened, what it was, and who got it.</p>
-<p><b>Rules.</b> Only original posts from official accounts (@thsottiaux, @OpenAIDevs, @ClaudeDevs, @lydiahallie). Every event lists eligible plans and a verification date and links to the source. Auto-collected events are marked until a human reviews them. No predictions, no probabilities: "next" always says "not announced".</p>
+<p><b>Rules.</b> Only original posts from official accounts (@thsottiaux, @OpenAIDevs, @ClaudeDevs, @lydiahallie). Every event lists eligible plans and a verification date and links to the source. Auto-collected events are marked until a human reviews them. "We will reset" is recorded as a heads-up and only counts once the reset is confirmed; a countdown appears only when the official post gives a time. No predictions, no probabilities.</p>
+<p><b>Leads.</b> Some new-announcement leads come from the public API of <a href="https://codex-resets.com" target="_blank" rel="noopener">Codex Resets</a>; every event is still verified against the original post on X.</p>
 <p><b>Who runs it.</b> ${esc(a.ownerEn || a.owner)}. ${a.contact ? `Contact: <a href="${esc(a.contact)}">${esc(a.contactLabel || a.contact)}</a>.` : ""} Spotted an error or a missing announcement? Tell us.</p>
 <p><b>Open data.</b> <a href="/api/events.json">JSON</a>, <a href="/en/rss.xml">RSS</a>. Free to reuse with attribution.</p>
 <p><b>Not affiliated</b> with OpenAI or Anthropic. Codex and Claude are trademarks of their respective owners.</p></article>`,

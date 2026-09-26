@@ -1,14 +1,48 @@
 {
-  "accounts": [
-    { "screen_name": "thsottiaux", "provider": "codex", "label": "OpenAI Codex 负责人" },
-    { "screen_name": "OpenAIDevs", "provider": "codex", "label": "OpenAI 开发者官方" },
-    { "screen_name": "ClaudeDevs", "provider": "claude", "label": "Claude 开发者官方" },
-    { "screen_name": "lydiahallie", "provider": "claude", "label": "Anthropic 开发者关系" }
-  ],
-  "keywords": "reset|banked|rate limit|usage limit|limits|quota|credit|额度|重置",
-  "leadSources": [
-    { "name": "didreset", "url": "https://didreset.com/api/timeline?provider=codex&limit=30", "provider": "codex" },
-    { "name": "didreset", "url": "https://didreset.com/api/timeline?provider=claude&limit=30", "provider": "claude" },
-    { "name": "whenreset", "url": "https://www.whenreset.site/api/resets", "provider": "codex" }
-  ]
+ "accounts": [
+  {
+   "screen_name": "thsottiaux",
+   "provider": "codex",
+   "label": "OpenAI Codex 负责人"
+  },
+  {
+   "screen_name": "OpenAIDevs",
+   "provider": "codex",
+   "label": "OpenAI 开发者官方"
+  },
+  {
+   "screen_name": "ClaudeDevs",
+   "provider": "claude",
+   "label": "Claude 开发者官方"
+  },
+  {
+   "screen_name": "lydiahallie",
+   "provider": "claude",
+   "label": "Anthropic 开发者关系"
+  }
+ ],
+ "keywords": "reset|banked|rate limit|usage limit|limits|quota|credit|额度|重置",
+ "leadSources": [
+  {
+   "name": "didreset",
+   "url": "https://didreset.com/api/timeline?provider=codex&limit=30",
+   "provider": "codex"
+  },
+  {
+   "name": "didreset",
+   "url": "https://didreset.com/api/timeline?provider=claude&limit=30",
+   "provider": "claude"
+  },
+  {
+   "name": "whenreset",
+   "url": "https://www.whenreset.site/api/resets",
+   "provider": "codex"
+  },
+  {
+   "name": "codex-resets",
+   "url": "https://codex-resets.com/api/v1/resets?limit=30",
+   "provider": "codex",
+   "note": "公开免费 API，要求展示时注明来源并链接 codex-resets.com"
+  }
+ ]
 }

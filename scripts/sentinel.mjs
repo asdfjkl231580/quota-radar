@@ -42,6 +42,20 @@ for (const src of watch.leadSources || []) {
     log(`${src.name}/${src.provider}: ${list.length} 条，新 ${n}`);
   } catch (e) { log(`${src.name} 失败: ${e.message}`); }
 }
+// ①b codex-resets 的「已排期」：它也把「宣布将重置」记为待执行（scheduled_reset），带 scheduled_for 时用来交叉核对我们的预告时间
+let crScheduled = null;
+try {
+  const j = await (await fetch("https://codex-resets.com/api/v1/status", { headers: { "User-Agent": "quota-radar-sentinel (airesetclock.com)" }, signal: AbortSignal.timeout(20000) })).json();
+  crScheduled = j?.data?.scheduled_reset || null;
+  if (crScheduled) {
+    const m = (crScheduled.source?.url || "").match(/x\.com\/([^/]+)\/status\/(\d+)/); if (m) add(m[2], m[1], "codex-resets");
+    const mine = ef.events.find((e) => e.id === crScheduled.id);
+    if (mine && mine.pendingReset && crScheduled.scheduled_for && !mine.expectedAt) { mine.expectedAt = new Date(crScheduled.scheduled_for).toISOString(); mine.expectedPrecision = "time"; mine.expectedFrom = "codex-resets"; log(`预告时间取自 codex-resets：${mine.id} → ${mine.expectedAt}`); }
+    else if (mine && mine.expectedAt && crScheduled.scheduled_for && Math.abs(new Date(mine.expectedAt) - new Date(crScheduled.scheduled_for)) > 3600000) log(`⚠ 预告时间与 codex-resets 相差超 1 小时：我们 ${mine.expectedAt} / 它 ${crScheduled.scheduled_for}`);
+  }
+  log(`codex-resets 状态：${crScheduled ? "有已排期 " + crScheduled.id + "（时间 " + (crScheduled.scheduled_for || "未公布") + "）" : "无已排期"}`);
+} catch (e) { log(`codex-resets 状态失败: ${e.message}`); }
+
 // ② ③ TikHub
 if (args.has("--tikhub") || args.has("--tikhub-all")) {
   const key = tikhubKey();
