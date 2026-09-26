@@ -57,6 +57,26 @@ if (args.has("--tikhub") || args.has("--tikhub-all")) {
   }
 }
 
+// ④ 有「已宣布、待生效」的预告时，加看该账号的回复（确认常发在回复里，如「Hi. It is done.」），按小时带 TikHub 时才查
+const CONFIRM = /propagated|it is done|it's done|all done|has landed|have landed|is live|are live|now reset|been reset|reset (is )?(done|complete)|back to 100%|should (now )?see (it|the reset)|rolled out|went out/i;
+const confirms = [];
+if ((args.has("--tikhub") || args.has("--tikhub-all")) && ef.events.some((e) => e.pendingReset)) {
+  const key = tikhubKey();
+  for (const acct of [...new Set(ef.events.filter((e) => e.pendingReset).map((e) => e.account.replace(/^@/, "")))]) {
+    try {
+      const j = await (await fetch(`https://api.tikhub.io/api/v1/twitter/web/fetch_user_tweet_replies?screen_name=${acct}`, { headers: { Authorization: "Bearer " + key }, signal: AbortSignal.timeout(30000) })).json();
+      const list = j?.data?.timeline || [];
+      for (const t of list) {
+        const ts = new Date(t.created_at).toISOString();
+        const pend = ef.events.find((e) => e.pendingReset && e.account.replace(/^@/, "").toLowerCase() === acct.toLowerCase() && ts > e.announcedAt && new Date(ts) - new Date(e.announcedAt) < 3 * 86400000);
+        if (pend && CONFIRM.test(t.text || "") && !/\?\s*$/.test(t.text || "")) confirms.push({ pend, id: String(t.tweet_id), at: ts, text: t.text });
+      }
+      log(`TikHub 回复 @${acct}: ${list.length} 条，确认候选 ${confirms.length}`);
+    } catch (e) { log(`TikHub 回复 @${acct} 失败: ${e.message}`); }
+  }
+}
+
+
 // 分类
 function classify(text) {
   const t = text.toLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, " ");
@@ -80,20 +100,29 @@ function classify(text) {
 const ZH_AUTO = { reset: "官方宣布全员重置（原文待整理）", banked: "官方发放重置卡（原文待整理）", boost: "官方提额或送额度（原文待整理）", teaser: "官方宣布即将重置（生效时间未公布）" };
 
 // 预告转正（2026-09-26 用户拍板）：
-//   公告里给了具体钟点 → 到点即按预告时间记为重置（effectiveAt=预告时间）
+//   公告里给了具体钟点 → 到点按预告时间记为重置（effectiveAt=预告时间）
 //   只给了哪一天 → 那天过完仍无确认，按那天记
-//   什么时间都没给 → 首页显示「已宣布，生效时间未公布」，24 小时仍无确认才按公告时间记
-let promoted = 0;
+//   什么时间都没给 → 不自动转正（9/26 教训：宣布 4 小时后评论区仍一片「没到账」）；
+//     一直显示「已宣布，生效时间未公布」，等官方确认帖/回复，或人工 review.mjs 处理；满 24 小时飞书提醒一次
+let promoted = 0; const nudges = [];
 for (const x of ef.events) {
   if (!x.pendingReset) continue;
-  const exp = x.expectedAt ? new Date(x.expectedAt).getTime() : null;
-  const due = exp ? (x.expectedPrecision === "day" ? exp + 86400000 : exp) : new Date(x.announcedAt).getTime() + 86400000;
+  if (!x.expectedAt) { if (Date.now() - new Date(x.announcedAt) > 86400000 && !x.nudgedAt) { x.nudgedAt = new Date().toISOString(); nudges.push(x); } continue; }
+  const exp = new Date(x.expectedAt).getTime();
+  const due = x.expectedPrecision === "day" ? exp + 86400000 : exp;
   if (Date.now() < due) continue;
-  x.pendingReset = false; x.kind = "reset"; x.promotedAt = new Date().toISOString();
-  x.effectiveAt = exp ? x.expectedAt : x.announcedAt;
-  x.detail = (x.detail ? x.detail + " " : "") + (exp ? "官方未另发确认，按预告时间计。" : "官方未公布生效时间，24 小时后按公告时间计。");
-  if (/尚未确认生效|生效时间未公布/.test(x.zh)) x.zh = x.zh.replace("官方宣布即将重置，尚未确认生效", "官方宣布全员重置").replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, exp ? "（按预告时间计）" : "（按公告时间计）");
+  x.pendingReset = false; x.kind = "reset"; x.promotedAt = new Date().toISOString(); x.effectiveAt = x.expectedAt;
+  x.detail = (x.detail ? x.detail + " " : "") + "官方未另发确认，按预告时间计。";
+  if (/尚未确认生效|生效时间未公布/.test(x.zh)) x.zh = x.zh.replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, "（按预告时间计）");
   promoted++;
+}
+for (const c of confirms) {
+  const x = c.pend; if (!x.pendingReset) continue;
+  x.pendingReset = false; x.kind = "reset"; x.effectiveAt = c.at; x.confirmedBy = c.id; x.promotedAt = new Date().toISOString();
+  x.extraLinks = [...(x.extraLinks || []), `https://x.com/${x.account.replace(/^@/, "")}/status/${c.id}`];
+  x.detail = (x.detail ? x.detail + " " : "") + `官方在回复中确认生效（${bj(c.at)} 北京）。`;
+  if (/生效时间未公布|尚未确认生效/.test(x.zh)) x.zh = x.zh.replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, "（已确认生效）");
+  promoted++; log(`回复确认转正 ${x.id} ← ${c.id}：${c.text.slice(0, 80)}`);
 }
 if (promoted) { ef.updatedAt = new Date().toISOString(); log(`预告超时转正 ${promoted} 条`); }
 
@@ -130,14 +159,16 @@ if ((auto.length || promoted) && !args.has("--no-deploy")) {
   try { execFileSync("node", ["scripts/deploy.mjs"], { cwd: ROOT, stdio: "inherit", timeout: 360000, env: { ...process.env, PATH: (process.env.PATH || "") + ":/Users/kenyuanlin/.npm-global/bin:/opt/homebrew/bin:/usr/local/bin" } }); log("已自动发布生产（含 IndexNow）"); }
   catch (e) { log("自动发布失败: " + e.message.slice(0, 200)); }
 }
-if ((auto.length || pend.length || promoted) && !args.has("--no-feishu")) {
+if ((auto.length || pend.length || promoted || nudges.length) && !args.has("--no-feishu")) {
   const lines = [...auto.map((a) => `· 已上线 [${a.kind}] ${a.account} ${bj(a.announcedAt, "md")}：${a.textEn.slice(0, 70).replace(/\n/g, " ")}${a.pendingReset ? (a.expectedAt ? `｜读出预告时间 ${bj(a.expectedAt)}${a.expectedPrecision === "day" ? "（只知哪天）" : ""}，首页已倒计时` : "｜没读出时间，首页显示「生效时间未公布」；有时间就 review.mjs edit <id> --expect <ISO>") : ""}`), ...pend.map((p) => `· 待办 [${p.guess}] ${p.account} ${bj(p.announcedAt, "md")}：${p.textEn.slice(0, 70).replace(/\n/g, " ")}`)];
+  const extra = [...confirms.map((c) => `· 官方回复确认生效：${c.text.slice(0, 70).replace(/\n/g, " ")}（${bj(c.at)}）`), ...nudges.map((x) => `· 提醒：${x.account} 的重置公告已满 24 小时，官方没给时间也没确认，页面仍显示「已宣布」。确认到账了就 review.mjs edit ${x.id} --kind reset，或补 --expect`)];
+  lines.push(...extra);
   const msg = `【额度雷达】哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条${promoted ? `，预告超时转正 ${promoted} 条` : ""}\n${lines.join("\n")}\n\n补中文：cd ~/Documents/GitHub/quota-radar && node scripts/review.mjs edit <id> --zh "..." --scope "..."\n待办：node scripts/review.mjs list`;
   try { await sendFeishu(msg); log("飞书已通知"); } catch (e) { log("飞书失败: " + e.message.slice(0, 120)); }
 }
 
 // 云端：把 events/pending/rejected 的变化提交回仓库，作为下一次运行的状态
-if (process.env.GITHUB_ACTIONS && (auto.length || pend.length || found.size || promoted)) {
+if (process.env.GITHUB_ACTIONS && (auto.length || pend.length || found.size || promoted || nudges.length)) {
   try {
     execFileSync("git", ["config", "user.name", "quota-radar-bot"], { cwd: ROOT });
     execFileSync("git", ["config", "user.email", "bot@airesetclock.com"], { cwd: ROOT });

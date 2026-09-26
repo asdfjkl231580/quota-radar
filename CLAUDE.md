@@ -13,7 +13,7 @@
 ## 开发命令
 - **哨兵（第二刀主链路）**：`node scripts/sentinel.mjs [--tikhub] [--dry] [--no-deploy] [--no-feishu]`：两参考站接口→（可选 TikHub）→fxtwitter 核原帖→能分类的自动上线并 build+vercel --prod→飞书。分类规则在文件头注释，77 条回测 73 对 3 待办 1 混合。自动上线的条目 confidence=auto，页面标「待整理」，随后 `review.mjs edit <id> --zh "..." --scope "..."` 补中文，edit 会自动把 auto 改成 high 并去掉「待整理」标，然后 `node scripts/build.mjs && vercel --prod`。
 - **哨兵跑在 GitHub Actions（2026-09-26 起）**：仓库 https://github.com/asdfjkl231580/quota-radar（公开），工作流 `.github/workflows/sentinel.yml` 每 10 分钟一次、每小时 :03 带 TikHub；密钥在仓库 Secrets（TIKHUB/VERCEL/FEISHU 七个）。云端会把 data/*.json 的变化 commit 回 main，**本地改数据前必须先 `git pull`**，改完 `git push`。本机 launchd 已卸载，勿再装。GitHub CLI 官方版在 `~/.local/bin/ghcli`（账号 asdfjkl231580）。手动触发：`~/.local/bin/ghcli workflow run sentinel.yml --repo asdfjkl231580/quota-radar -f tikhub=true`
-- 口径（2026-09-26 用户拍板）：将来时重置公告记 teaser（pendingReset），首页卡片三态——原帖有钟点→倒计时（expectedAt，到点按预告时间转正）；只说哪天→倒计时到那天（美西），那天过完无确认转正；没给时间→「官方已宣布，生效时间未公布」，24 小时无确认按公告时间转正。时间由 lib.parseExpected 自动读，读错用 `review.mjs edit <id> --expect <ISO> [--precision day]` 改，`--pending` 改回预告。回测：`node scripts/qa.mjs`
+- 口径（2026-09-26 用户拍板）：将来时重置公告记 teaser（pendingReset），首页卡片三态——原帖有钟点→倒计时（expectedAt，到点按预告时间转正）；只说哪天→倒计时到那天（美西），那天过完无确认转正；没给时间→「官方已宣布，生效时间未公布」，**不自动转正**（9/26 宣布后 4 小时评论区仍没到账），等官方确认帖或回复（哨兵带 TikHub 时会查该账号回复，确认词命中即按回复时间转正），满 24 小时飞书提醒人工判断。时间由 lib.parseExpected 自动读，读错用 `review.mjs edit <id> --expect <ISO> [--precision day]` 改，`--pending` 改回预告。回测：`node scripts/qa.mjs`
 - 抓新线索：`node scripts/fetch.mjs`（TikHub 计费约 $0.01/账号；`--no-feishu` 不推飞书；`--dry` 不写盘）
 - 人工确认：`node scripts/review.mjs list` / `approve <id> --kind reset --zh "..."` / `reject <id>`
 - 构建：`node scripts/build.mjs`

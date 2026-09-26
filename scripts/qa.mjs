@@ -69,9 +69,11 @@ for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间
 }
 {
   const pend = local.filter((e) => e.pendingReset);
-  const due = (e) => e.expectedAt ? new Date(e.expectedAt).getTime() + (e.expectedPrecision === "day" ? 86400000 : 0) : new Date(e.announcedAt).getTime() + 86400000;
-  const stale = pend.filter((e) => Date.now() - due(e) > 30 * 60000);   // 哨兵 10 分钟一轮，过期半小时还没转正就是哨兵没跑
-  add("数据准确", "没有过了期限还没转正的预告（有时间=到点，只知哪天=那天过完，没时间=24 小时）", stale.length ? "fail" : "pass", stale.length ? stale.map((e) => e.id).join(", ") : `挂着的预告 ${pend.length} 条`);
+  const due = (e) => new Date(e.expectedAt).getTime() + (e.expectedPrecision === "day" ? 86400000 : 0);
+  const stale = pend.filter((e) => e.expectedAt && Date.now() - due(e) > 30 * 60000);   // 没给时间的预告不自动转正，不算过期
+  const old = pend.filter((e) => !e.expectedAt && Date.now() - new Date(e.announcedAt) > 86400000);
+  if (old.length) add("数据准确", "已宣布超过 24 小时、官方仍未给时间也未确认的预告（要人工判断）", "warn", old.map((e) => `${bjDate(e.announcedAt)} ${e.account}：${e.zh}`).join("\n"));
+  add("数据准确", "有预告时间的预告都按时转正了", stale.length ? "fail" : "pass", stale.length ? stale.map((e) => e.id).join(", ") : `挂着的预告 ${pend.length} 条`);
   const contra = local.filter((e) => e.kind !== "teaser" && /尚未确认|生效时间未公布|即将/.test(e.zh || ""));
   add("数据准确", "已记重置的条目，中文不再写「尚未确认 / 即将」", contra.length ? "fail" : "pass", contra.map((e) => `${e.id}：${e.zh}`).join("\n") || "无矛盾");
   const miss2 = local.filter((e) => !e.sourceUrl || !e.scope || !e.verifiedAt || !e.zh);
@@ -203,7 +205,7 @@ ${mgroups.map((g) => `<h3>${esc(g)}</h3><div class="scroll"><table><tr><th style
 <script>
 const AUTO=${JSON.stringify(results.filter((r) => r.status !== "pass").map((r) => `[机器·${LBL[r.status]}] ${r.name}`))};
 const M=${JSON.stringify(manual.map((m) => m[1]))};
-const KEY="qr_qa_${now.toISOString().slice(0, 10)}";
+const KEY="qr_qa_${now.getTime()}";
 let st={};try{st=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
 function paint(){let n=0;document.querySelectorAll("tr[data-i]").forEach(tr=>{const i=tr.dataset.i,v=(st[i]||{}).r;tr.querySelector(".ok").setAttribute("aria-pressed",v==="ok");tr.querySelector(".no").setAttribute("aria-pressed",v==="no");if(v)n++});document.getElementById("mdone").textContent=n+" / "+M.length}

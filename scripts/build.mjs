@@ -13,7 +13,7 @@ const { events, updatedAt } = readJson("events.json");
 const NOW = Date.now();
 const BUILT = new Date().toISOString();
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const count = (p, days) => events.filter((e) => e.provider === p && daysAgo(e.announcedAt, NOW) <= days).length;
+const count = (p, days) => events.filter((e) => e.provider === p && e.kind !== "teaser" && daysAgo(e.announcedAt, NOW) <= days).length;   // 预告不算送过
 const CSS = fs.readFileSync(path.join(ROOT, "site/styles.css"), "utf8");
 const plain = (html) => html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 
