@@ -98,3 +98,32 @@ async function _feishuApi(message) {
   return JSON.stringify(r.data);
 }
 export function sendFeishuApi(message) { return _feishuApi(message); }
+
+// 从「将要重置」的公告里读出官方给的时间：返回 { expectedAt, expectedPrecision: "time"|"day" } 或 null
+// 只认明确说法：in 2 hours / within the hour / at 10am PT / tomorrow / on Tuesday / later today；读不出就返回 null（页面显示「生效时间未公布」）
+const PT = "America/Los_Angeles";
+function ptOffsetMin(d) { // 该时刻太平洋时间相对 UTC 的分钟差（夏令时 -420，冬令时 -480）
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: PT, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).formatToParts(d).map((x) => [x.type, x.value]));
+  return (Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - d.getTime()) / 60000;
+}
+function ptDate(d) { const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: PT, year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" }).formatToParts(d).map((x) => [x.type, x.value])); return { y: +p.year, m: +p.month, d: +p.day, wd: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(p.weekday) }; }
+function ptAt(y, m, d, h = 0, mi = 0) { const guess = new Date(Date.UTC(y, m - 1, d, h, mi)); return new Date(guess.getTime() - ptOffsetMin(guess) * 60000); }
+export function parseExpected(text, announcedAt) {
+  const t = text.toLowerCase().replace(/[’‘]/g, "'");
+  const a = new Date(announcedAt);
+  const NUM = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, few: 3, couple: 2 };
+  let m = t.match(/\b(?:in|within)(?: the next)? (\d+|an?|one|two|three|four|five|six|a few|a couple of) (min|minute|hour|hr)s?\b/);
+  if (m) { const n = NUM[m[1].replace(/^a (few|couple of)$/, "$1").replace(" of", "")] ?? +m[1]; return { expectedAt: new Date(a.getTime() + n * (m[2].startsWith("min") ? 60000 : 3600000)).toISOString(), expectedPrecision: "time" }; }
+  if (/within the (next )?hour/.test(t)) return { expectedAt: new Date(a.getTime() + 3600000).toISOString(), expectedPrecision: "time" };
+  const base = ptDate(a);
+  let day = null;
+  if (/\btomorrow\b/.test(t)) day = 1;
+  else if (/later today|tonight|today/.test(t)) day = 0;
+  else { const wd = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"].findIndex((w) => new RegExp(`\\b(on |this |next )?${w}\\b`).test(t)); if (wd >= 0) day = ((wd - base.wd + 7) % 7) || 7; }
+  const tm = t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\s*(pt|pst|pdt|pacific)\b/);
+  if (day === null && !tm) return null;
+  const d0 = new Date(Date.UTC(base.y, base.m - 1, base.d + (day || 0)));
+  if (tm) { let h = +tm[1] % 12 + (tm[3] === "pm" ? 12 : 0); return { expectedAt: ptAt(d0.getUTCFullYear(), d0.getUTCMonth() + 1, d0.getUTCDate(), h, +(tm[2] || 0)).toISOString(), expectedPrecision: "time" }; }
+  if (day === 0) return null; // 「今天晚些」没给钟点，不装精确
+  return { expectedAt: ptAt(d0.getUTCFullYear(), d0.getUTCMonth() + 1, d0.getUTCDate()).toISOString(), expectedPrecision: "day" };
+}

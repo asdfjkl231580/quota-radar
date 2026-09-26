@@ -59,16 +59,20 @@ const ids = new Set([...tl.matchAll(/id="e(\d+)"/g)].map((m) => m[1]));
 const miss = local.filter((e) => !ids.has(e.id));
 add("数据准确", "时间线页每条记录都在", miss.length ? "fail" : "pass", miss.length ? "缺：" + miss.map((e) => e.id).join(", ") : `${ids.size} 条都在`);
 const home = pages[BASE + "/"] || "";
-for (const p of ["codex", "claude"]) {
-  const last = local.filter((e) => e.provider === p && e.kind !== "teaser").sort((a, b) => b.announcedAt.localeCompare(a.announcedAt))[0];
-  const ok = last && home.includes(`data-ts="${last.announcedAt}" data-mode="full"`);
-  add("数据准确", `首页 ${p === "codex" ? "Codex" : "Claude"} 卡片「上次」= 最新一条（预告不算）`, ok ? "pass" : "fail", last ? `应为 ${bjDate(last.announcedAt)} 北京 · ${last.kind} · ${last.id}` : "没有记录");
+for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间→倒计时；已宣布没时间→已宣布多久；否则→距上次
+  const at = (e) => e.effectiveAt || e.announcedAt;
+  const last = local.filter((e) => e.provider === p && e.kind !== "teaser").sort((a, b) => at(b).localeCompare(at(a)))[0];
+  const pend = local.find((e) => e.provider === p && e.pendingReset && e.announcedAt > last.announcedAt);
+  const want = pend ? (pend.expectedAt ? `data-until="${pend.expectedAt}"` : `data-since="${pend.announcedAt}"`) : `data-since="${at(last)}"`;
+  const mode = pend ? (pend.expectedAt ? `倒计时到官方预告时间 ${bjDate(pend.expectedAt)} 北京` : `已宣布、生效时间未公布（公告 ${bjDate(pend.announcedAt)} 北京）`) : `距上次 ${bjDate(at(last))} 北京 · ${last.kind}`;
+  add("数据准确", `首页 ${p === "codex" ? "Codex" : "Claude"} 卡片状态正确`, home.includes(want) ? "pass" : "fail", `应为：${mode}`);
 }
 {
   const pend = local.filter((e) => e.pendingReset);
-  const stale = pend.filter((e) => Date.now() - new Date(e.announcedAt) > 3 * 3600000);
-  add("数据准确", "没有超过 3 小时还挂着的预告", stale.length ? "fail" : "pass", stale.length ? stale.map((e) => e.id).join(", ") : `挂着的预告 ${pend.length} 条`);
-  const contra = local.filter((e) => e.kind !== "teaser" && /尚未确认|将重置|即将/.test(e.zh || ""));
+  const due = (e) => e.expectedAt ? new Date(e.expectedAt).getTime() + (e.expectedPrecision === "day" ? 86400000 : 0) : new Date(e.announcedAt).getTime() + 86400000;
+  const stale = pend.filter((e) => Date.now() - due(e) > 30 * 60000);   // 哨兵 10 分钟一轮，过期半小时还没转正就是哨兵没跑
+  add("数据准确", "没有过了期限还没转正的预告（有时间=到点，只知哪天=那天过完，没时间=24 小时）", stale.length ? "fail" : "pass", stale.length ? stale.map((e) => e.id).join(", ") : `挂着的预告 ${pend.length} 条`);
+  const contra = local.filter((e) => e.kind !== "teaser" && /尚未确认|生效时间未公布|即将/.test(e.zh || ""));
   add("数据准确", "已记重置的条目，中文不再写「尚未确认 / 即将」", contra.length ? "fail" : "pass", contra.map((e) => `${e.id}：${e.zh}`).join("\n") || "无矛盾");
   const miss2 = local.filter((e) => !e.sourceUrl || !e.scope || !e.verifiedAt || !e.zh);
   add("数据准确", "每条都有原帖链接、适用范围、核验日期、中文", miss2.length ? "fail" : "pass", miss2.map((e) => e.id).join(", ") || "全部齐全");
@@ -122,9 +126,9 @@ const manual = [
   ["手机观感", "微信里打开", "把 airesetclock.com 发给自己的微信，在微信里点开", "能打开，不提示「非微信官方网页」拦截；样式和浏览器一致"],
   ["手机观感", "手机菜单", "手机首页点右上角汉堡菜单，逐个点 Codex / Claude / 常见问题 / EN", "菜单能开能关，每个都跳对页面"],
   ["首页", "天时分在走", "首页停 1 分钟以上", "两张卡片的「分」会加 1；数字不是 -- 或负数"],
-  ["首页", "上次时间对得上", "看 Codex 卡片「上次」，点卡片上的「原帖 ↗」", "时间和原帖发帖时间一致（北京时间差 8 小时正常）；原帖内容确实是送额度/重置"],
-  ["首页", "时区切换", "顶栏时区下拉选「纽约」，再刷新页面", "所有时间变成纽约时间；刷新后仍记得纽约；改回北京"],
-  ["首页", "最近记录", "点最近记录第一条", "跳到时间线页并定位到那一条"],
+  ["首页", "卡片状态对", "看两张卡片的大标题一行和数字，点「原帖 ↗」对照", "官方说了具体时间→「距官方预告的重置还有」倒计时；官方说要重置但没给时间→「官方已宣布重置，公告发出已过去」；都没有→「距上次送额度已过去」。时间和原帖一致"],
+  ["首页", "时区切换", "点卡片里时间后面带下划线的「北京 ▾」，选「纽约」；再刷新页面", "底部弹出「已切换到 纽约」，时间闪一下变成纽约时间（天时分大数字不变，这是正常的：过去多久跟时区无关）；刷新后仍是纽约；改回北京"],
+  ["首页", "最近记录", "看最近记录第一条，再点它", "第一条就是最新的官方动态（包括还没生效的「预告」）；点了跳到时间线页那一条"],
   ["首页", "常见问题折叠", "点首页每个常见问题", "能展开收起；「单独打开 ↗」能打开对应问题页"],
   ["时间线", "逐条看最近 10 条", "打开 /timeline，看最上面 10 条", "每条有类型标签、中文说明、适用范围、原帖卡片（头像能显示）；预告/待补证有标注"],
   ["时间线", "原帖卡片点得通", "随便点 3 条的原帖卡片", "打开 X 对应帖子（国内要翻墙才能看，链接对就算过）"],

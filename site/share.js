@@ -6,6 +6,7 @@
                  :{share:'Share',sharePage:'Share this page',shareImg:'Snapshot image',copy:'Copy link',copied:'Copied',dl:'Download',sys:'System share',close:'Close',gen:'Generating…',asof:'Data as of',bj:'UTC',since:'Since the last quota grant',next:'Next: not announced',fb:'Feedback',fbTitle:'Feedback',fbPh:'Wrong data, missing events, anything confusing',fbContact:'Contact (optional)',fbSend:'Send',fbOk:'Got it, thanks!',fbErr:'Failed, try again later',units:['d','h','m'],portrait:'Portrait 1080×1440',og:'Card 1200×630',tip:'A snapshot of this moment; it will not change later'};
   function el(h){var d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild}
   function pad(n){return (n<10?'0':'')+n}
+  function remain(iso){var ms=new Date(iso).getTime()-Date.now();if(ms<0)ms=0;return [Math.floor(ms/86400000),Math.floor(ms%86400000/3600000),Math.floor(ms%3600000/60000)]}
   function elapsed(iso){var ms=Date.now()-new Date(iso).getTime();if(ms<0)ms=0;return [Math.floor(ms/86400000),Math.floor(ms%86400000/3600000),Math.floor(ms%3600000/60000)]}
   function nowLabel(){var d=new Date();var tz=zh?'Asia/Shanghai':'UTC';var o={timeZone:tz,year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false};if(zh){var p={};new Intl.DateTimeFormat('zh-CN',o).formatToParts(d).forEach(function(x){p[x.type]=x.value});return p.year+'年'+p.month+'月'+p.day+'日 '+p.hour+':'+p.minute+' '+T.bj}return new Intl.DateTimeFormat('en-US',{timeZone:tz,month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(d)+' UTC'}
   function load(src){return new Promise(function(res,rej){var i=new Image();i.onload=function(){res(i)};i.onerror=function(){res(null)};i.src=src})}
@@ -13,19 +14,19 @@
   var CN='"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif', EN='"NumCN",Inter,"Helvetica Neue",Arial,sans-serif', HERO='"HeroCN",'+CN;
   // 画一张卡：p=codex|claude
   function drawCard(c,x,y,w,h,p,big){
-    var d=S[p]; var isC=p==='codex'; var e=elapsed(d.since);
+    var d=S[p]; var isC=p==='codex'; var e=d.until?remain(d.until):elapsed(d.since);
     c.save(); roundRect(c,x,y,w,h,big?36:26); c.fillStyle=isC?'#1467F5':'#FFEA00'; c.fill();
     var fg=isC?'#fff':'#111'; c.fillStyle=fg; var pad_=big?44:30;
     c.font='900 '+(big?52:34)+'px '+EN; c.fillText(isC?'Codex':'Claude',x+pad_,y+pad_+(big?46:30));
     var badge=S.kinds[d.kind]||d.kind; c.font='700 '+(big?26:18)+'px '+CN; var bw=c.measureText(badge).width+(big?36:24);
     var bx=x+pad_+c.measureText(isC?'Codex':'Claude').width*(big?1.9:1.85)+(big?24:16), by=y+pad_+(big?8:4);
     roundRect(c,bx,by,bw,big?44:30,big?12:8); c.fillStyle=isC?'#fff':'#111'; c.fill(); c.fillStyle=isC?'#1467F5':'#FFEA00'; c.fillText(badge,bx+(big?18:12),by+(big?31:21));
-    c.fillStyle=fg; c.font='600 '+(big?26:18)+'px '+CN; c.fillText(T.since,x+pad_,y+pad_+(big?110:76));
+    c.fillStyle=fg; c.font='600 '+(big?26:18)+'px '+CN; c.fillText(d.lbl||T.since,x+pad_,y+pad_+(big?110:76));
     var ny=y+pad_+(big?210:140); var nx=x+pad_; var nf=big?112:72, uf=big?40:26;
     [e[0],e[1],e[2]].forEach(function(v,i){c.font='900 '+nf+'px '+EN; c.fillText(pad(v),nx,ny); nx+=c.measureText(pad(v)).width+(big?10:6); c.font='800 '+uf+'px '+CN; c.fillText(T.units[i],nx,ny); nx+=c.measureText(T.units[i]).width+(big?34:22)});
     var sub=zh?d.zh:d.en; c.font='600 '+(big?24:16)+'px '+CN; c.globalAlpha=.95; var maxw=w-pad_*2; var t=sub; while(c.measureText(t).width>maxw&&t.length>4){t=t.slice(0,-2)} if(t!==sub)t=t.slice(0,-1)+'…'; c.fillText(t,x+pad_,y+pad_+(big?266:180)); c.globalAlpha=1;
     c.strokeStyle=isC?'rgba(255,255,255,.4)':'rgba(0,0,0,.2)'; c.lineWidth=2; c.beginPath(); c.moveTo(x+pad_,y+h-(big?78:52)); c.lineTo(x+w-pad_,y+h-(big?78:52)); c.stroke();
-    c.font='700 '+(big?24:16)+'px '+CN; c.fillText(T.next,x+pad_,y+h-(big?34:22)); c.restore();
+    c.font='700 '+(big?24:16)+'px '+CN; c.fillText(d.next||T.next,x+pad_,y+h-(big?34:22)); c.restore();
   }
   function drawBrand(c,x,y,size){c.save();c.font='900 '+size+'px '+HERO;c.fillStyle='#111';c.fillText(S.site,x,y);c.restore()}
   async function render(kind){   // 'portrait' | 'og'

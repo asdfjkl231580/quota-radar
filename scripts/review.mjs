@@ -6,6 +6,8 @@
  *      --merge 把同线程的其他 pending 一并移除（当作已合并）
  *   reject <id> [--why ""]
  *   edit <id> --zh ".." [--detail ".."] [--scope ".."] [--kind ..]   改已发布事件
+ *   edit <id> --expect 2026-09-27T17:00:00Z [--precision day]      给预告填官方说的生效时间（首页转倒计时）；--expect none 清掉
+ *   edit <id> --pending                                          把一条记回「已宣布、待生效」的预告
  */
 import { readJson, writeJson, KINDS, bj } from "./lib.mjs";
 
@@ -55,6 +57,9 @@ if (!cmd || cmd === "list") {
   const e = ef.events.find((x) => x.id === id);
   if (!e) throw new Error("events 里没有 " + id);
   for (const k of ["zh", "detail", "scope", "kind", "provider", "confidence"]) if (opt[k]) e[k] = opt[k];
+  if (opt.expect === "none") { delete e.expectedAt; delete e.expectedPrecision; }
+  else if (opt.expect) { const d = new Date(opt.expect); if (isNaN(d)) throw new Error("--expect 不是合法时间"); e.expectedAt = d.toISOString(); e.expectedPrecision = opt.precision === "day" ? "day" : "time"; }
+  if (opt.pending) { e.kind = "teaser"; e.pendingReset = true; delete e.promotedAt; delete e.effectiveAt; }
   if (e.confidence === "auto" && opt.zh) { e.confidence = "high"; e.verifiedBy = "人工核实 + 原帖"; }   // 补了中文即视为人工核过
   e.verifiedAt = today; ef.updatedAt = new Date().toISOString();
   writeJson("events.json", ef);

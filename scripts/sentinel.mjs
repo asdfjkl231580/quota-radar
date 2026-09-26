@@ -16,7 +16,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { ROOT, DATA, readJson, writeJson, tikhubKey, sendFeishu, fxTweet, bj } from "./lib.mjs";
+import { ROOT, DATA, readJson, writeJson, tikhubKey, sendFeishu, fxTweet, bj, parseExpected } from "./lib.mjs";
 
 const args = new Set(process.argv.slice(2));
 const log = (...a) => { const line = `[${new Date().toISOString()}] ${a.join(" ")}`; console.log(line); fs.appendFileSync(path.join(DATA, "sentinel.log"), line + "\n"); };
@@ -77,18 +77,23 @@ function classify(text) {
   if (boost) return "boost";
   return teaser ? "teaser" : "unclear";
 }
-const ZH_AUTO = { reset: "官方宣布全员重置（原文待整理）", banked: "官方发放重置卡（原文待整理）", boost: "官方提额或送额度（原文待整理）", teaser: "官方宣布即将重置，尚未确认生效" };
+const ZH_AUTO = { reset: "官方宣布全员重置（原文待整理）", banked: "官方发放重置卡（原文待整理）", boost: "官方提额或送额度（原文待整理）", teaser: "官方宣布即将重置（生效时间未公布）" };
 
-// 预告超时转正：宣布「将重置」超过 3 小时仍无确认 → 按公告时间记为重置（与对标站同口径，注明）
+// 预告转正（2026-09-26 用户拍板）：
+//   公告里给了具体钟点 → 到点即按预告时间记为重置（effectiveAt=预告时间）
+//   只给了哪一天 → 那天过完仍无确认，按那天记
+//   什么时间都没给 → 首页显示「已宣布，生效时间未公布」，24 小时仍无确认才按公告时间记
 let promoted = 0;
 for (const x of ef.events) {
-  if (x.pendingReset && Date.now() - new Date(x.announcedAt).getTime() > 3 * 3600000) {
-    x.pendingReset = false; x.kind = "reset"; x.promotedAt = new Date().toISOString();
-    x.detail = (x.detail ? x.detail + " " : "") + "官方未单独确认生效时间，超过 3 小时按公告时间计。";
-    // 自动模板与人工写的「（尚未确认生效）」都要改掉，否则计数已算重置、文案还说未生效
-    if (/尚未确认生效/.test(x.zh)) x.zh = x.zh.replace("官方宣布即将重置，尚未确认生效", "官方宣布全员重置（按公告时间计）").replace(/[，,（(]?\s*尚未确认生效\s*[）)]?/, "（按公告时间计）");
-    promoted++;
-  }
+  if (!x.pendingReset) continue;
+  const exp = x.expectedAt ? new Date(x.expectedAt).getTime() : null;
+  const due = exp ? (x.expectedPrecision === "day" ? exp + 86400000 : exp) : new Date(x.announcedAt).getTime() + 86400000;
+  if (Date.now() < due) continue;
+  x.pendingReset = false; x.kind = "reset"; x.promotedAt = new Date().toISOString();
+  x.effectiveAt = exp ? x.expectedAt : x.announcedAt;
+  x.detail = (x.detail ? x.detail + " " : "") + (exp ? "官方未另发确认，按预告时间计。" : "官方未公布生效时间，24 小时后按公告时间计。");
+  if (/尚未确认生效|生效时间未公布/.test(x.zh)) x.zh = x.zh.replace("官方宣布即将重置，尚未确认生效", "官方宣布全员重置").replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, exp ? "（按预告时间计）" : "（按公告时间计）");
+  promoted++;
 }
 if (promoted) { ef.updatedAt = new Date().toISOString(); log(`预告超时转正 ${promoted} 条`); }
 
@@ -104,8 +109,8 @@ for (const [id, meta] of found) {
     const base = { id, provider: providerOf(author) || meta.provider, account: "@" + author, sourceUrl: t.url || `https://x.com/${author}/status/${id}`, announcedAt: t.createdAt, textEn: t.text };
     if (["reset", "banked", "boost", "teaser"].includes(kind)) {
       const ev = { ...base, kind, extraLinks: [], zh: ZH_AUTO[kind], detail: "", scope: "待核实", verified: true, verifiedBy: `自动：${meta.via} 线索 + 原帖核验`, verifiedAt: new Date().toISOString().slice(0, 10), confidence: "auto" };
-      if (kind === "teaser" && /reset/.test(t.text.toLowerCase())) ev.pendingReset = true;   // 等确认或超时转正
-      if (kind === "reset") { const pend = ef.events.find((x) => x.provider === ev.provider && x.pendingReset && Date.now() - new Date(x.announcedAt) < 86400000); if (pend) { pend.pendingReset = false; pend.fulfilledBy = ev.id; ev.detail = "官方确认生效；预告见 " + new Date(pend.announcedAt).toISOString().slice(0, 16) + "Z"; } }
+      if (kind === "teaser" && /reset/.test(t.text.toLowerCase())) { ev.pendingReset = true; Object.assign(ev, parseExpected(t.text, t.createdAt) || {}); }   // 读得出时间就倒计时，读不出显示「生效时间未公布」
+      if (kind === "reset") { const pend = ef.events.find((x) => x.provider === ev.provider && x.pendingReset && Date.now() - new Date(x.announcedAt) < 86400000); if (pend) { pend.pendingReset = false; pend.fulfilledBy = ev.id; pend.kind = "teaser"; ev.detail = "官方确认生效；预告见 " + new Date(pend.announcedAt).toISOString().slice(0, 16) + "Z"; } }
       auto.push(ev);
     } else {
       pend.push({ ...base, via: meta.via, foundAt: new Date().toISOString(), zhDraft: "", guess: kind });
@@ -126,7 +131,7 @@ if ((auto.length || promoted) && !args.has("--no-deploy")) {
   catch (e) { log("自动发布失败: " + e.message.slice(0, 200)); }
 }
 if ((auto.length || pend.length || promoted) && !args.has("--no-feishu")) {
-  const lines = [...auto.map((a) => `· 已上线 [${a.kind}] ${a.account} ${bj(a.announcedAt, "md")}：${a.textEn.slice(0, 70).replace(/\n/g, " ")}`), ...pend.map((p) => `· 待办 [${p.guess}] ${p.account} ${bj(p.announcedAt, "md")}：${p.textEn.slice(0, 70).replace(/\n/g, " ")}`)];
+  const lines = [...auto.map((a) => `· 已上线 [${a.kind}] ${a.account} ${bj(a.announcedAt, "md")}：${a.textEn.slice(0, 70).replace(/\n/g, " ")}${a.pendingReset ? (a.expectedAt ? `｜读出预告时间 ${bj(a.expectedAt)}${a.expectedPrecision === "day" ? "（只知哪天）" : ""}，首页已倒计时` : "｜没读出时间，首页显示「生效时间未公布」；有时间就 review.mjs edit <id> --expect <ISO>") : ""}`), ...pend.map((p) => `· 待办 [${p.guess}] ${p.account} ${bj(p.announcedAt, "md")}：${p.textEn.slice(0, 70).replace(/\n/g, " ")}`)];
   const msg = `【额度雷达】哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条${promoted ? `，预告超时转正 ${promoted} 条` : ""}\n${lines.join("\n")}\n\n补中文：cd ~/Documents/GitHub/quota-radar && node scripts/review.mjs edit <id> --zh "..." --scope "..."\n待办：node scripts/review.mjs list`;
   try { await sendFeishu(msg); log("飞书已通知"); } catch (e) { log("飞书失败: " + e.message.slice(0, 120)); }
 }

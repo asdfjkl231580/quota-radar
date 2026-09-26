@@ -35,7 +35,9 @@ const L = {
     title: `Codex 什么时候重置？Claude 额度什么时候恢复？| ${site.name}`, desc: "官方每一次送额度、全员重置、重置卡的中文实时记录，附原帖与适用套餐。Codex、Claude 什么时候送额度，一眼看清。不预测。",
     nav: [["/", "首页"], ["/codex", "Codex"], ["/claude", "Claude"], ["/faq", "常见问题"]],
     hero1: "AI 额度动态", hero2: "一眼看清", sticker: "好消息<br>马上通知！", mascotAlt: "额度雷达吉祥物：拿着喇叭的雷达小人",
-    since: "距上次送额度已过去", next: "官方下次：尚未公布", source: "原帖 ↗", last: "上次", units: ["天", "时", "分"],
+    since: "距上次送额度已过去", next: "官方下次：尚未公布",
+    untilLbl: "距官方预告的重置还有", untilDayLbl: "距官方预告那天（美西时间）还有", annLbl: "官方已宣布重置，公告发出已过去", dueLbl: "预告时间已到，等官方确认生效",
+    expLine: "官方预告", expDayNote: "（美西当天，几点未公布）", annLine: "公告", nextUnknown: "生效时间：官方未公布", nextKnown: "时间来自官方原帖", prevGrant: "上次送额度", tzSwitched: "已切换到", source: "原帖 ↗", last: "上次", units: ["天", "时", "分"],
     recent: "最近记录", viewAll: "查看全部 →", faq: "常见问题", all: "全部 →", openAlone: "单独打开 ↗",
     footer: "只收录官方消息 · 不预测下次", menu: "菜单", tz: "时区", about: "关于", updated: "数据更新",
     kinds: { reset: "全员重置", banked: "重置卡", boost: "提额", teaser: "预告" }, lowBadge: "待补证", autoBadge: "待整理", teaserLbl: "预告", viewOnX: "在 X 上看 ↗", tweetCard: "原帖",
@@ -55,7 +57,9 @@ const L = {
     title: "When does Codex reset? Claude quota reset tracker | Quota Radar", desc: "Every official Codex and Claude quota reset, banked reset and quota boost, verified against the original posts on X. No predictions.",
     nav: [["/", "Home"], ["/codex", "Codex"], ["/claude", "Claude"], ["/faq", "FAQ"]],
     hero1: "AI Quota Updates", hero2: "at a Glance", sticker: "Good news,<br>instantly!", mascotAlt: "Quota Radar mascot: a radar character holding a megaphone",
-    since: "Since the last quota grant", next: "Next: not announced", source: "Source ↗", last: "Last", units: ["d", "h", "m"],
+    since: "Since the last quota grant", next: "Next: not announced",
+    untilLbl: "Announced reset in", untilDayLbl: "Announced day (US Pacific) starts in", annLbl: "Reset announced, time since announcement", dueLbl: "Announced time reached, awaiting confirmation",
+    expLine: "Announced for", expDayNote: " (US Pacific day, time not given)", annLine: "Announced", nextUnknown: "Effective time: not announced", nextKnown: "Time from the official post", prevGrant: "Previous grant", tzSwitched: "Time zone:", source: "Source ↗", last: "Last", units: ["d", "h", "m"],
     recent: "Recent", viewAll: "View all →", faq: "FAQ", all: "All →", openAlone: "Open ↗",
     footer: "Official announcements only · No predictions", menu: "Menu", tz: "Time zone", about: "About", updated: "Updated",
     kinds: { reset: "Full reset", banked: "Banked reset", boost: "Quota boost", teaser: "Heads-up" }, lowBadge: "unconfirmed", autoBadge: "auto", teaserLbl: "Heads-up", viewOnX: "View on X ↗", tweetCard: "Source post",
@@ -117,8 +121,9 @@ const JS = `
   var lang=document.documentElement.lang.slice(0,2), units=JSON.parse(document.body.dataset.units), TZ_KEY='qr_tz';
   var TZ_LABELS=JSON.parse(document.body.dataset.tzlabels);
   function pad(n){return (n<10?'0':'')+n}
-  function tick(){document.querySelectorAll('.counter[data-since]').forEach(function(el){
-    var ms=Date.now()-new Date(el.dataset.since).getTime(); if(ms<0)ms=0;
+  function tick(){document.querySelectorAll('.counter[data-since],.counter[data-until]').forEach(function(el){
+    var ms=el.dataset.until?new Date(el.dataset.until).getTime()-Date.now():Date.now()-new Date(el.dataset.since).getTime();
+    if(ms<0){ms=0;if(el.dataset.until){var l=el.parentNode.querySelector('.lbl[data-due]');if(l)l.textContent=l.dataset.due}}
     var d=Math.floor(ms/86400000), h=Math.floor(ms%86400000/3600000), m=Math.floor(ms%3600000/60000);
     el.innerHTML='<span>'+pad(d)+'</span><i>'+units[0]+'</i><span>'+pad(h)+'</span><i>'+units[1]+'</i><span>'+pad(m)+'</span><i>'+units[2]+'</i>';
   })}
@@ -143,7 +148,12 @@ const JS = `
     document.querySelectorAll('.tzname').forEach(function(s){s.textContent=label});
     document.querySelectorAll('.tzsel').forEach(function(s){s.value=v});
   }
-  document.querySelectorAll('.tzsel').forEach(function(s){s.addEventListener('change',function(){try{localStorage.setItem(TZ_KEY,s.value)}catch(e){}apply()})});
+  document.querySelectorAll('.tzsel').forEach(function(s){s.addEventListener('change',function(){
+    try{localStorage.setItem(TZ_KEY,s.value)}catch(e){}apply();
+    var n=document.querySelector('nav.main.open'),bgb=document.querySelector('.burger');if(n){n.classList.remove('open');if(bgb)bgb.setAttribute('aria-expanded','false')}
+    document.querySelectorAll('time[data-ts]').forEach(function(t){t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')});
+    var tip=document.createElement('div');tip.className='tz-toast';tip.textContent=document.body.dataset.tzmsg+' '+(s.options[s.selectedIndex]||{}).text;document.body.appendChild(tip);setTimeout(function(){tip.remove()},1800);
+  })});
   apply();
   var bg=document.querySelector('.burger'), nav=document.querySelector('nav.main');
   if(bg&&nav){bg.addEventListener('click',function(){var o=nav.classList.toggle('open');bg.setAttribute('aria-expanded',o?'true':'false')})}
@@ -178,21 +188,39 @@ function tweetCard(T, e) {
 const timeEl = (T, iso, mode = "md") => `<time datetime="${iso}" data-ts="${iso}" data-mode="${mode}">${esc(T.dateFallback(iso, mode))}</time>`;
 const href = (T, p) => (T.base + p).replace(/\/$/, "") || "/";
 
+const at = (e) => e.effectiveAt || e.announcedAt;   // 实际生效时间：转正的预告按预告时间，其余按公告时间
+const tzPick = (T) => `<select class="tzsel tzinline" aria-label="${T.tz}">${TZ.map(([v, zh, en]) => `<option value="${v}">${T.code === "zh" ? zh : en}</option>`).join("")}</select>`;
+const COUNTER = (T, attr) => `<div class="counter" ${attr}><span>--</span><i>${T.units[0]}</i><span>--</span><i>${T.units[1]}</i><span>--</span><i>${T.units[2]}</i></div>`;
 function statusCard(T, p) {
-  const last = events.find((e) => e.provider === p && REAL(e));
-  const tz = events.find((e) => e.provider === p && e.kind === "teaser");
-  const teaserLine = tz && tz.announcedAt > last.announcedAt ? `<div class="teaser-line">${T.teaserLbl}：${esc(T.summary(tz))} <a href="${esc(tz.sourceUrl)}" target="_blank" rel="noopener">↗</a></div>` : "";
+  const last = events.filter((e) => e.provider === p && REAL(e)).sort((x, y) => at(y).localeCompare(at(x)))[0];
+  const pend = events.find((e) => e.provider === p && e.pendingReset && e.announcedAt > last.announcedAt);
+  const head = (e) => `<div class="head"><span class="logo" aria-hidden="true">${LOGO[p]}</span><span class="name">${PROVIDERS[p].zh}</span>${badge(T, e)}</div>`;
+  // 状态一/二：官方已宣布要重置（有时间 → 倒计时；没时间 → 已宣布多久）
+  if (pend) {
+    const exp = pend.expectedAt, day = pend.expectedPrecision === "day";
+    const lbl = exp ? (day ? T.untilDayLbl : T.untilLbl) : T.annLbl;
+    const line = exp ? `${T.expLine}：${timeEl(T, exp, day ? "date" : "full")}${day ? T.expDayNote : ""} · ${tzPick(T)}` : `${T.annLine}：${timeEl(T, pend.announcedAt, "full")} · ${tzPick(T)}`;
+    return `<section class="card ${p} pending" aria-label="${PROVIDERS[p].zh}">
+  ${head(pend)}
+  <div class="lbl" data-due="${esc(T.dueLbl)}">${lbl}</div>
+  ${COUNTER(T, exp ? `data-until="${exp}"` : `data-since="${pend.announcedAt}"`)}
+  <div class="last">${line}</div>
+  <div class="teaser-line">${esc(T.summary(pend))}<br><span class="prev">${T.prevGrant}：${timeEl(T, at(last), "full")} · ${T.kinds[last.kind]}</span></div>
+  <div class="foot"><span>${exp ? T.nextKnown : T.nextUnknown}</span><a href="${esc(pend.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a></div>
+</section>`;
+  }
+  // 状态三：没有预告 → 距上次送额度
   return `<section class="card ${p}" aria-label="${PROVIDERS[p].zh}">
-  <div class="head"><span class="logo" aria-hidden="true">${LOGO[p]}</span><span class="name">${PROVIDERS[p].zh}</span>${badge(T, last)}</div>
+  ${head(last)}
   <div class="lbl">${T.since}</div>
-  <div class="counter" data-since="${last.announcedAt}"><span>--</span><i>${T.units[0]}</i><span>--</span><i>${T.units[1]}</i><span>--</span><i>${T.units[2]}</i></div>
-  <div class="last">${T.last}：${timeEl(T, last.announcedAt, "full")} · <span class="tzname">${T.tzFallback}</span></div>${teaserLine}
+  ${COUNTER(T, `data-since="${at(last)}"`)}
+  <div class="last">${T.last}：${timeEl(T, at(last), "full")} · ${tzPick(T)}</div>
   <div class="foot"><span>${T.next}</span><a href="${esc(last.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a></div>
 </section>`;
 }
 function recentPanel(T, n = 4) {
   return `<section class="panel" aria-label="${T.recent}"><div class="ph">${SVG_CLOCK}${T.recent}<a class="more" href="${href(T, "/timeline")}">${T.viewAll}</a></div>
-<div class="rows">${events.filter(REAL).slice(0, n).map((e) => `<a class="row" href="${href(T, "/timeline")}#e${e.id}"><span class="d">${timeEl(T, e.announcedAt, "date")}</span><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${badge(T, e)}</span></a>`).join("")}</div></section>`;
+<div class="rows">${events.filter((e) => REAL(e) || e.pendingReset).slice(0, n).map((e) => `<a class="row" href="${href(T, "/timeline")}#e${e.id}"><span class="d">${timeEl(T, e.announcedAt, "date")}</span><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${badge(T, e)}</span></a>`).join("")}</div></section>`;
 }
 function faqPanel(T) {
   return `<section class="panel" aria-label="${T.faq}"><div class="ph">${SVG_Q}${T.faq}<a class="more" href="${href(T, "/faq")}">${T.all}</a></div>
@@ -216,7 +244,13 @@ function followBlock() {
 }
 
 function shareData(T) {
-  const pick = (p) => { const e = events.find((x) => x.provider === p && REAL(x)); return { kind: e.kind, since: e.announcedAt, zh: e.zh, en: enSummary(e).slice(0, 80) }; };
+  // 与首页卡片同一套三态：until=倒计时到预告时间 / since=已宣布多久或距上次多久
+  const pick = (p) => {
+    const e = events.filter((x) => x.provider === p && REAL(x)).sort((x, y) => at(y).localeCompare(at(x)))[0];
+    const pd = events.find((x) => x.provider === p && x.pendingReset && x.announcedAt > e.announcedAt);
+    if (pd) return { kind: "teaser", until: pd.expectedAt || null, since: pd.expectedAt ? null : pd.announcedAt, lbl: pd.expectedAt ? (pd.expectedPrecision === "day" ? T.untilDayLbl : T.untilLbl) : T.annLbl, next: pd.expectedAt ? T.nextKnown : T.nextUnknown, zh: pd.zh, en: enSummary(pd).slice(0, 80) };
+    return { kind: e.kind, since: at(e), lbl: T.since, next: T.next, zh: e.zh, en: enSummary(e).slice(0, 80) };
+  };
   return { site: T.name, url: site.url + T.base, codex: pick("codex"), claude: pick("claude"), kinds: T.kinds };
 }
 function page(T, { title, desc, path: p, active, body, jsonld }) {
@@ -244,7 +278,7 @@ ${site.verify && site.verify.baidu ? `<meta name="baidu-site-verification" conte
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 <style>${CSS}</style>
 </head>
-<body data-units='${JSON.stringify(T.units)}' data-tzlabels='${JSON.stringify(tzLabels)}'>
+<body data-units='${JSON.stringify(T.units)}' data-tzmsg="${T.tzSwitched}" data-tzlabels='${JSON.stringify(tzLabels)}'>
 <div class="page">
 <header class="top">
   <div class="brand"><h1><a href="${href(T, "/")}">${esc(T.name)}</a></h1><span class="tag">${esc(T.tagline)}</span></div>
