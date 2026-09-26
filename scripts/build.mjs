@@ -296,6 +296,7 @@ ${followBlock()}
 <script type="application/json" id="share-data">${JSON.stringify(shareData(T))}</script>
 <script>${JS}</script>
 <script defer src="/share.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 
 ${site.analytics && site.analytics.baiduTongji ? `<script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?${site.analytics.baiduTongji}";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();</script>` : ""}
 </body>

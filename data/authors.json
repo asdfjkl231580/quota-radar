@@ -6,9 +6,10 @@
   "verified": true
  },
  "OpenAIDevs": {
-  "name": "OpenAIDevs",
+  "name": "OpenAI Developers",
   "handle": "OpenAIDevs",
-  "avatar": ""
+  "avatar": "/assets/avatars/OpenAIDevs.jpg",
+  "verified": true
  },
  "ClaudeDevs": {
   "name": "ClaudeDevs",
