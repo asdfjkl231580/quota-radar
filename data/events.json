@@ -1,6 +1,23 @@
 {
- "updatedAt": "2026-09-24T00:34:23.088Z",
+ "updatedAt": "2026-09-26T02:40:00Z",
  "events": [
+  {
+   "id": "2103637477760311522",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2103637477760311522",
+   "announcedAt": "2026-09-26T00:07:13.000Z",
+   "textEn": "o yes… we’re back in action and we’ll reset usage limits for all paid users across codex and ChatGPT work\n\nsorry about the brief disruption!\n\n(and yes we have a special spare codex when things are down to help us out)",
+   "kind": "reset",
+   "extraLinks": [],
+   "zh": "服务短暂中断后，Codex 与 ChatGPT Work 全部付费用户重置",
+   "detail": "Tibo：「我们回来了」，为所有付费用户重置使用限制。",
+   "scope": "Codex 与 ChatGPT Work 全部付费用户",
+   "verified": true,
+   "verifiedBy": "人工核实 + 原帖",
+   "verifiedAt": "2026-09-26",
+   "confidence": "high"
+  },
   {
    "id": "2102871550974427462",
    "provider": "claude",
@@ -10,10 +27,11 @@
    "sourceUrl": "https://x.com/ClaudeDevs/status/2102871550974427462",
    "extraLinks": [
     "https://x.com/ClaudeDevs/status/2102871554069774451",
-    "https://x.com/ClaudeDevs/status/2102871555244257518"
+    "https://x.com/ClaudeDevs/status/2102871555244257518",
+    "https://x.com/ClaudeDevs/status/2102940480736821610"
    ],
    "zh": "Claude Code 云端会话正式上线，现有订阅者一次性送试用额度：Pro 送 $100、Max 送 $250，10 月 7 日前领",
-   "detail": "额度独立于用量限额，只能用于云端会话；本地触顶可转云端继续。CLI 输入 /claim-credit 领取，需连接 GitHub。",
+   "detail": "额度独立于用量限额，只能用于云端会话；本地触顶可转云端继续。CLI 输入 /claim-credit 领取，需连接 GitHub。官方澄清：云端会话本身走你的 Pro/Max 套餐，这笔 credit 是可选的一次性赠送。",
    "scope": "Pro / Max 现有订阅者",
    "textEn": "Cloud sessions are officially available and out of research preview! They let you keep Claude Code working, even when your laptop is closed.\n\nExisting subscribers get a one-time credit to try them: $100 on Pro, $250 on Max.",
    "verified": true,
@@ -45,14 +63,16 @@
    "announcedAt": "2026-09-22T16:44:06Z",
    "account": "@ClaudeDevs",
    "sourceUrl": "https://x.com/ClaudeDevs/status/2102438800836489554",
-   "extraLinks": [],
+   "extraLinks": [
+    "https://x.com/ClaudeDevs/status/2102438803013333469"
+   ],
    "zh": "Opus 5.5 发布：5 小时限额上调 20%，Pro/Max/Team 各得一张随时可用的重置卡",
-   "detail": "Opus 5.5 更便宜，同样额度多用 25%。",
+   "detail": "Opus 5.5 更便宜，同样额度多用 25%。重置卡在设置→用量里使用，10 月 22 日前有效。",
    "scope": "Pro / Max / Team",
    "textEn": "Opus 5.5 performs at the level of Fable 5.1. It's ~30% faster and ~40% cheaper than Opus 5 per task.\n\nIn Claude Code:\n- 5-hour session limits increase 20% today\n- Opus 5.5 is priced lower, so it goes 25% further within limits\n- Pro, Max, and Team users get a reset to use anytime",
    "verified": true,
    "verifiedBy": "原帖核验（fxtwitter）",
-   "verifiedAt": "2026-09-24",
+   "verifiedAt": "2026-09-26",
    "confidence": "high"
   },
   {
