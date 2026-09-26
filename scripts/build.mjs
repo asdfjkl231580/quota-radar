@@ -207,6 +207,7 @@ function statusCard(T, p) {
   <div class="lbl" data-due="${esc(T.dueLbl)}">${lbl}</div>
   ${COUNTER(T, exp ? `data-until="${exp}"` : `data-since="${pend.announcedAt}"`)}
   <div class="last">${line}</div>
+  <button class="beg" type="button" data-p="${p}" hidden><span class="beg-l"></span><span class="beg-n">0</span><span class="beg-u"></span></button>
   <div class="teaser-line">${esc(T.summary(pend))}<br><span class="prev">${T.prevGrant}：${timeEl(T, at(last), "full")} · ${T.kinds[last.kind]}</span></div>
   <div class="foot"><span>${exp ? T.nextKnown : T.nextUnknown}</span><a href="${esc(pend.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a></div>
 </section>`;
@@ -217,6 +218,7 @@ function statusCard(T, p) {
   <div class="lbl">${T.since}</div>
   ${COUNTER(T, `data-since="${at(last)}"`)}
   <div class="last">${T.last}：${timeEl(T, at(last), "full")}${last.observedAt ? T.observedTag : ""} · ${tzPick(T)}</div>
+  <button class="beg" type="button" data-p="${p}" hidden><span class="beg-l"></span><span class="beg-n">0</span><span class="beg-u"></span></button>
   <div class="foot"><span>${T.next}</span><a href="${esc(last.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a></div>
 </section>`;
 }
@@ -296,6 +298,7 @@ ${followBlock()}
 <script type="application/json" id="share-data">${JSON.stringify(shareData(T))}</script>
 <script>${JS}</script>
 <script defer src="/share.js"></script>
+<script defer src="/beg.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 
 ${site.analytics && site.analytics.baiduTongji ? `<script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?${site.analytics.baiduTongji}";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();</script>` : ""}
@@ -361,5 +364,6 @@ for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^[0-9a-f]{32}\.txt
 for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^baidu_verify_.*\.html$/.test(f)) out(f, fs.readFileSync(path.join(ROOT, "site", f), "utf8"));
 if (fs.existsSync(path.join(ROOT, "site/assets"))) fs.cpSync(path.join(ROOT, "site/assets"), path.join(DIST, "assets"), { recursive: true });
 fs.copyFileSync(path.join(ROOT, "site/share.js"), path.join(DIST, "share.js"));
+fs.copyFileSync(path.join(ROOT, "site/beg.js"), path.join(DIST, "beg.js"));
 
 console.log(`构建完成：${events.length} 条事件，${urls.length} 个页面（中英）→ dist/`);

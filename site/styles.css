@@ -173,3 +173,15 @@ time.flash{animation:tzflash 1s ease}
 .tz-toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#111;color:#fff;font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;z-index:99}
 .card .teaser-line .prev{font-weight:500;opacity:.85}
 @media(prefers-reduced-motion:reduce){time.flash{animation:none}}
+/* 求重置按钮（2026-09-26）：卡片内，Codex 蓝卡用白底、Claude 黄卡用黑底 */
+.card .beg{position:relative;display:inline-flex;align-items:baseline;gap:6px;margin-top:12px;align-self:flex-start;border:0;border-radius:999px;padding:9px 16px;font:800 15px/1 var(--cn);cursor:pointer;transition:transform .12s;overflow:visible}
+.card.codex .beg{background:var(--white);color:var(--blue)}
+.card.claude .beg{background:var(--black);color:var(--yellow)}
+.card .beg .beg-n{font:900 17px/1 "NumCN",var(--en);font-variant-numeric:tabular-nums}
+.card .beg .beg-u{font-weight:600;font-size:13px;opacity:.8}
+.card .beg[data-mode=thanks] .beg-l::before{content:"♥ "}
+.card .beg:active,.card .beg.pop{transform:scale(.94)}
+.card .beg:focus-visible{outline:3px solid var(--black);outline-offset:2px}
+.card .beg-plus{position:absolute;top:-4px;font:900 16px/1 "NumCN",var(--en);pointer-events:none;animation:begup .7s ease-out forwards}
+@keyframes begup{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-34px)}}
+@media(prefers-reduced-motion:reduce){.card .beg-plus{animation:none;opacity:0}.card .beg{transition:none}}

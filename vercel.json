@@ -4,7 +4,7 @@
   "trailingSlash": false,
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/api/events.json",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
