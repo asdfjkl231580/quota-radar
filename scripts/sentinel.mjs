@@ -72,7 +72,7 @@ function classify(text) {
   const done = /(have|has|we've|i've|been|just|now|done|propagated|landed|enjoy|is back)/.test(t);
   const immediate = /(full|fully|hard|double|sneaky) reset|reset everyone's|will be fully reset/.test(t);
   if (banked && !immediate) return teaser && !reset ? "teaser" : "banked";   // 同帖既立即重置又发卡，按重置记
-  if (reset) { if (confirmed) return "reset"; if (future && !done) return "teaser"; if (teaser && !done) return "teaser"; return "reset"; }
+  if (reset) { if (confirmed) return "reset"; if (future) return "teaser"; if (teaser && !done) return "teaser"; return "reset"; }
   if (boost) return "boost";
   return teaser ? "teaser" : "unclear";
 }
