@@ -1,14 +1,14 @@
 name: 哨兵（每 10 分钟盯 X 官方账号）
 on:
   schedule:
-    - cron: "*/10 * * * *"     # 每 10 分钟：两参考站接口
-    - cron: "3 * * * *"        # 每小时一次：加 TikHub 直查
+    - cron: "7 */2 * * *"      # 兜底：每 2 小时一次（主触发改由 Vercel 定时器每 10 分钟调，GitHub 自带定时不准）
+    - cron: "30 1 * * *"       # 每天一次 09:30 北京：加 TikHub 直查 X（2026-09-26 用户定：一天一次足够）
   workflow_dispatch:
     inputs:
       tikhub:
         description: "带 TikHub 直查"
         type: boolean
-        default: true
+        default: false
 concurrency: { group: sentinel, cancel-in-progress: false }
 permissions: { contents: write }
 jobs:
@@ -31,7 +31,7 @@ jobs:
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_TO_CHAT_ID: ${{ secrets.FEISHU_TO_CHAT_ID }}
         run: |
-          if [ "${{ github.event.schedule }}" = "3 * * * *" ] || [ "${{ github.event.inputs.tikhub }}" = "true" ]; then
+          if [ "${{ github.event.schedule }}" = "30 1 * * *" ] || [ "${{ github.event.inputs.tikhub }}" = "true" ]; then
             node scripts/sentinel.mjs --tikhub
           else
             node scripts/sentinel.mjs

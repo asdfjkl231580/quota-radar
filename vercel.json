@@ -49,5 +49,11 @@
       "source": "/:path*",
       "destination": "/:path*/index.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "*/10 * * * *"
+    }
   ]
 }

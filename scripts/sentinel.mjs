@@ -43,7 +43,7 @@ for (const src of watch.leadSources || []) {
   } catch (e) { log(`${src.name} 失败: ${e.message}`); }
 }
 // ①b codex-resets 的「已排期」：它也把「宣布将重置」记为待执行（scheduled_reset），带 scheduled_for 时用来交叉核对我们的预告时间
-let crScheduled = null;
+let crScheduled = null; const crEvidence = [];
 try {
   const j = await (await fetch("https://codex-resets.com/api/v1/status", { headers: { "User-Agent": "quota-radar-sentinel (airesetclock.com)" }, signal: AbortSignal.timeout(20000) })).json();
   crScheduled = j?.data?.scheduled_reset || null;
@@ -54,6 +54,13 @@ try {
     else if (mine && mine.expectedAt && crScheduled.scheduled_for && Math.abs(new Date(mine.expectedAt) - new Date(crScheduled.scheduled_for)) > 3600000) log(`⚠ 预告时间与 codex-resets 相差超 1 小时：我们 ${mine.expectedAt} / 它 ${crScheduled.scheduled_for}`);
   }
   log(`codex-resets 状态：${crScheduled ? "有已排期 " + crScheduled.id + "（时间 " + (crScheduled.scheduled_for || "未公布") + "）" : "无已排期"}`);
+  // 执行证据：它确认到账后，会出现 id 为 observed-<原帖id> 的记录（时间=它实测到账的时间），或把这条挪进 latest_reset
+  const list = (await (await fetch("https://codex-resets.com/api/v1/resets?limit=20", { headers: { "User-Agent": "quota-radar-sentinel (airesetclock.com)" }, signal: AbortSignal.timeout(20000) })).json())?.data || [];
+  for (const x of ef.events.filter((e) => e.provider === "codex" && e.pendingReset)) {
+    const obs = list.find((r) => r.id === "observed-" + x.id);
+    if (obs) crEvidence.push({ x, at: new Date(obs.announced_at).toISOString(), how: "codex-resets 实测到账", observed: true });
+    else if (j?.data?.latest_reset?.id === x.id && crScheduled?.id !== x.id) crEvidence.push({ x, at: new Date().toISOString(), how: "codex-resets 标记已执行（本站发现时间）" });
+  }
 } catch (e) { log(`codex-resets 状态失败: ${e.message}`); }
 
 // ② ③ TikHub
@@ -129,6 +136,14 @@ for (const x of ef.events) {
   x.detail = (x.detail ? x.detail + " " : "") + "官方未另发确认，按预告时间计。";
   if (/尚未确认生效|生效时间未公布/.test(x.zh)) x.zh = x.zh.replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, "（按预告时间计）");
   promoted++;
+}
+for (const c of crEvidence) {
+  const x = c.x; if (!x.pendingReset) continue;
+  x.pendingReset = false; x.kind = /bank/i.test(x.textEn) ? "banked" : "reset"; x.effectiveAt = c.at; x.promotedAt = new Date().toISOString();
+  if (c.observed) x.observedAt = c.at;
+  x.detail = `${(x.detail || "").trim()} 到账时间：${bj(c.at)} 北京（${c.how}）。`.trim();
+  if (/生效时间未公布|尚未确认生效/.test(x.zh)) x.zh = x.zh.replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, "（已到账）").replace("将为", "为");
+  promoted++; log(`codex-resets 执行证据转正 ${x.id} @ ${c.at}`);
 }
 for (const c of confirms) {
   const x = c.pend; if (!x.pendingReset) continue;
