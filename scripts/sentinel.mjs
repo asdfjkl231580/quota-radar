@@ -85,7 +85,8 @@ for (const x of ef.events) {
   if (x.pendingReset && Date.now() - new Date(x.announcedAt).getTime() > 3 * 3600000) {
     x.pendingReset = false; x.kind = "reset"; x.promotedAt = new Date().toISOString();
     x.detail = (x.detail ? x.detail + " " : "") + "官方未单独确认生效时间，超过 3 小时按公告时间计。";
-    if (/尚未确认生效/.test(x.zh)) x.zh = x.zh.replace("官方宣布即将重置，尚未确认生效", "官方宣布全员重置（按公告时间计）");
+    // 自动模板与人工写的「（尚未确认生效）」都要改掉，否则计数已算重置、文案还说未生效
+    if (/尚未确认生效/.test(x.zh)) x.zh = x.zh.replace("官方宣布即将重置，尚未确认生效", "官方宣布全员重置（按公告时间计）").replace(/[，,（(]?\s*尚未确认生效\s*[）)]?/, "（按公告时间计）");
     promoted++;
   }
 }
@@ -124,19 +125,19 @@ if ((auto.length || promoted) && !args.has("--no-deploy")) {
   try { execFileSync("node", ["scripts/deploy.mjs"], { cwd: ROOT, stdio: "inherit", timeout: 360000, env: { ...process.env, PATH: (process.env.PATH || "") + ":/Users/kenyuanlin/.npm-global/bin:/opt/homebrew/bin:/usr/local/bin" } }); log("已自动发布生产（含 IndexNow）"); }
   catch (e) { log("自动发布失败: " + e.message.slice(0, 200)); }
 }
-if ((auto.length || pend.length) && !args.has("--no-feishu")) {
+if ((auto.length || pend.length || promoted) && !args.has("--no-feishu")) {
   const lines = [...auto.map((a) => `· 已上线 [${a.kind}] ${a.account} ${bj(a.announcedAt, "md")}：${a.textEn.slice(0, 70).replace(/\n/g, " ")}`), ...pend.map((p) => `· 待办 [${p.guess}] ${p.account} ${bj(p.announcedAt, "md")}：${p.textEn.slice(0, 70).replace(/\n/g, " ")}`)];
-  const msg = `【额度雷达】哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条\n${lines.join("\n")}\n\n补中文：cd ~/Documents/GitHub/quota-radar && node scripts/review.mjs edit <id> --zh "..." --scope "..."\n待办：node scripts/review.mjs list`;
+  const msg = `【额度雷达】哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条${promoted ? `，预告超时转正 ${promoted} 条` : ""}\n${lines.join("\n")}\n\n补中文：cd ~/Documents/GitHub/quota-radar && node scripts/review.mjs edit <id> --zh "..." --scope "..."\n待办：node scripts/review.mjs list`;
   try { await sendFeishu(msg); log("飞书已通知"); } catch (e) { log("飞书失败: " + e.message.slice(0, 120)); }
 }
 
 // 云端：把 events/pending/rejected 的变化提交回仓库，作为下一次运行的状态
-if (process.env.GITHUB_ACTIONS && (auto.length || pend.length || found.size)) {
+if (process.env.GITHUB_ACTIONS && (auto.length || pend.length || found.size || promoted)) {
   try {
     execFileSync("git", ["config", "user.name", "quota-radar-bot"], { cwd: ROOT });
     execFileSync("git", ["config", "user.email", "bot@airesetclock.com"], { cwd: ROOT });
     execFileSync("git", ["add", "data/events.json", "data/pending.json", "data/rejected.json"], { cwd: ROOT });
     const st = execFileSync("git", ["status", "--porcelain", "data"], { cwd: ROOT, encoding: "utf8" });
-    if (st.trim()) { execFileSync("git", ["commit", "-m", `哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条`], { cwd: ROOT }); execFileSync("git", ["push"], { cwd: ROOT }); log("数据已提交回仓库"); }
+    if (st.trim()) { execFileSync("git", ["commit", "-m", `哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条，转正 ${promoted} 条`], { cwd: ROOT }); execFileSync("git", ["push"], { cwd: ROOT }); log("数据已提交回仓库"); }
   } catch (e) { log("提交回仓库失败: " + e.message.slice(0, 160)); }
 }
