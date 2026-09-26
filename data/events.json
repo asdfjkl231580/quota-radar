@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-26T03:00:00Z",
+ "updatedAt": "2026-09-26T03:34:09.309Z",
  "events": [
   {
    "id": "2103637477760311522",
@@ -8,16 +8,17 @@
    "sourceUrl": "https://x.com/thsottiaux/status/2103637477760311522",
    "announcedAt": "2026-09-26T00:07:13.000Z",
    "textEn": "o yes… we’re back in action and we’ll reset usage limits for all paid users across codex and ChatGPT work\n\nsorry about the brief disruption!\n\n(and yes we have a special spare codex when things are down to help us out)",
-   "kind": "teaser",
+   "kind": "reset",
    "extraLinks": [],
-   "zh": "服务中断恢复后，官方宣布将为 Codex 与 ChatGPT Work 全部付费用户重置（尚未确认生效）",
-   "detail": "Tibo：「我们回来了，将重置所有付费用户的使用限制」。生效后本条更新。",
+   "zh": "服务中断恢复后，官方宣布将为 Codex 与 ChatGPT Work 全部付费用户重置（按公告时间计）",
+   "detail": "Tibo：「我们回来了，将重置所有付费用户的使用限制」。生效后本条更新。 官方未单独确认生效时间，超过 3 小时按公告时间计。",
    "scope": "Codex 与 ChatGPT Work 全部付费用户",
    "verified": true,
    "verifiedBy": "人工核实 + 原帖",
    "verifiedAt": "2026-09-26",
    "confidence": "high",
-   "pendingReset": true
+   "pendingReset": false,
+   "promotedAt": "2026-09-26T03:34:09.309Z"
   },
   {
    "id": "2102871550974427462",
