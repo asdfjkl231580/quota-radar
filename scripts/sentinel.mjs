@@ -70,9 +70,10 @@ function classify(text) {
   const reset = /\breset(ting|s|ed)?\b|reseting/.test(t);
   const boost = /(limits? (increase|up|raised)|increase[sd]? (the )?(usage|limits|rate limits)|more usage|free credits?|one-time credit|goes? \d+% further|(\d+)x more usage|(lifting|lift) (the )?usage limits|2x the usual)/.test(t);
   const done = /(have|has|we've|i've|been|just|now|done|propagated|landed|enjoy|is back)/.test(t);
+  const doneStrong = /(have|has|we've|i've|i have|we have) (now |just |also |again )?(reset|reseted|been reset)|(are|is) (now )?reset\b|reset(ed)? (all|for everyone|usage limits|rate limits|the usage limits|the rate limit) (has|is)|has been reset|have been reset|enjoy (a |the )?(nice |full |sweet )?reset|reset button pressed|we did a .*reset|giving .* a usage reset/.test(t);
   const immediate = /(full|fully|hard|double|sneaky) reset|reset everyone's|will be fully reset/.test(t);
   if (banked && !immediate) return teaser && !reset ? "teaser" : "banked";   // 同帖既立即重置又发卡，按重置记
-  if (reset) { if (confirmed) return "reset"; if (future) return "teaser"; if (teaser && !done) return "teaser"; return "reset"; }
+  if (reset) { if (confirmed || doneStrong) return "reset"; if (future) return "teaser"; if (teaser && !done) return "teaser"; return "reset"; }
   if (boost) return "boost";
   return teaser ? "teaser" : "unclear";
 }
