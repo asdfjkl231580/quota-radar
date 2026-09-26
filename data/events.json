@@ -1,6 +1,23 @@
 {
- "updatedAt": "2026-09-26T03:54:23.085Z",
+ "updatedAt": "2026-09-26T18:20:42.695Z",
  "events": [
+  {
+   "id": "2103911959544610829",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2103911959544610829",
+   "announcedAt": "2026-09-26T18:17:54.000Z",
+   "textEn": "Resets all propagated. That will be all. Have a fantastic weekend.",
+   "kind": "reset",
+   "extraLinks": [],
+   "zh": "官方宣布全员重置（原文待整理）",
+   "detail": "官方确认生效；预告见 2026-09-26T00:07Z",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：didreset 线索 + 原帖核验",
+   "verifiedAt": "2026-09-26",
+   "confidence": "auto"
+  },
   {
    "id": "2103637477760311522",
    "provider": "codex",
@@ -17,7 +34,8 @@
    "verifiedBy": "人工核实 + 原帖",
    "verifiedAt": "2026-09-26",
    "confidence": "high",
-   "pendingReset": true
+   "pendingReset": false,
+   "fulfilledBy": "2103911959544610829"
   },
   {
    "id": "2102871550974427462",
