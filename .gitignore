@@ -6,3 +6,4 @@ data/fetch-log.jsonl
 .vercel
 data/sentinel.log
 data/sentinel-launchd.log
+.probe/

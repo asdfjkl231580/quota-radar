@@ -109,6 +109,20 @@ for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间
   add("文案与事实", "FAQ「近 90 天次数」与数据一致", m && +m[1] === n90("codex") && +m[2] === n90("claude") ? "pass" : "fail", m ? `页面 ${m[1]}/${m[2]}，数据 ${n90("codex")}/${n90("claude")}` : "没找到这句");
 }
 
+// ③b 到账探针（本机）：多久没跑、灵敏度
+{
+  const f = path.join(ROOT, ".probe/state.json");
+  if (!fs.existsSync(f)) add("到账探针", "探针在跑", "fail", "没有 .probe/state.json：定时任务还没装");
+  else {
+    const st = JSON.parse(fs.readFileSync(f, "utf8"));
+    const age = (Date.now() - new Date(st.lastOkAt)) / 60000;
+    add("到账探针", "最近 15 分钟内成功探测过", age <= 15 ? "pass" : "fail", `上次成功 ${bjDate(st.lastOkAt)} 北京（${Math.round(age)} 分钟前）${st.authFailAt ? "；登录失效，终端运行 codex login" : ""}`);
+    add("到账探针", "探测灵敏度", /^高/.test(st.sensitivity || "") ? "pass" : "warn", `${st.sensitivity}；当前周额度 ${st.last?.primary?.used}%，重置卡 ${st.last?.banked}`);
+    const obs = (st.observations || []).slice(-3);
+    if (obs.length) add("到账探针", "最近的实测到账记录", "pass", obs.map((o) => `${o.window}：${o.detail}`).join("\n"));
+  }
+}
+
 // ④ 资源和接口
 {
   const srcs = new Set();

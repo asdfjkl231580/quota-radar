@@ -37,7 +37,7 @@ const L = {
     hero1: "AI 额度动态", hero2: "一眼看清", sticker: "好消息<br>马上通知！", mascotAlt: "额度雷达吉祥物：拿着喇叭的雷达小人",
     since: "距上次送额度已过去", next: "官方下次：尚未公布",
     untilLbl: "距官方预告的重置还有", untilDayLbl: "距官方预告那天（美西时间）还有", annLbl: "官方已宣布重置，公告发出已过去", dueLbl: "预告时间已到，等官方确认生效",
-    expLine: "官方预告", expDayNote: "（美西当天，几点未公布）", annLine: "公告", nextUnknown: "生效时间：官方未公布", nextKnown: "时间来自官方原帖", prevGrant: "上次送额度", tzSwitched: "已切换到", source: "原帖 ↗", last: "上次", units: ["天", "时", "分"],
+    expLine: "官方预告", expDayNote: "（美西当天，几点未公布）", annLine: "公告", nextUnknown: "生效时间：官方未公布", nextKnown: "时间来自官方原帖", prevGrant: "上次送额度", tzSwitched: "已切换到", observedTag: "（实测到账）", source: "原帖 ↗", last: "上次", units: ["天", "时", "分"],
     recent: "最近记录", viewAll: "查看全部 →", faq: "常见问题", all: "全部 →", openAlone: "单独打开 ↗",
     footer: "只收录官方消息 · 不预测下次", menu: "菜单", tz: "时区", about: "关于", updated: "数据更新",
     kinds: { reset: "全员重置", banked: "重置卡", boost: "提额", teaser: "预告" }, lowBadge: "待补证", autoBadge: "待整理", teaserLbl: "预告", viewOnX: "在 X 上看 ↗", tweetCard: "原帖",
@@ -59,7 +59,7 @@ const L = {
     hero1: "AI Quota Updates", hero2: "at a Glance", sticker: "Good news,<br>instantly!", mascotAlt: "Quota Radar mascot: a radar character holding a megaphone",
     since: "Since the last quota grant", next: "Next: not announced",
     untilLbl: "Announced reset in", untilDayLbl: "Announced day (US Pacific) starts in", annLbl: "Reset announced, time since announcement", dueLbl: "Announced time reached, awaiting confirmation",
-    expLine: "Announced for", expDayNote: " (US Pacific day, time not given)", annLine: "Announced", nextUnknown: "Effective time: not announced", nextKnown: "Time from the official post", prevGrant: "Previous grant", tzSwitched: "Time zone:", source: "Source ↗", last: "Last", units: ["d", "h", "m"],
+    expLine: "Announced for", expDayNote: " (US Pacific day, time not given)", annLine: "Announced", nextUnknown: "Effective time: not announced", nextKnown: "Time from the official post", prevGrant: "Previous grant", tzSwitched: "Time zone:", observedTag: " (observed)", source: "Source ↗", last: "Last", units: ["d", "h", "m"],
     recent: "Recent", viewAll: "View all →", faq: "FAQ", all: "All →", openAlone: "Open ↗",
     footer: "Official announcements only · No predictions", menu: "Menu", tz: "Time zone", about: "About", updated: "Updated",
     kinds: { reset: "Full reset", banked: "Banked reset", boost: "Quota boost", teaser: "Heads-up" }, lowBadge: "unconfirmed", autoBadge: "auto", teaserLbl: "Heads-up", viewOnX: "View on X ↗", tweetCard: "Source post",
@@ -216,7 +216,7 @@ function statusCard(T, p) {
   ${head(last)}
   <div class="lbl">${T.since}</div>
   ${COUNTER(T, `data-since="${at(last)}"`)}
-  <div class="last">${T.last}：${timeEl(T, at(last), "full")} · ${tzPick(T)}</div>
+  <div class="last">${T.last}：${timeEl(T, at(last), "full")}${last.observedAt ? T.observedTag : ""} · ${tzPick(T)}</div>
   <div class="foot"><span>${T.next}</span><a href="${esc(last.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a></div>
 </section>`;
 }

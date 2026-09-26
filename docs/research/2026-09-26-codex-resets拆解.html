@@ -1,0 +1,112 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>codex-resets 拆解</title>
+<style>
+:root{--bg:#F7F8FA;--paper:#fff;--ink:#111;--sub:#6b6f76;--line:#E7E7E7;--blue:#1467F5;--yellow:#FFEA00;--ok:#12823B;--okbg:#E7F6EC;--bad:#C62828;--badbg:#FDECEC;--warn:#A85D00;--warnbg:#FFF4E0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:32px 16px 80px;display:flex;flex-direction:column;gap:28px}
+h1{margin:0;font-size:30px;font-weight:900;line-height:1.25}h1 mark{background:linear-gradient(transparent 58%,var(--yellow) 58%);color:inherit}
+.meta{color:var(--sub);font-size:13px;margin-top:6px}
+h2{margin:0 0 10px;font-size:20px;font-weight:900}
+h3{margin:14px 0 6px;font-size:15px}
+p{margin:0 0 10px}
+.lead{background:var(--ink);color:#fff;border-radius:14px;padding:18px 20px;font-size:16px}
+.lead b{color:var(--yellow)}
+.box{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--sub);font-weight:600;border-top:0}
+.scroll{overflow-x:auto}
+code{font:12.5px ui-monospace,Menlo,monospace;background:#EEF1F5;padding:1px 5px;border-radius:4px;word-break:break-all}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.ok{background:var(--okbg);color:var(--ok)}.bad{background:var(--badbg);color:var(--bad)}.warn{background:var(--warnbg);color:var(--warn)}.blue{background:#E8F0FE;color:var(--blue)}
+.big{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1}
+.stats{display:flex;flex-wrap:wrap;gap:10px}.stats>div{flex:1 1 160px}
+.stats span{display:block;font-size:12.5px;color:var(--sub)}
+ol,ul{margin:0;padding-left:20px}li{margin:4px 0}
+.dec{border-left:4px solid var(--blue);padding:10px 14px;background:var(--paper);border-radius:0 10px 10px 0;margin:8px 0}
+.dec b.t{display:block}
+.need{color:var(--warn);font-weight:700}
+a{color:var(--blue)}
+</style></head><body><div class="wrap">
+
+<header><h1>codex-resets.com <mark>拆解与借用方案</mark></h1>
+<div class="meta">2026-09-26 12:20 · 数据全部是当场实调接口拿到的，不是看网页猜的</div></header>
+
+<div class="lead">结论：它的数据<b>可以合法、免费地接进来当第二双眼睛</b>，我已经接好上线了。它最值钱的一招不是按钮，而是<b>用真实账号实测重置几点到账</b>。这招我们用你的 Codex 账号就能做，今天已经实测成功。「求重置」按钮值得做，但要做我们自己的，不能嵌它的。</div>
+
+<section><h2>一、它的数据是怎么来的</h2>
+<div class="box scroll"><table>
+<tr><th>接口</th><th>干什么</th><th>我们能不能用</th></tr>
+<tr><td><code>GET /api/v1/status</code></td><td>当前状态：最近一次重置、<b>已排期但没到账的重置</b>（带 scheduled_for 预告时间）、AI 预测、统计</td><td><span class="chip ok">能用</span> 公开、免费、不要钥匙，条件是展示时注明来源并链接</td></tr>
+<tr><td><code>GET /api/v1/resets</code></td><td>全部 54 条历史记录，只有 Codex，分「普通重置 / 重置卡」两类</td><td><span class="chip ok">能用</span> 同上</td></tr>
+<tr><td><code>/api/resets?locale=zh-CN</code></td><td>网页自己用的版本，多了机器翻译的中文</td><td><span class="chip warn">不用</span> 不在公开文档里，翻译质量一般</td></tr>
+<tr><td><code>/api/reset-requests</code> + 实时 WebSocket</td><td>「求重置」计数：读、点、实时推送（带点击者国家）</td><td><span class="chip bad">不能用</span> 内部接口，没开跨域，我们网页直接读不到</td></tr>
+<tr><td><code>/api/email/subscribe</code>、<code>/api/push/subscribe</code></td><td>邮件订阅（24 小时内点确认链接）+ 浏览器推送</td><td><span class="chip blue">借思路</span> 自己做一套</td></tr>
+<tr><td><code>/api/sponsors/checkout</code></td><td>卖赞助位（页面上的赞助卡片）</td><td><span class="chip blue">借思路</span> 它的变现方式</td></tr>
+</table></div>
+<p style="margin-top:10px">它还有两条 id 以 <code>observed-</code> 开头的记录，时间和官方发帖时间对不上。它的接口说明里写着「已排期的重置要等<b>执行证据</b>，过了预告时间也不等于已到账」。也就是说，它有一套自己实测「到没到账」的办法。</p>
+</section>
+
+<section><h2>二、今天这条，它和我们的判断一致</h2>
+<div class="box">
+<p>它的状态接口现在写的是：<b>最近一次重置 = 9/22 的 GPT-6 重置卡</b>，今天 08:07 那条是<b>「已排期、时间未公布」</b>，不算已重置。跟我们刚改好的口径完全一样。</p>
+<p>另外一个硬证据：我用你本机的 Codex 登录，只读查了你自己账号的用量。<b>本周额度用了 100%，下次恢复是 9/30 07:32（北京时间）</b>。如果今天宣布的重置真的到账了，这里会立刻清零。<b>所以到 12:20 为止，重置还没到账。</b></p>
+</div></section>
+
+<section><h2>三、两边逐条对账</h2>
+<div class="stats">
+<div class="box"><div class="big">54 / 63</div><span>它的 Codex 记录 / 我们的</span></div>
+<div class="box"><div class="big">2</div><span>它有我们没有：都是「实测到账」记录，原帖我们已经有，只是时间不同</span></div>
+<div class="box"><div class="big">11</div><span>我们有它没有：4 条重置、4 条重置卡、2 条提额、1 条今天的预告</span></div>
+<div class="box"><div class="big">3</div><span>两边分类不同，回原帖核过：2 条我们对，1 条它对，已改</span></div>
+</div>
+<h3>分类不同的 3 条</h3>
+<div class="box scroll"><table>
+<tr><th>日期</th><th>原帖说了什么</th><th>它</th><th>我们</th><th>结论</th></tr>
+<tr><td>7/13</td><td>「给每个账户加了一张重置卡」</td><td>普通重置</td><td>重置卡</td><td><span class="chip ok">我们对</span></td></tr>
+<tr><td>7/12</td><td>「给 50 万用户加了重置卡」</td><td>普通重置</td><td>重置卡</td><td><span class="chip ok">我们对</span></td></tr>
+<tr><td>2025/12/25</td><td>「重置了限额，并提到 2 倍到 1 月 1 日」</td><td>普通重置</td><td>提额</td><td><span class="chip warn">它对</span> 已改成全员重置，2 倍写进说明</td></tr>
+</table></div>
+<p style="margin-top:10px">它的短板：只有 Codex，没有 Claude；分类只分两种；有一个「AI 预测重置概率」功能（它自己也注明不是官方承诺）。这三点正好是我们的差异：中文、两家都有、不预测。</p>
+</section>
+
+<section><h2>四、「求重置」按钮的真相</h2>
+<div class="box">
+<ul>
+<li><b>199,946 是点击次数，不是人数。</b>点一下加 1，连点 10 下合并成一次提交，没有按人去重。所以「已有 X 人在求」这个说法是虚的，我们做的话要写「X 次」。</li>
+<li><b>每轮重置清零。</b>计数挂在「最近一次重置」上，重置到账后，按钮从「求重置」变成「感谢这次重置」，重新计数。</li>
+<li><b>实时感。</b>别人点击时通过 WebSocket 推过来，页面上飘出点击者国家的国旗。这是它最有传播力的细节。</li>
+<li><b>不能直接嵌它的计数</b>：内部接口、没开跨域，未授权使用也不妥。</li>
+</ul>
+</div></section>
+
+<section><h2>五、我的决定（你不同意就说）</h2>
+
+<div class="dec"><b class="t">✅ 已做并上线：codex-resets 接成第二双眼睛</b>
+哨兵每 10 分钟调一次它的公开接口，拿到的是线索，仍回 X 原帖核对才收录。它的「已排期」如果带了预告时间，我们的卡片直接转倒计时；两边时间相差超过 1 小时，就报警。关于页已注明来源（它的使用条件）。</div>
+
+<div class="dec"><b class="t">✅ 已做：分类对账，改了圣诞那条</b>
+以后每周复核时顺带和它对一次账，分歧会进报告。</div>
+
+<div class="dec"><b class="t">▶ 下一步做：自有「到账探针」，解决「上次重置到底几点」</b>
+每 5 分钟用你的 Codex 登录只读查一次用量。一旦用量清零、恢复时间跳变，或者重置卡数量变多，就记为「实测到账」，精确到 5 分钟，然后自动把卡片从「已宣布」切成「已到账」，并通知你。
+<br><span class="need">限制：</span>钥匙只放你这台 Mac，不上传云端（上传了会把你本机 Codex 登出，也不安全），所以 Mac 合盖睡眠时不测，醒来后补测。Claude 这边同理，可以用你的 Claude 账号做第二个探针。
+<br><span class="need">要你：</span>同意用你的账号当探针。定时任务我按老规矩只给文件，由你装。</div>
+
+<div class="dec"><b class="t">▶ 再下一步：我们自己的「求重置」按钮</b>
+照它的玩法做中文版：点击计数、重置到账后变「感谢重置」、实时飘动。计数写「X 次」，不写「X 人」。
+<br><span class="need">要你：</span>计数要存在一个小数据库里。我选 Upstash（免费档，Vercel 后台一键开通），需要你在 Vercel 点一次授权。</div>
+
+<div class="dec"><b class="t">▶ 提醒：先邮件 + 浏览器推送，公众号第二步</b>
+它用的是邮件（双重确认）加浏览器推送。但国内用户大多在微信里打开网页，微信里浏览器推送不可用。所以两样照做，真正触达国内用户靠公众号推送，放第二步，等探针稳定、提醒准了再接。</div>
+</section>
+
+<section><h2>六、你可能还不知道的</h2>
+<div class="box"><ul>
+<li>它有 5 种语言（含简体、繁体），中文是机器翻的，读起来别扭。<b>我们的中文是人工写的，这是真差异。</b></li>
+<li>它靠卖赞助位赚钱（页面上有赞助商卡片和购买入口）。同类站的变现路子是赞助，不是会员。</li>
+<li>它用了两个轻量统计（onedollarstats、umami），连按钮点击都埋了点。</li>
+<li>它的「AI 预测概率」自己都标注「不是官方承诺」。我们坚持不做预测是对的。</li>
+</ul></div></section>
+
+</div></body></html>
