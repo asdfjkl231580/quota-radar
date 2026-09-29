@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-29T06:50:46.928Z",
+ "updatedAt": "2026-09-29T07:05:14.361Z",
  "events": [
   {
    "id": "2104823812042940713",
@@ -15,6 +15,23 @@
    "scope": "待核实",
    "verified": true,
    "verifiedBy": "自动：didreset 线索 + 原帖核验",
+   "verifiedAt": "2026-09-29",
+   "confidence": "auto"
+  },
+  {
+   "id": "2104641323198472430",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2104641323198472430",
+   "announcedAt": "2026-09-28T18:36:08.000Z",
+   "textEn": "Sonnet 5.5 is available now in the Claude Platform and Claude Code.\n\nWe granted all Pro, Max, and Team users a reset last Tuesday. If you haven’t used it yet, you can still apply it whenever you want, before Oct 22. https://clau.de/reset",
+   "kind": "reset",
+   "extraLinks": [],
+   "zh": "官方宣布全员重置（原文待整理）",
+   "detail": "",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：tikhub 线索 + 原帖核验",
    "verifiedAt": "2026-09-29",
    "confidence": "auto"
   },
