@@ -1,6 +1,23 @@
 {
- "updatedAt": "2026-09-29T07:05:14.361Z",
+ "updatedAt": "2026-10-01T15:00:47.185Z",
  "events": [
+  {
+   "id": "2105672058269212820",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2105672058269212820",
+   "announcedAt": "2026-10-01T14:51:54.000Z",
+   "textEn": "Because usage on your primary dot is virtually unlimited at the moment, I can’t really give a reset. I need to come up with something new fast.",
+   "kind": "reset",
+   "extraLinks": [],
+   "zh": "官方宣布全员重置（原文待整理）",
+   "detail": "",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：didreset 线索 + 原帖核验",
+   "verifiedAt": "2026-10-01",
+   "confidence": "auto"
+  },
   {
    "id": "2104823812042940713",
    "provider": "codex",
