@@ -1,6 +1,23 @@
 {
- "updatedAt": "2026-10-01T15:00:47.185Z",
+ "updatedAt": "2026-10-02T02:20:41.918Z",
  "events": [
+  {
+   "id": "2105843926221660585",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2105843926221660585",
+   "announcedAt": "2026-10-02T02:14:51.000Z",
+   "textEn": "Global reset landing tomorrow 10am PST for all paid ChatGPT accounts. Apologies for the slow start with GPT-6.1 Sol, it's now back to running at expected speeds after the massive load spike in the first two days.",
+   "kind": "reset",
+   "extraLinks": [],
+   "zh": "官方宣布全员重置（原文待整理）",
+   "detail": "",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：didreset 线索 + 原帖核验",
+   "verifiedAt": "2026-10-02",
+   "confidence": "auto"
+  },
   {
    "id": "2105672058269212820",
    "provider": "codex",
