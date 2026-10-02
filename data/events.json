@@ -1,6 +1,23 @@
 {
- "updatedAt": "2026-10-02T02:20:41.918Z",
+ "updatedAt": "2026-10-02T21:20:46.619Z",
  "events": [
+  {
+   "id": "2106131810921136451",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2106131810921136451",
+   "announcedAt": "2026-10-02T21:18:48.000Z",
+   "textEn": "Reset all propagated. Enjoy.",
+   "kind": "reset",
+   "extraLinks": [],
+   "zh": "官方宣布全员重置（原文待整理）",
+   "detail": "",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：didreset 线索 + 原帖核验",
+   "verifiedAt": "2026-10-02",
+   "confidence": "auto"
+  },
   {
    "id": "2105843926221660585",
    "provider": "codex",
