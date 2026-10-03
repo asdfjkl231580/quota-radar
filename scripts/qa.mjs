@@ -13,7 +13,7 @@ const BASE = (args.includes("--base") ? args[args.indexOf("--base") + 1] : "http
 const HOST = new URL(BASE).host;
 const results = []; // { group, name, status: pass|fail|warn, detail }
 const add = (group, name, status, detail = "") => results.push({ group, name, status, detail });
-const get = async (u, opt = {}) => { const r = await fetch(u.startsWith("http") ? u : BASE + u, { redirect: "manual", headers: { "User-Agent": "Mozilla/5.0 (qa-airesetclock)" }, signal: AbortSignal.timeout(15000), ...opt }); return { status: r.status, loc: r.headers.get("location"), type: r.headers.get("content-type") || "", text: r.status < 300 ? await r.text() : "" }; };
+const get = async (u, opt = {}) => { const r = await fetch(u.startsWith("http") ? u : BASE + u, { redirect: "manual", headers: { "User-Agent": "Mozilla/5.0 (qa-airesetclock)" }, signal: AbortSignal.timeout(15000), ...opt }); return { status: r.status, loc: r.headers.get("location"), type: r.headers.get("content-type") || "", text: r.status < 300 || r.status >= 400 ? await r.text() : "" }; };
 const visible = (h) => h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, " ").replace(/&[a-z#0-9]+;/g, " ").replace(/\s+/g, " ");
 const bjDate = (iso) => new Date(new Date(iso).getTime() + 8 * 3600000).toISOString().slice(0, 16).replace("T", " ");
 

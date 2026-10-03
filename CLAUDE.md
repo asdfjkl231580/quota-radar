@@ -59,3 +59,10 @@
 - 无头 Chrome `--window-size=390` 实际视口 500，验手机端要用 puppeteer setViewport。
 - 两个同类站「距上次重置」差 10 天：口径不同（一家把重置卡算进去）。本站分类展示，不合并。
 - didreset 的 summary 有时是站方改写不是原文，种子数据一律以 fxtwitter 返回的原帖为准。
+
+
+## 2026-10-03 正式发布回读
+- 修复代码已合入 main；部署于 05:54 UTC 完成，airesetclock.com 的公开事件全文与首页版本回读通过。事件80条、页面34个。
+- 本地62项回归通过；GitHub 离线回归与构建 run 37101273405 成功。
+- 使用现有本机 Vercel 登录完成本次发布。GitHub Secrets 的 VERCEL_TOKEN 仍失效：CLI OAuth 无权签发长期token（403 Cannot create tokens for this app），需要账户持有人通过正规凭据页面轮换并更新同名Secret，再验收一次真实云端部署。不要把本机短期OAuth token复制到CI，不要因当前页面更新或健康接口正常而宣布自动部署已恢复。
+- 收费系统尚未实施；公开基础信息免费，下一步个性化提醒及工作流按试点验收推进。
