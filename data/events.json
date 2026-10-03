@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-03T05:50:33.891Z",
+ "updatedAt": "2026-10-03T05:59:00.307Z",
  "events": [
   {
    "id": "2105843926221660585",
@@ -16,9 +16,9 @@
    "detail": "官方在引用本公告的新帖中确认“Reset all propagated. Enjoy.”。以确认帖发布时间 2026 年 10 月 3 日 05:18 北京时间作为本站生效记时依据。先前的 PST 时区歧义已被后续确认取代，未用原定钟点推算到账。",
    "scope": "ChatGPT 全部付费账户",
    "verified": true,
-   "verifiedBy": "自动：didreset 线索 + 原帖核验",
+   "verifiedBy": "原帖全文与官方引用关系复核（fxtwitter）",
    "verifiedAt": "2026-10-03",
-   "confidence": "auto",
+   "confidence": "high",
    "pendingReset": false,
    "corrections": [
     {
@@ -50,6 +50,19 @@
       "detail": "原文称 tomorrow 10am PST；公告时美西处于夏令时，PST 固定偏移与当地时间相差一小时。在官方确认前不自动填写精确倒计时。",
       "expectedAmbiguity": "原文使用 PST，与该日期的美西当地时区相差一小时；需核实官方采用固定时区还是当地时间。"
      }
+    },
+    {
+     "at": "2026-10-03T05:59:00.307Z",
+     "reason": "复核官方原公告与明确引用它的完成确认，中文已整理；将自动待整理标记改为有依据的编辑复核。",
+     "previous": {
+      "zh": "ChatGPT 全部付费账户重置，官方已确认生效",
+      "en": "Quota reset for all paid ChatGPT accounts; officially confirmed.",
+      "detail": "官方在引用本公告的新帖中确认“Reset all propagated. Enjoy.”。以确认帖发布时间 2026 年 10 月 3 日 05:18 北京时间作为本站生效记时依据。先前的 PST 时区歧义已被后续确认取代，未用原定钟点推算到账。",
+      "scope": "ChatGPT 全部付费账户",
+      "confidence": "auto",
+      "verifiedBy": "自动：didreset 线索 + 原帖核验",
+      "verifiedAt": "2026-10-03"
+     }
     }
    ],
    "effectiveAt": "2026-10-02T21:18:48.000Z",
@@ -64,7 +77,20 @@
     "sourceText": "Reset all propagated. Enjoy."
    },
    "confirmedBy": "2106131810921136451",
-   "en": "Quota reset for all paid ChatGPT accounts; officially confirmed."
+   "en": "Quota reset for all paid ChatGPT accounts; officially confirmed.",
+   "scopeEn": "All paid ChatGPT accounts",
+   "contextEvidence": [
+    {
+     "id": "2106131810921136451",
+     "account": "@thsottiaux",
+     "url": "https://x.com/thsottiaux/status/2106131810921136451",
+     "textEn": "Reset all propagated. Enjoy.",
+     "relationship": "quote",
+     "quotedTweetId": "2105843926221660585",
+     "verifiedAt": "2026-10-03",
+     "verifiedVia": "fxtwitter"
+    }
+   ]
   },
   {
    "id": "2103911959544610829",
@@ -75,13 +101,41 @@
    "textEn": "Resets all propagated. That will be all. Have a fantastic weekend.",
    "kind": "reset",
    "extraLinks": [],
-   "zh": "官方宣布全员重置（原文待整理）",
-   "detail": "官方确认生效；预告见 2026-09-26T00:07Z",
-   "scope": "待核实",
+   "zh": "官方确认本轮重置已全部生效",
+   "detail": "官方原文为“Resets all propagated. That will be all. Have a fantastic weekend.”。该帖未说明适用套餐；本次回查未提供与先前预告的引用或回复关系，不据此继承其他公告的范围。",
+   "scope": "原帖未说明",
    "verified": true,
-   "verifiedBy": "自动：didreset 线索 + 原帖核验",
-   "verifiedAt": "2026-09-26",
-   "confidence": "auto"
+   "verifiedBy": "原帖全文与可用上下文字段复核（fxtwitter）",
+   "verifiedAt": "2026-10-03",
+   "confidence": "high",
+   "corrections": [
+    {
+     "at": "2026-10-03T05:59:00.307Z",
+     "reason": "原帖明确确认重置完成，但未说明套餐范围，也未提供对先前预告的引用/回复关系；移除未经关系证实的预告关联断言。",
+     "previous": {
+      "zh": "官方宣布全员重置（原文待整理）",
+      "detail": "官方确认生效；预告见 2026-09-26T00:07Z",
+      "scope": "待核实",
+      "confidence": "auto",
+      "verifiedBy": "自动：didreset 线索 + 原帖核验",
+      "verifiedAt": "2026-09-26"
+     }
+    }
+   ],
+   "en": "This round of quota resets has fully propagated, according to the official post.",
+   "scopeEn": "Not specified in the original post",
+   "contextEvidence": [
+    {
+     "id": "2103911959544610829",
+     "account": "@thsottiaux",
+     "url": "https://x.com/thsottiaux/status/2103911959544610829",
+     "textEn": "Resets all propagated. That will be all. Have a fantastic weekend.",
+     "relationship": "standalone",
+     "verifiedAt": "2026-10-03",
+     "verifiedVia": "fxtwitter",
+     "note": "No reply or quote relationship returned by this source check."
+    }
+   ]
   },
   {
    "id": "2103637477760311522",
@@ -406,15 +460,50 @@
    "announcedAt": "2026-08-25T18:00:04Z",
    "account": "@thsottiaux",
    "sourceUrl": "https://x.com/thsottiaux/status/2092311059197808936",
-   "extraLinks": [],
-   "zh": "回复中确认了一次未公开宣布的重置",
-   "detail": "原帖只是回复「忘了说」，事件内容来自站方记录，未独立核实。",
-   "scope": "全部付费套餐",
+   "extraLinks": [
+    "https://x.com/dtzy_88/status/2092265390948909194"
+   ],
+   "zh": "官方回应用户的重置询问，称忘记公告（含义仍待核实）",
+   "detail": "已核对回复关系：用户父帖询问“发生了什么，Tibo reset 了？？？”，官方答“Ah yeah, forgot to say”。这支持重置的上下文推断，但并非明确的重置公告，也没有说明适用范围，仍保留低置信标记。",
+   "scope": "原帖未说明",
    "textEn": "@dtzy_88 Ah yeah, forgot to say",
    "verified": true,
-   "verifiedBy": "原帖核验（fxtwitter）",
-   "verifiedAt": "2026-09-24",
-   "confidence": "low"
+   "verifiedBy": "原帖与直接回复父帖复核（fxtwitter）；事件含义仍待核实",
+   "verifiedAt": "2026-10-03",
+   "confidence": "low",
+   "corrections": [
+    {
+     "at": "2026-10-03T05:59:00.307Z",
+     "reason": "回查取得明确父帖，但官方回复仅为含蓄回应，仍不足以确认全体付费套餐范围；移除无依据的适用范围，保留低置信标记。",
+     "previous": {
+      "zh": "回复中确认了一次未公开宣布的重置",
+      "detail": "原帖只是回复「忘了说」，事件内容来自站方记录，未独立核实。",
+      "scope": "全部付费套餐",
+      "confidence": "low",
+      "verifiedBy": "原帖核验（fxtwitter）",
+      "verifiedAt": "2026-09-24"
+     }
+    }
+   ],
+   "en": "The official account replied to a reset question with “forgot to say”; the implication remains unconfirmed.",
+   "scopeEn": "Not specified in the original post",
+   "contextEvidence": [
+    {
+     "id": "2092311059197808936",
+     "relationship": "reply",
+     "replyToId": "2092265390948909194",
+     "verifiedAt": "2026-10-03",
+     "verifiedVia": "fxtwitter"
+    },
+    {
+     "id": "2092265390948909194",
+     "account": "@dtzy_88",
+     "url": "https://x.com/dtzy_88/status/2092265390948909194",
+     "textEn": "发生了什么，Tibo reset 了？？？",
+     "verifiedAt": "2026-10-03",
+     "verifiedVia": "fxtwitter"
+    }
+   ]
   },
   {
    "id": "2091688655828246890",
@@ -508,15 +597,63 @@
    "announcedAt": "2026-08-11T00:27:44Z",
    "account": "@thsottiaux",
    "sourceUrl": "https://x.com/thsottiaux/status/2086972802457063486",
-   "extraLinks": [],
-   "zh": "「搞定了」：兑现此前承诺的重置",
-   "detail": "原帖只有三个词，上下文来自前一天承诺。",
-   "scope": "全部付费用户",
+   "extraLinks": [
+    "https://x.com/blueemi99/status/2086902321108205926",
+    "https://x.com/thsottiaux/status/2086189414292865249"
+   ],
+   "zh": "此前承诺周一进行的重置，官方通过引用回复确认已完成",
+   "detail": "已核对两级引用关系：官方“Hi. It is done.”引用用户“So what about our reset?”；用户帖引用此前官方“I’ll do another performative reset on Monday”。因此可确认“搞定了”指这次重置，但这些帖子没有说明适用套餐。",
+   "scope": "原帖未说明",
    "textEn": "Hi.\n\nIt is done.",
    "verified": true,
-   "verifiedBy": "原帖核验（fxtwitter）",
-   "verifiedAt": "2026-09-24",
-   "confidence": "low"
+   "verifiedBy": "原帖与两级引用上下文复核（fxtwitter）",
+   "verifiedAt": "2026-10-03",
+   "confidence": "high",
+   "corrections": [
+    {
+     "at": "2026-10-03T05:59:00.307Z",
+     "reason": "通过官方完成帖→用户询问→官方周一重置承诺的两级引用链确认事件含义；原帖没有套餐范围，移除全部付费用户断言。",
+     "previous": {
+      "zh": "「搞定了」：兑现此前承诺的重置",
+      "detail": "原帖只有三个词，上下文来自前一天承诺。",
+      "scope": "全部付费用户",
+      "confidence": "low",
+      "verifiedBy": "原帖核验（fxtwitter）",
+      "verifiedAt": "2026-09-24"
+     }
+    }
+   ],
+   "en": "Officially confirmed completion of the reset previously promised for Monday.",
+   "scopeEn": "Not specified in the original post",
+   "contextEvidence": [
+    {
+     "id": "2086972802457063486",
+     "relationship": "quote",
+     "quotedTweetId": "2086902321108205926",
+     "verifiedAt": "2026-10-03",
+     "verifiedVia": "fxtwitter"
+    },
+    {
+     "id": "2086902321108205926",
+     "account": "@blueemi99",
+     "url": "https://x.com/blueemi99/status/2086902321108205926",
+     "textEn": "So what about our reset?",
+     "relationship": "quote",
+     "quotedTweetId": "2086189414292865249",
+     "verifiedAt": "2026-10-03",
+     "verifiedVia": "fxtwitter"
+    },
+    {
+     "id": "2086189414292865249",
+     "account": "@thsottiaux",
+     "url": "https://x.com/thsottiaux/status/2086189414292865249",
+     "textEn": "@rxmphai I'll do another performative reset on Monday",
+     "relationship": "reply",
+     "replyToId": "2086188425691140496",
+     "verifiedAt": "2026-10-03",
+     "verifiedVia": "fxtwitter"
+    }
+   ]
   },
   {
    "id": "2086188036493344823",
