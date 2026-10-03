@@ -7,3 +7,6 @@ data/fetch-log.jsonl
 data/sentinel.log
 data/sentinel-launchd.log
 .probe/
+.env
+.env.*
+!.env.example

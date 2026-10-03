@@ -5,13 +5,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { ROOT, readJson, fxTweet } from "./lib.mjs";
+import { eventVersion, comparePublicSnapshot, normalizeSource } from "./snapshot.mjs";
+import { validateEvents } from "./validate-events.mjs";
 
 const args = process.argv.slice(2);
 const BASE = (args.includes("--base") ? args[args.indexOf("--base") + 1] : "https://airesetclock.com").replace(/\/$/, "");
 const HOST = new URL(BASE).host;
 const results = []; // { group, name, status: pass|fail|warn, detail }
 const add = (group, name, status, detail = "") => results.push({ group, name, status, detail });
-const get = async (u, opt = {}) => { const r = await fetch(u.startsWith("http") ? u : BASE + u, { redirect: "manual", headers: { "User-Agent": "Mozilla/5.0 (qa-airesetclock)" }, ...opt }); return { status: r.status, loc: r.headers.get("location"), type: r.headers.get("content-type") || "", text: r.status < 300 ? await r.text() : "" }; };
+const get = async (u, opt = {}) => { const r = await fetch(u.startsWith("http") ? u : BASE + u, { redirect: "manual", headers: { "User-Agent": "Mozilla/5.0 (qa-airesetclock)" }, signal: AbortSignal.timeout(15000), ...opt }); return { status: r.status, loc: r.headers.get("location"), type: r.headers.get("content-type") || "", text: r.status < 300 ? await r.text() : "" }; };
 const visible = (h) => h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, " ").replace(/&[a-z#0-9]+;/g, " ").replace(/\s+/g, " ");
 const bjDate = (iso) => new Date(new Date(iso).getTime() + 8 * 3600000).toISOString().slice(0, 16).replace("T", " ");
 
@@ -35,7 +37,7 @@ for (const u of urls) {
   if (/\bundefined\b|\bNaN\b|\[object Object\]|\$\{/.test(vis)) probs.push("页面出现 undefined/NaN 等残留");
   if (!/rel="canonical"/.test(r.text)) probs.push("缺 canonical");
   if (!/name="description"/.test(r.text)) probs.push("缺描述");
-  if (/\/en(\/|$)/.test(new URL(u).pathname)) { const zh = (vis.match(/[一-龥]/g) || []).length; if (zh > 30) probs.push(`英文页夹了 ${zh} 个汉字`); }
+  if (/\/en(\/|$)/.test(new URL(u).pathname)) { const zh = (vis.match(/[一-龥]/g) || []).length; if (zh > 2) probs.push(`英文页夹了 ${zh} 个汉字`); }
   if (probs.length) pageFails.push(`${new URL(u).pathname}：${probs.join("、")}`);
 }
 add("页面能打开", `全部 ${urls.length} 个页面 200、有标题、无乱码残留、英文页无中文`, pageFails.length ? "fail" : "pass", pageFails.join("\n") || "全部正常");
@@ -53,7 +55,13 @@ for (const [n, u, ok] of checks302) { try { const r = await get(u); add("跳转�
 // ③ 数据和原帖一致
 const live = JSON.parse((await get("/api/events.json")).text || "{}");
 const liveEv = live.events || live;
-add("数据准确", "线上 JSON 条数 = 仓库条数", Array.isArray(liveEv) && liveEv.length === local.length ? "pass" : "fail", `线上 ${liveEv.length ?? "读不到"} / 仓库 ${local.length}`);
+const builtPath = path.join(ROOT, "dist/api/events.json");
+const expected = fs.existsSync(builtPath) ? JSON.parse(fs.readFileSync(builtPath, "utf8")) : null;
+const snapshot = expected ? comparePublicSnapshot(expected, live) : { ok: false, reason: "先构建再验收" };
+const currentVersion = eventVersion(local);
+add("数据准确", "线上内容、更新时间与当前构建版本一致", snapshot.ok && expected.version === currentVersion ? "pass" : "fail", `线上 ${liveEv.length ?? "读不到"} / 仓库 ${local.length}；${snapshot.reason || (expected.version === currentVersion ? "版本和全文一致" : "本地构建已过时")}`);
+const structureErrors = validateEvents(local);
+add("数据准确", "事件结构与状态一致", structureErrors.length ? "fail" : "pass", structureErrors.join("\n") || "状态校验通过");
 const tl = pages[BASE + "/timeline"] || "";
 const ids = new Set([...tl.matchAll(/id="e(\d+)"/g)].map((m) => m[1]));
 const miss = local.filter((e) => !ids.has(e.id));
@@ -69,7 +77,7 @@ for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间
 }
 {
   const pend = local.filter((e) => e.pendingReset);
-  const due = (e) => new Date(e.expectedAt).getTime() + (e.expectedPrecision === "day" ? 86400000 : 0);
+  const due = (e) => e.expectedPrecision === "day" && e.expectedUntil ? Date.parse(e.expectedUntil) : new Date(e.expectedAt).getTime() + (e.expectedPrecision === "day" ? 86400000 : 0);
   const stale = pend.filter((e) => e.expectedAt && Date.now() - due(e) > 30 * 60000);   // 没给时间的预告不自动转正，不算过期
   const old = pend.filter((e) => !e.expectedAt && Date.now() - new Date(e.announcedAt) > 86400000);
   if (old.length) add("数据准确", "已宣布超过 24 小时、官方仍未给时间也未确认的预告（要人工判断）", "warn", old.map((e) => `${bjDate(e.announcedAt)} ${e.account}：${e.zh}`).join("\n"));
@@ -83,7 +91,7 @@ for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间
   const low = local.filter((e) => e.confidence === "low");
   add("数据准确", "低可信条目（页面标「待补证」）", low.length ? "warn" : "pass", low.map((e) => `${bjDate(e.announcedAt)} ${e.account}：${e.zh}`).join("\n"));
 }
-{ // 逐条对原帖
+if (!args.includes("--skip-sources")) { // 逐条经公开镜像核对来源；与语义分类验收分开
   const bad = [];
   for (const x of local) {
     const h = x.account.replace(/^@/, "");
@@ -93,13 +101,13 @@ for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间
       if (!watch.includes(h.toLowerCase())) probs.push("账号不在白名单");
       if ((t.author || "").toLowerCase() !== h.toLowerCase()) probs.push("作者不符 " + t.author);
       if (t.createdAt && Math.abs(new Date(t.createdAt) - new Date(x.announcedAt)) > 120000) probs.push("时间差超 2 分钟");
-      const n = (s) => (s || "").replace(/[’‘]/g, "'").trim().slice(0, 60);
+      const n = normalizeSource;
       if (x.textEn && n(x.textEn) !== n(t.text)) probs.push("原文不一致");
       if (probs.length) bad.push(`${x.id}：${probs.join("、")}`);
     } catch (e) { bad.push(`${x.id}：原帖取不到（${e.message}）`); }
     await new Promise((r) => setTimeout(r, 250));
   }
-  add("数据准确", `全部 ${local.length} 条逐条回 X 原帖核对（作者 / 时间 / 原文）`, bad.length ? "fail" : "pass", bad.join("\n") || "全部一致");
+  add("数据准确", `全部 ${local.length} 条经公开镜像核对原帖（作者 / 时间 / 全文）`, bad.length ? "fail" : "pass", bad.join("\n") || "全部一致");
 }
 { // 文案与事实
   const faq = pages[BASE + "/faq"] || home;
@@ -109,14 +117,13 @@ for (const p of ["codex", "claude"]) {   // 首页卡片三态：有预告时间
   add("文案与事实", "FAQ「近 90 天次数」与数据一致", m && +m[1] === n90("codex") && +m[2] === n90("claude") ? "pass" : "fail", m ? `页面 ${m[1]}/${m[2]}，数据 ${n90("codex")}/${n90("claude")}` : "没找到这句");
 }
 
-// ③b 定时器：哨兵最近一次成功运行离现在多久（Vercel 每 10 分钟触发）
+// ③b 只读健康检查；不访问可能触发生产任务的 cron 接口。
 {
-  const j = await (await fetch("https://api.github.com/repos/asdfjkl231580/quota-radar/actions/workflows/sentinel.yml/runs?per_page=10", { headers: { "User-Agent": "qa" } })).json();
-  const ok = (j.workflow_runs || []).filter((r) => r.conclusion === "success");
-  const last = ok[0]; const age = last ? (Date.now() - new Date(last.created_at)) / 60000 : Infinity;
-  add("自动运行", "哨兵最近 20 分钟内成功跑过（电脑关机也照跑）", age <= 20 ? "pass" : "fail", last ? `上次 ${bjDate(last.created_at)} 北京，${Math.round(age)} 分钟前，触发方式 ${last.event === "workflow_dispatch" ? "Vercel 定时器/手动" : "GitHub 兜底定时"}` : "查不到运行记录");
-  const r = await fetch(BASE + "/api/cron");
-  add("自动运行", "Vercel 定时器接口在线且拒绝外人调用", r.status === 401 ? "pass" : "fail", "状态 " + r.status + (r.status === 500 ? "（缺 GH_DISPATCH_TOKEN）" : ""));
+  try {
+    const r = await get("/api/health");
+    const j = JSON.parse(r.text || "{}");
+    add("自动运行", "采集与发布健康（独立核对生产版本）", j.ok === true ? "pass" : j.status === "degraded" ? "warn" : "fail", `HTTP ${r.status}；状态 ${j.status || "unknown"}；${(j.reasons || []).join("；")}`);
+  } catch (e) { add("自动运行", "采集与发布健康可读", "fail", e.message); }
 }
 
 // ③c 求重置计数（Upstash）
@@ -231,10 +238,13 @@ try{await navigator.clipboard.writeText(t);document.getElementById("copied").tex
 paint();
 </script></body></html>`;
 
-const out = path.join(ROOT, "docs/qa/网站回测.html");
+const out = args.includes("--out") ? path.resolve(args[args.indexOf("--out") + 1]) : path.join(ROOT, "docs/qa/网站回测.html");
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, html);
 console.log(`机器检查：通过 ${cnt("pass")} · 有问题 ${cnt("fail")} · 要注意 ${cnt("warn")}`);
 for (const r of results.filter((r) => r.status !== "pass")) console.log(`[${LBL[r.status]}] ${r.name}\n   ${r.detail.replace(/\n/g, "\n   ")}`);
 console.log("回测页：" + out);
 if (!args.includes("--no-open")) try { execFileSync("open", [out]); } catch {}
+
+fs.writeFileSync(out.replace(/\.html$/, "") + ".json", JSON.stringify({ checkedAt: now.toISOString(), base: BASE, sourceAuditSkipped: args.includes("--skip-sources"), counts: { pass: cnt("pass"), fail: cnt("fail"), warn: cnt("warn") }, results }, null, 2));
+process.exitCode = cnt("fail") > 0 ? 1 : 0;

@@ -6,7 +6,10 @@
     "fetch": "node scripts/fetch.mjs",
     "review": "node scripts/review.mjs",
     "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate-events.mjs",
+    "qa": "node scripts/qa.mjs",
     "serve": "node scripts/serve.mjs",
-    "deploy": "node scripts/build.mjs && vercel --prod"
+    "deploy": "node scripts/deploy.mjs"
   }
 }

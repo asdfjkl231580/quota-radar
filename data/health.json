@@ -1,0 +1,55 @@
+{
+ "schemaVersion": 1,
+ "sources": {
+  "lead:didreset:codex": {
+   "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-03T05:50:05.019Z",
+   "lastError": null,
+   "items": 30
+  },
+  "lead:didreset:claude": {
+   "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-03T05:50:05.019Z",
+   "lastError": null,
+   "items": 15
+  },
+  "lead:whenreset:codex": {
+   "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-03T05:50:05.019Z",
+   "lastError": null,
+   "items": 20
+  },
+  "lead:codex-resets:codex": {
+   "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-03T05:50:05.019Z",
+   "lastError": null,
+   "items": 30
+  },
+  "codex-resets:status": {
+   "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-03T05:50:05.019Z",
+   "lastError": null
+  },
+  "codex-resets:evidence": {
+   "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-03T05:50:05.019Z",
+   "lastError": null,
+   "items": 20
+  },
+  "fx:2106131810921136451": {
+   "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-03T05:50:05.019Z",
+   "lastError": null
+  }
+ },
+ "lastAttemptAt": "2026-10-03T05:50:05.019Z",
+ "status": "ok",
+ "lastSuccessAt": "2026-10-03T05:50:05.019Z"
+}

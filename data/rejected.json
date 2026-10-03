@@ -44,6 +44,117 @@
    "id": "2102940480736821610",
    "why": "并入 2102871550974427462（同事件澄清）",
    "at": "2026-09-26"
+  },
+  {
+   "id": "2105672058269212820",
+   "why": "原文明确说无法提供重置，不是新的送额度事件。",
+   "at": "2026-10-02T07:41:55.774021Z",
+   "originalEvent": {
+    "id": "2105672058269212820",
+    "provider": "codex",
+    "account": "@thsottiaux",
+    "sourceUrl": "https://x.com/thsottiaux/status/2105672058269212820",
+    "announcedAt": "2026-10-01T14:51:54.000Z",
+    "textEn": "Because usage on your primary dot is virtually unlimited at the moment, I can’t really give a reset. I need to come up with something new fast.",
+    "kind": "reset",
+    "extraLinks": [],
+    "zh": "官方宣布全员重置（原文待整理）",
+    "detail": "",
+    "scope": "待核实",
+    "verified": true,
+    "verifiedBy": "自动：didreset 线索 + 原帖核验",
+    "verifiedAt": "2026-10-01",
+    "confidence": "auto"
+   },
+   "correction": {
+    "type": "remove-misclassified-event",
+    "reason": "原文明确说无法提供重置，不是新的送额度事件。",
+    "reviewedAt": "2026-10-02T07:41:55.774021Z"
+   }
+  },
+  {
+   "id": "2104823812042940713",
+   "why": "原文为套餐恢复销售和计费变更，没有承诺重置；不得生成重置预告。",
+   "at": "2026-10-02T07:41:55.774021Z",
+   "originalEvent": {
+    "id": "2104823812042940713",
+    "provider": "codex",
+    "account": "@thsottiaux",
+    "sourceUrl": "https://x.com/thsottiaux/status/2104823812042940713",
+    "announcedAt": "2026-09-29T06:41:17.000Z",
+    "textEn": "Hi,\n\nTomorrow we are re-opening the Pro $200 subscriptions to new subscribers, but together with it we are also changing how we calculate the usage for it. In effect, if you do the math, it will net out at half the dollar in API spend compared to the old Pro $200 plan. \n\nNow that it's said, let me explain why this is happening and why you will still get more work done than if you were on the Pro $200 subscription one month ago.\n\n(a) We didn't want to compromise in other ways and are committing to not reintroducing the 5h limit, so that you can fully use the weekly usage when you want.\n(b) On the subscription, we guarantee that over time you always get more work done and with an increasing level of quality. This means that you will continue to get more value per dollar spent as a result of models getting more efficient and us passing down the improvements in the form of API price reductions.\n(c) We don't want to put an incentive on ourselves to artificially inflate the API list prices to make it look like you are getting a lot (and workaround it through discounts, etc). Instead we want to continue to both rapidly reduce prices and increase capabilities of models on the API. This week we introduced GPT-6 Sol and GPT-6 Luna at 50% of their previous price. Over time, we see prices go low enough that it makes sense for most to buy usage as needed without there being a significant gap between what you get in a subscription and what you get in the API for a dollar spent.\n(d) Tomorrow, we are adding more things to the subscription that won't draw on the usage, I won't reveal what that is yet.\n\nI wanted to be transparent before all the big announcements tomorrow. Lots of new exciting things are coming to the subscriptions that will make it super compelling, but I wanted to make sure to share this change ahead of time so you can all understand it before we shower you with good news.\n\nCodexingly,\nTibo",
+    "kind": "teaser",
+    "extraLinks": [],
+    "zh": "官方宣布即将重置（生效时间未公布）",
+    "detail": "",
+    "scope": "待核实",
+    "verified": true,
+    "verifiedBy": "自动：didreset 线索 + 原帖核验",
+    "verifiedAt": "2026-09-29",
+    "confidence": "auto"
+   },
+   "correction": {
+    "type": "remove-misclassified-event",
+    "reason": "原文为套餐恢复销售和计费变更，没有承诺重置；不得生成重置预告。",
+    "reviewedAt": "2026-10-02T07:41:55.774021Z"
+   }
+  },
+  {
+   "id": "2104641323198472430",
+   "why": "这是对上周已发重置卡的领取提醒，不是当日新发放。",
+   "at": "2026-10-02T07:41:55.774021Z",
+   "originalEvent": {
+    "id": "2104641323198472430",
+    "provider": "claude",
+    "account": "@ClaudeDevs",
+    "sourceUrl": "https://x.com/ClaudeDevs/status/2104641323198472430",
+    "announcedAt": "2026-09-28T18:36:08.000Z",
+    "textEn": "Sonnet 5.5 is available now in the Claude Platform and Claude Code.\n\nWe granted all Pro, Max, and Team users a reset last Tuesday. If you haven’t used it yet, you can still apply it whenever you want, before Oct 22. https://clau.de/reset",
+    "kind": "reset",
+    "extraLinks": [],
+    "zh": "官方宣布全员重置（原文待整理）",
+    "detail": "",
+    "scope": "待核实",
+    "verified": true,
+    "verifiedBy": "自动：tikhub 线索 + 原帖核验",
+    "verifiedAt": "2026-09-29",
+    "confidence": "auto"
+   },
+   "correction": {
+    "type": "remove-misclassified-event",
+    "reason": "这是对上周已发重置卡的领取提醒，不是当日新发放。",
+    "reviewedAt": "2026-10-02T07:41:55.774021Z"
+   },
+   "relatedEventId": "2102438800836489554"
+  },
+  {
+   "id": "2106131810921136451",
+   "why": "确认帖已关联预告 2105843926221660585",
+   "at": "2026-10-03T05:50:05.019Z",
+   "originalEvent": {
+    "id": "2106131810921136451",
+    "provider": "codex",
+    "account": "@thsottiaux",
+    "sourceUrl": "https://x.com/thsottiaux/status/2106131810921136451",
+    "announcedAt": "2026-10-02T21:18:48.000Z",
+    "textEn": "Reset all propagated. Enjoy.",
+    "kind": "reset",
+    "extraLinks": [],
+    "zh": "官方宣布重置（适用范围见原帖，中文待整理）",
+    "detail": "",
+    "scope": "待核实",
+    "verified": true,
+    "verifiedBy": "自动：didreset 线索 + 原帖核验",
+    "verifiedAt": "2026-10-03",
+    "confidence": "auto"
+   },
+   "relatedEventId": "2105843926221660585",
+   "relationship": {
+    "type": "quote",
+    "quotedTweetId": "2105843926221660585",
+    "verifiedVia": "fxtwitter",
+    "verifiedAt": "2026-10-03T05:50:33.891Z"
+   }
   }
  ]
 }

@@ -96,6 +96,6 @@ if (added.length) {
   if (!args.has("--no-feishu")) {
     const lines = added.map((a) => `· ${a.account} ${bj(a.announcedAt, "md")}：${(a.zhDraft || a.textEn).slice(0, 90).replace(/\n/g, " ")}`);
     const msg = `【额度雷达】${added.length} 条新线索待确认\n${lines.join("\n")}\n\n处理：cd ~/Documents/GitHub/quota-radar && node scripts/review.mjs list`;
-    try { sendFeishu(msg); console.log("飞书已通知"); } catch (e) { console.error("飞书通知失败:", e.message); }
+    try { await sendFeishu(msg); console.log("飞书已通知"); } catch (e) { console.error("飞书通知失败:", e.message); }
   }
 }

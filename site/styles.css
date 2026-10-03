@@ -185,3 +185,21 @@ time.flash{animation:tzflash 1s ease}
 .card .beg-plus{position:absolute;top:-4px;font:900 16px/1 "NumCN",var(--en);pointer-events:none;animation:begup .7s ease-out forwards}
 @keyframes begup{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-34px)}}
 @media(prefers-reduced-motion:reduce){.card .beg-plus{animation:none;opacity:0}.card .beg{transition:none}}
+/* Public evidence and version status: the existing blue/yellow visual system. */
+.snapshot-strip{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;font-size:12px;color:var(--text-2);border-bottom:1px solid var(--border)}
+.snapshot-strip a{color:var(--blue);text-decoration:none;font-weight:600}
+.version-notice{padding:12px 16px;margin-top:12px;background:var(--yellow);border-radius:var(--r-btn);font-size:14px;font-weight:600}
+.version-notice[hidden]{display:none}.version-notice .qr-btn{margin-left:10px;height:32px}
+.evidence-note{font-size:12px;line-height:1.6;color:#666;margin:8px 0;overflow-wrap:anywhere}
+.card .evidence-note{color:inherit;opacity:.88;margin-top:10px}
+.status-facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px 16px;border:1px solid var(--border);border-radius:var(--r-panel);padding:20px;background:var(--panel)}
+.status-facts dt{font-weight:700}.status-facts dd{margin:0;overflow-wrap:anywhere}.status-facts code{font-size:12px;white-space:normal}
+.public-doc .lede{font-size:18px;color:var(--text-2)}.public-doc h2{font-size:20px;margin-top:30px}
+.qr-form label{display:block;font-weight:600;font-size:14px;margin:8px 0 4px}.qr-form .qr-privacy{font-size:12px;color:var(--text-2)}
+.qr-btn:focus-visible,.qr-x:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.qr-x{min-width:36px;min-height:36px}.qr-box h3{padding-right:32px}.qr-box:focus{outline:none}
+.card .beg[hidden]{display:none}footer{padding-bottom:88px}
+@media(max-width:600px){.status-facts{grid-template-columns:1fr;gap:4px;padding:16px}.status-facts dd{margin-bottom:10px}.snapshot-strip{font-size:11px}.version-notice .qr-btn{margin:8px 0 0;display:block}}
+.health-panel{margin:24px 0;padding:16px 20px;border:1px solid var(--border);border-left:5px solid var(--blue);border-radius:var(--r-panel);background:var(--panel)}
+.public-doc .health-panel h2{margin:0 0 8px}.health-panel[data-health=error]{border-left-color:var(--red-orange)}.health-panel[data-health=degraded],.health-panel[data-health=unknown]{border-left-color:#b18700}.health-panel p{margin:8px 0}.health-panel [data-health-times]{font-size:12px;color:var(--text-2)}
+.beg-feedback{font-size:12px;color:inherit;margin-top:4px}.beg-feedback:empty{display:none}

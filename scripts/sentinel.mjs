@@ -1,208 +1,152 @@
-/**
- * sentinel.mjs — 哨兵：每 10 分钟跑一次，官方一发帖 10 分钟内自动上线
- *
- * 线索三层：① 两个参考站接口（免费）② --tikhub 主账号直查（计费）③ --tikhub-all 全部账号
- * 每条新线索都必须过 fxtwitter 原帖核验（存在 + 作者是官方账号）才算数。
- *
- * 分类规则（能自动就自动上线，标 confidence:auto「待整理」）：
- *   banked  原文含 banked
- *   reset   原文含 reset/resetting/reset limits 且是「已做/正在做」语气
- *   boost   原文含 increase limits / more usage / credit / goes further
- *   teaser  预告语气（promised / tomorrow / later today / coming / soon）→ 只进待办
- *   其他命中关键词但分不清 → 待办
- *
- * 用法：node scripts/sentinel.mjs [--tikhub] [--tikhub-all] [--dry] [--no-deploy] [--no-feishu]
+/** Official-source collector. Production publishing is retried by version, independently of new posts.
+ * node scripts/sentinel.mjs [--tikhub] [--tikhub-all] [--dry] [--no-deploy] [--no-feishu]
+ * Importing this file is safe; runSentinel supports isolated offline tests.
  */
-import fs from "node:fs";
-import path from "node:path";
-import { execFileSync } from "node:child_process";
-import { ROOT, DATA, readJson, writeJson, tikhubKey, sendFeishu, fxTweet, bj, parseExpected } from "./lib.mjs";
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
+import {ROOT,DATA,readJson,writeJson,tikhubKey,sendFeishu,fxTweet,bj} from './lib.mjs';
+import {classify,parseExpected,confirmationFor,applyEvidence,scheduledEvidence,relatedTo} from './pipeline.mjs';
+import {eventVersion} from './snapshot.mjs';
 
-const args = new Set(process.argv.slice(2));
-const log = (...a) => { const line = `[${new Date().toISOString()}] ${a.join(" ")}`; console.log(line); fs.appendFileSync(path.join(DATA, "sentinel.log"), line + "\n"); };
-
-const watch = readJson("watch.json");
-const OFFICIAL = new Set(watch.accounts.map((a) => a.screen_name.toLowerCase()));
-const providerOf = (h) => (watch.accounts.find((a) => a.screen_name.toLowerCase() === h.toLowerCase()) || {}).provider;
-const ef = readJson("events.json", { events: [] });
-const pf = readJson("pending.json", { pending: [] });
-const rf = readJson("rejected.json", { rejected: [] });
-const known = new Set([...ef.events.map((e) => e.id), ...pf.pending.map((p) => p.id), ...rf.rejected.map((r) => r.id)]);
-const kw = new RegExp(watch.keywords, "i");
-const found = new Map();
-const add = (id, screen_name, via) => { if (id && !known.has(id) && !found.has(id)) found.set(id, { screen_name, via }); };
-
-// ① 参考站线索
-for (const src of watch.leadSources || []) {
-  try {
-    const j = await (await fetch(src.url, { headers: { "User-Agent": "quota-radar-sentinel" }, signal: AbortSignal.timeout(20000) })).json();
-    const list = j.events || j.data || [];
-    let n = 0;
-    for (const e of list) { const m = (e.sourceUrl || e.source?.url || "").match(/x\.com\/([^/]+)\/status\/(\d+)/); if (m && !known.has(m[2])) { add(m[2], m[1], src.name); n++; } }
-    log(`${src.name}/${src.provider}: ${list.length} 条，新 ${n}`);
-  } catch (e) { log(`${src.name} 失败: ${e.message}`); }
+const ZH={reset:'官方宣布重置（适用范围见原帖，中文待整理）',banked:'官方发放重置卡（中文待整理）',boost:'官方提额或送额度（中文待整理）',teaser:'官方宣布即将重置（生效时间未公布）'};
+const sourceId=url=>String(url||'').match(/(?:x|twitter)\.com\/([^/]+)\/status\/(\d+)/);
+const safeError=e=>String(e?.message||e).slice(0,240).replace(/(?:Bearer\s+|token[=:\s]+)[^\s]+/gi,'[redacted]');
+function realLog(...parts){const line=`[${new Date().toISOString()}] ${parts.join(' ')}`;console.log(line);fs.appendFileSync(path.join(DATA,'sentinel.log'),line+'\n');}
+function commitData(){
+  execFileSync('git',['config','user.name','quota-radar-bot'],{cwd:ROOT});
+  execFileSync('git',['config','user.email','bot@airesetclock.com'],{cwd:ROOT});
+  const files=['events','pending','rejected','release','health'].map(n=>`data/${n}.json`).filter(p=>fs.existsSync(path.join(ROOT,p)));
+  execFileSync('git',['add',...files],{cwd:ROOT});
+  const changed=execFileSync('git',['diff','--cached','--name-only','--',...files],{cwd:ROOT,encoding:'utf8'}).trim();
+  if(changed)execFileSync('git',['commit','-m','哨兵：保存采集、发布版本与来源健康状态'],{cwd:ROOT,stdio:'inherit'});
+  const ahead=Number(execFileSync('git',['rev-list','--count','@{upstream}..HEAD'],{cwd:ROOT,encoding:'utf8'}).trim());
+  if(ahead>0)execFileSync('git',['push'],{cwd:ROOT,stdio:'inherit'});
 }
-// ①b codex-resets 的「已排期」：它也把「宣布将重置」记为待执行（scheduled_reset），带 scheduled_for 时用来交叉核对我们的预告时间
-let crScheduled = null; const crEvidence = [];
-try {
-  const j = await (await fetch("https://codex-resets.com/api/v1/status", { headers: { "User-Agent": "quota-radar-sentinel (airesetclock.com)" }, signal: AbortSignal.timeout(20000) })).json();
-  crScheduled = j?.data?.scheduled_reset || null;
-  if (crScheduled) {
-    const m = (crScheduled.source?.url || "").match(/x\.com\/([^/]+)\/status\/(\d+)/); if (m) add(m[2], m[1], "codex-resets");
-    const mine = ef.events.find((e) => e.id === crScheduled.id);
-    if (mine && mine.pendingReset && crScheduled.scheduled_for && !mine.expectedAt) { mine.expectedAt = new Date(crScheduled.scheduled_for).toISOString(); mine.expectedPrecision = "time"; mine.expectedFrom = "codex-resets"; log(`预告时间取自 codex-resets：${mine.id} → ${mine.expectedAt}`); }
-    else if (mine && mine.expectedAt && crScheduled.scheduled_for && Math.abs(new Date(mine.expectedAt) - new Date(crScheduled.scheduled_for)) > 3600000) log(`⚠ 预告时间与 codex-resets 相差超 1 小时：我们 ${mine.expectedAt} / 它 ${crScheduled.scheduled_for}`);
+export async function runSentinel(options={}){
+  const args=new Set(options.args||[]), now=options.now?.()||new Date().toISOString();
+  const read=options.read||readJson, write=options.write||writeJson, fetcher=options.fetcher||fetch, tweet=options.tweet||fxTweet;
+  const key=options.key||tikhubKey, notify=options.notify||sendFeishu,log=options.log||realLog;
+  const deploy=options.deploy||(()=>execFileSync('node',['scripts/deploy.mjs'],{cwd:ROOT,stdio:'inherit',timeout:360000,env:{...process.env,PATH:(process.env.PATH||'')+':/Users/kenyuanlin/.npm-global/bin:/opt/homebrew/bin:/usr/local/bin'}}));
+  const ef=structuredClone(read('events.json',{events:[]})),pf=structuredClone(read('pending.json',{pending:[]})),rf=structuredClone(read('rejected.json',{rejected:[]}));
+  const watch=read('watch.json');
+  const accounts=new Map(watch.accounts.map(a=>[a.screen_name.toLowerCase(),a.provider]));
+  const known=new Set([...ef.events,...pf.pending,...rf.rejected].map(e=>String(e.id))),found=new Map();
+  const add=(id,account,via)=>{id=String(id||'');if(id&&!known.has(id)&&!found.has(id))found.set(id,{account,via});};
+  const before=JSON.stringify(ef.events),beforePending=JSON.stringify(pf.pending),beforeRejected=JSON.stringify(rf.rejected);
+  const health=structuredClone(read('health.json',{schemaVersion:1,sources:{}}));health.schemaVersion=1;health.sources??={};health.lastAttemptAt=now;
+  const errors=[],attempted=[];let discoverySuccess=0,verificationSuccess=0;
+  async function source(name,fn,discovery=false){
+    const state={...health.sources[name],lastAttemptAt:now};health.sources[name]=state;attempted.push(state);
+    try{const value=await fn();state.status='ok';state.lastSuccessAt=now;state.lastError=null;state.items=Array.isArray(value)?value.length:undefined;if(discovery)discoverySuccess++;return value;}
+    catch(e){state.status='error';state.lastError=safeError(e);log(`${name} 失败: ${state.lastError}`);return null;}
   }
-  log(`codex-resets 状态：${crScheduled ? "有已排期 " + crScheduled.id + "（时间 " + (crScheduled.scheduled_for || "未公布") + "）" : "无已排期"}`);
-  // 执行证据：它确认到账后，会出现 id 为 observed-<原帖id> 的记录（时间=它实测到账的时间），或把这条挪进 latest_reset
-  const list = (await (await fetch("https://codex-resets.com/api/v1/resets?limit=20", { headers: { "User-Agent": "quota-radar-sentinel (airesetclock.com)" }, signal: AbortSignal.timeout(20000) })).json())?.data || [];
-  for (const x of ef.events.filter((e) => e.provider === "codex" && e.pendingReset)) {
-    const obs = list.find((r) => r.id === "observed-" + x.id);
-    if (obs) crEvidence.push({ x, at: new Date(obs.announced_at).toISOString(), how: "codex-resets 实测到账", observed: true });
-    else if (j?.data?.latest_reset?.id === x.id && crScheduled?.id !== x.id) crEvidence.push({ x, at: new Date().toISOString(), how: "codex-resets 标记已执行（本站发现时间）" });
+  async function json(url,headers={}){const response=await fetcher(url,{headers:{'User-Agent':'quota-radar-sentinel (airesetclock.com)',...headers},signal:AbortSignal.timeout(25000)});if(!response.ok)throw Error(`HTTP ${response.status}`);return response.json();}
+  for(const src of watch.leadSources||[]){
+    await source(`lead:${src.name}:${src.provider}`,async()=>{
+      const j=await json(src.url),list=j.events??j.data;if(!Array.isArray(list))throw Error('线索响应不是事件数组');
+      for(const item of list){const m=sourceId(item.sourceUrl||item.source?.url);if(m)add(m[2],m[1],src.name);}
+      log(`${src.name}/${src.provider}: ${list.length} 条`);return list;
+    },true);
   }
-} catch (e) { log(`codex-resets 状态失败: ${e.message}`); }
-
-// ② ③ TikHub
-if (args.has("--tikhub") || args.has("--tikhub-all")) {
-  const key = tikhubKey();
-  const accounts = args.has("--tikhub-all") ? watch.accounts : watch.accounts.filter((a) => ["thsottiaux", "ClaudeDevs"].includes(a.screen_name));
-  for (const a of accounts) {
-    try {
-      const j = await (await fetch(`https://api.tikhub.io/api/v1/twitter/web/fetch_user_post_tweet?screen_name=${a.screen_name}`, { headers: { Authorization: "Bearer " + key }, signal: AbortSignal.timeout(30000) })).json();
-      const list = j?.data?.timeline || [];
-      let n = 0;
-      for (const t of list) { const id = String(t.tweet_id || ""); if (id && !known.has(id) && kw.test(t.text || "")) { add(id, a.screen_name, "tikhub"); n++; } }
-      log(`TikHub @${a.screen_name}: ${list.length} 条，命中新 ${n}`);
-    } catch (e) { log(`TikHub @${a.screen_name} 失败: ${e.message}`); }
-  }
-}
-
-// ④ 有「已宣布、待生效」的预告时，加看该账号的回复（确认常发在回复里，如「Hi. It is done.」），按小时带 TikHub 时才查
-const CONFIRM = /propagated|it is done|it's done|all done|has landed|have landed|is live|are live|now reset|been reset|reset (is )?(done|complete)|back to 100%|should (now )?see (it|the reset)|rolled out|went out/i;
-const confirms = [];
-if ((args.has("--tikhub") || args.has("--tikhub-all")) && ef.events.some((e) => e.pendingReset)) {
-  const key = tikhubKey();
-  for (const acct of [...new Set(ef.events.filter((e) => e.pendingReset).map((e) => e.account.replace(/^@/, "")))]) {
-    try {
-      const j = await (await fetch(`https://api.tikhub.io/api/v1/twitter/web/fetch_user_tweet_replies?screen_name=${acct}`, { headers: { Authorization: "Bearer " + key }, signal: AbortSignal.timeout(30000) })).json();
-      const list = j?.data?.timeline || [];
-      for (const t of list) {
-        const ts = new Date(t.created_at).toISOString();
-        const pend = ef.events.find((e) => e.pendingReset && e.account.replace(/^@/, "").toLowerCase() === acct.toLowerCase() && ts > e.announcedAt && new Date(ts) - new Date(e.announcedAt) < 3 * 86400000);
-        if (pend && CONFIRM.test(t.text || "") && !/\?\s*$/.test(t.text || "")) confirms.push({ pend, id: String(t.tweet_id), at: ts, text: t.text });
+  let scheduled=null;const evidence=new Map();
+  const offer=(id,value)=>{const list=evidence.get(String(id))||[];list.push(value);evidence.set(String(id),list);};
+  const status=await source('codex-resets:status',async()=>{const j=await json('https://codex-resets.com/api/v1/status');if(!j.data||typeof j.data!=='object')throw Error('状态响应无 data');return j.data;});
+  if(status){
+    scheduled=status.scheduled_reset;
+    if(scheduled){const m=sourceId(scheduled.source?.url);if(m)add(m[2],m[1],'codex-resets');}
+    const resets=await source('codex-resets:evidence',async()=>{const j=await json('https://codex-resets.com/api/v1/resets?limit=20');if(!Array.isArray(j.data))throw Error('执行证据响应不是数组');return j.data;});
+    for(const event of ef.events.filter(e=>e.provider==='codex'&&(e.pendingReset||['scheduled','observed'].includes(e.effectiveEvidence?.type)))){
+      if(scheduled?.id===event.id&&scheduled.scheduled_for&&!event.expectedAt){
+        const at=Date.parse(scheduled.scheduled_for);
+        if(Number.isFinite(at)&&!event.expectedAmbiguity){event.expectedAt=new Date(at).toISOString();event.expectedPrecision='time';event.expectedFrom='codex-resets';log(`记录第三方排期 ${event.id}；不作为官方时间自动转正`);}
       }
-      log(`TikHub 回复 @${acct}: ${list.length} 条，确认候选 ${confirms.length}`);
-    } catch (e) { log(`TikHub 回复 @${acct} 失败: ${e.message}`); }
-  }
-}
-
-
-// 分类
-function classify(text) {
-  const t = text.toLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, " ");
-  if (/^@/.test(t)) return "unclear";                                   // 回复帖不自动上线
-  if (/(no|not|won't|don't|didn't|never) (be |a |any )?reset/.test(t)) return "unclear";
-  const teaser = /promis|tomorrow|next week|later this week|coming (soon|up)|stay tuned|start your engines|will (be )?reset(ting)? (on|next|tomorrow)/.test(t);
-  // 将来时：宣布「将要」重置但尚未生效 → 预告，等确认或 3 小时后按公告时间计
-  const future = /(we'?ll|we will|will|going to|about to) (fully )?reset|lands? (in|within|by|around|at|end of|over)|propagat(ing|e) (over|in|to)|within the (next )?(hour|\d+)|(in|over) the next (\d+ )?(min|hour)|should (be )?(showing|land|see)|later (today|tonight)/.test(t);
-  const confirmed = /propagated|it is done|has landed|have landed|all reset for|is done|reset button pressed|are now reset|has been reset|have been reset|now reset|back to 100%/.test(t);
-  const banked = /banked|into (your|the) (reset )?bank|reset (credit|to use (anytime|at your|whenever))|(a|one) reset (you can|to) use/.test(t);
-  const reset = /\breset(ting|s|ed)?\b|reseting/.test(t);
-  const boost = /(limits? (increase|up|raised)|increase[sd]? (the )?(usage|limits|rate limits)|more usage|free credits?|one-time credit|goes? \d+% further|(\d+)x more usage|(lifting|lift) (the )?usage limits|2x the usual)/.test(t);
-  const done = /(have|has|we've|i've|been|just|now|done|propagated|landed|enjoy|is back)/.test(t);
-  const doneStrong = /(have|has|we've|i've|i have|we have) (now |just |also |again )?(reset|reseted|been reset)|(are|is) (now )?reset\b|reset(ed)? (all|for everyone|usage limits|rate limits|the usage limits|the rate limit) (has|is)|has been reset|have been reset|enjoy (a |the )?(nice |full |sweet )?reset|reset button pressed|we did a .*reset|giving .* a usage reset/.test(t);
-  const immediate = /(full|fully|hard|double|sneaky) reset|reset everyone's|will be fully reset/.test(t);
-  if (banked && !immediate) return teaser && !reset ? "teaser" : "banked";   // 同帖既立即重置又发卡，按重置记
-  if (reset) { if (confirmed || doneStrong) return "reset"; if (future) return "teaser"; if (teaser && !done) return "teaser"; return "reset"; }
-  if (boost) return "boost";
-  return teaser ? "teaser" : "unclear";
-}
-const ZH_AUTO = { reset: "官方宣布全员重置（原文待整理）", banked: "官方发放重置卡（原文待整理）", boost: "官方提额或送额度（原文待整理）", teaser: "官方宣布即将重置（生效时间未公布）" };
-
-// 预告转正（2026-09-26 用户拍板）：
-//   公告里给了具体钟点 → 到点按预告时间记为重置（effectiveAt=预告时间）
-//   只给了哪一天 → 那天过完仍无确认，按那天记
-//   什么时间都没给 → 不自动转正（9/26 教训：宣布 4 小时后评论区仍一片「没到账」）；
-//     一直显示「已宣布，生效时间未公布」，等官方确认帖/回复，或人工 review.mjs 处理；满 24 小时飞书提醒一次
-let promoted = 0; const nudges = [];
-for (const x of ef.events) {
-  if (!x.pendingReset) continue;
-  if (!x.expectedAt) { if (Date.now() - new Date(x.announcedAt) > 86400000 && !x.nudgedAt) { x.nudgedAt = new Date().toISOString(); nudges.push(x); } continue; }
-  const exp = new Date(x.expectedAt).getTime();
-  const due = x.expectedPrecision === "day" ? exp + 86400000 : exp;
-  if (Date.now() < due) continue;
-  x.pendingReset = false; x.kind = "reset"; x.promotedAt = new Date().toISOString(); x.effectiveAt = x.expectedAt;
-  x.detail = (x.detail ? x.detail + " " : "") + "官方未另发确认，按预告时间计。";
-  if (/尚未确认生效|生效时间未公布/.test(x.zh)) x.zh = x.zh.replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, "（按预告时间计）");
-  promoted++;
-}
-for (const c of crEvidence) {
-  const x = c.x; if (!x.pendingReset) continue;
-  x.pendingReset = false; x.kind = /bank/i.test(x.textEn) ? "banked" : "reset"; x.effectiveAt = c.at; x.promotedAt = new Date().toISOString();
-  if (c.observed) x.observedAt = c.at;
-  x.detail = `${(x.detail || "").trim()} 到账时间：${bj(c.at)} 北京（${c.how}）。`.trim();
-  if (/生效时间未公布|尚未确认生效/.test(x.zh)) x.zh = x.zh.replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, "（已到账）").replace("将为", "为");
-  promoted++; log(`codex-resets 执行证据转正 ${x.id} @ ${c.at}`);
-}
-for (const c of confirms) {
-  const x = c.pend; if (!x.pendingReset) continue;
-  x.pendingReset = false; x.kind = "reset"; x.effectiveAt = c.at; x.confirmedBy = c.id; x.promotedAt = new Date().toISOString();
-  x.extraLinks = [...(x.extraLinks || []), `https://x.com/${x.account.replace(/^@/, "")}/status/${c.id}`];
-  x.detail = (x.detail ? x.detail + " " : "") + `官方在回复中确认生效（${bj(c.at)} 北京）。`;
-  if (/生效时间未公布|尚未确认生效/.test(x.zh)) x.zh = x.zh.replace(/[，,（(]?\s*(尚未确认生效|生效时间未公布)\s*[）)]?/, "（已确认生效）");
-  promoted++; log(`回复确认转正 ${x.id} ← ${c.id}：${c.text.slice(0, 80)}`);
-}
-if (promoted) { ef.updatedAt = new Date().toISOString(); log(`预告超时转正 ${promoted} 条`); }
-
-// 核验 + 入库
-const auto = [], pend = [];
-for (const [id, meta] of found) {
-  try {
-    const t = await fxTweet(meta.screen_name, id);
-    if (!t.text) throw new Error("原帖为空");
-    const author = (t.author || meta.screen_name);
-    if (!OFFICIAL.has(author.toLowerCase())) { log(`跳过 ${id}：作者 @${author} 不在官方名单`); rf.rejected.push({ id, why: "作者非官方账号 @" + author, at: new Date().toISOString().slice(0, 10) }); continue; }
-    const kind = classify(t.text);
-    const base = { id, provider: providerOf(author) || meta.provider, account: "@" + author, sourceUrl: t.url || `https://x.com/${author}/status/${id}`, announcedAt: t.createdAt, textEn: t.text };
-    if (["reset", "banked", "boost", "teaser"].includes(kind)) {
-      const ev = { ...base, kind, extraLinks: [], zh: ZH_AUTO[kind], detail: "", scope: "待核实", verified: true, verifiedBy: `自动：${meta.via} 线索 + 原帖核验`, verifiedAt: new Date().toISOString().slice(0, 10), confidence: "auto" };
-      if (kind === "teaser" && /reset/.test(t.text.toLowerCase())) { ev.pendingReset = true; Object.assign(ev, parseExpected(t.text, t.createdAt) || {}); }   // 读得出时间就倒计时，读不出显示「生效时间未公布」
-      if (kind === "reset") { const pend = ef.events.find((x) => x.provider === ev.provider && x.pendingReset && Date.now() - new Date(x.announcedAt) < 86400000); if (pend) { pend.pendingReset = false; pend.fulfilledBy = ev.id; pend.kind = "teaser"; ev.detail = "官方确认生效；预告见 " + new Date(pend.announcedAt).toISOString().slice(0, 16) + "Z"; } }
-      auto.push(ev);
-    } else {
-      pend.push({ ...base, via: meta.via, foundAt: new Date().toISOString(), zhDraft: "", guess: kind });
+      const observed=resets?.find(r=>r.id==='observed-'+event.id);
+      if(observed&&Number.isFinite(Date.parse(observed.announced_at)))offer(event.id,{type:'observed',at:new Date(observed.announced_at).toISOString(),url:'https://codex-resets.com',sourceId:observed.id});
+      else if(status.latest_reset?.id===event.id&&scheduled?.id!==event.id)offer(event.id,{type:'observed',at:now,url:'https://codex-resets.com',sourceId:event.id,note:'第三方标记已执行；时间为本站发现时间'});
     }
-  } catch (e) { log(`核验 ${id} 失败: ${e.message}`); }
+  }
+  const useTikHub=args.has('--tikhub')||args.has('--tikhub-all');
+  if(useTikHub){
+    const token=key();if(!token)errors.push('TikHub 配置缺失');
+    else for(const account of (args.has('--tikhub-all')?watch.accounts:watch.accounts.filter(a=>['thsottiaux','ClaudeDevs'].includes(a.screen_name)))){
+      await source(`tikhub:${account.screen_name}`,async()=>{
+        const j=await json(`https://api.tikhub.io/api/v1/twitter/web/fetch_user_post_tweet?screen_name=${account.screen_name}`,{Authorization:'Bearer '+token});
+        const list=j.data?.timeline;if(!Array.isArray(list))throw Error('TikHub 响应无 timeline');
+        for(const t of list)if(new RegExp(watch.keywords,'i').test(t.text||''))add(t.tweet_id,account.screen_name,'tikhub');return list;
+      },true);
+    }
+    const candidates=ef.events.filter(e=>(e.pendingReset||['scheduled','observed'].includes(e.effectiveEvidence?.type))&&Date.parse(now)-Date.parse(e.announcedAt)<7*86400000);
+    if(token)for(const account of [...new Set(candidates.map(e=>e.account.replace(/^@/,'')))]){
+      const list=await source(`tikhub:replies:${account}`,async()=>{const j=await json(`https://api.tikhub.io/api/v1/twitter/web/fetch_user_tweet_replies?screen_name=${account}`,{Authorization:'Bearer '+token});if(!Array.isArray(j.data?.timeline))throw Error('TikHub 回复响应无 timeline');return j.data.timeline;});
+      for(const item of list||[]){
+        const id=String(item.tweet_id||'');if(!id||!candidates.some(e=>relatedTo(item,e)))continue;
+        // Independently validate author, text and relationship, not just a broad “is live”.
+        await source(`fx:reply:${id}`,async()=>{const t=await tweet(account,id);if(!t.text||!accounts.has(String(t.author).toLowerCase()))throw Error('确认帖作者或正文未核实');const event=confirmationFor(t,candidates);if(event)offer(event.id,{type:'official',at:t.createdAt,sourceId:id,url:t.url||`https://x.com/${account}/status/${id}`});return t;});
+      }
+    }
+  }
+  const auto=[],pending=[];
+  for(const [id,meta]of found){
+    await source(`fx:${id}`,async()=>{
+      const t=await tweet(meta.account,id);if(!t.text||!t.author||!Number.isFinite(Date.parse(t.createdAt)))throw Error('原帖正文、作者或时间不完整');
+      if(t.id&&String(t.id)!==id)throw Error('原帖 ID 不匹配');
+      if(!accounts.has(t.author.toLowerCase())){rf.rejected.push({id,why:'作者非官方账号 @'+t.author,at:now,textEn:t.text,sourceUrl:t.url});verificationSuccess++;return t;}
+      verificationSuccess++;
+      const kind=classify(t.text),base={id,provider:accounts.get(t.author.toLowerCase()),account:'@'+t.author,sourceUrl:t.url||`https://x.com/${t.author}/status/${id}`,announcedAt:t.createdAt,textEn:t.text};
+      if(['reset','banked','boost','teaser'].includes(kind)){
+        const event={...base,kind,extraLinks:[],zh:ZH[kind],detail:'',scope:'待核实',verified:true,verifiedBy:`自动：${meta.via} 线索 + 原帖核验`,verifiedAt:now.slice(0,10),confidence:'auto'};
+        if(kind==='teaser'){event.pendingReset=true;Object.assign(event,parseExpected(t.text,t.createdAt)||{});if(event.expectedAmbiguity)event.detail=event.expectedAmbiguity;}
+        const related=confirmationFor(t,ef.events);
+        if(related&&kind==='reset'){
+          // Keep one event for the announcement and its confirmation; retain the new source link.
+          offer(related.id,{type:'official',at:t.createdAt,sourceId:id,url:event.sourceUrl});
+          rf.rejected.push({id,why:'确认帖已关联预告 '+related.id,at:now,originalEvent:event,relatedEventId:related.id});
+        }else auto.push(event);
+      }else pending.push({...base,via:meta.via,foundAt:now,zhDraft:'',guess:kind});
+      return t;
+    });
+  }
+  let promoted=0;const nudges=[];
+  for(const event of ef.events){
+    const fallback=scheduledEvidence(event,now);if(fallback)offer(event.id,fallback);
+    if(applyEvidence(event,evidence.get(event.id)||[],now)){promoted++;log(`更新生效证据 ${event.id} ${event.effectiveEvidence.type}`);}
+    if(event.pendingReset&&!event.expectedAt&&Date.parse(now)-Date.parse(event.announcedAt)>86400000&&!event.nudgedAt)nudges.push(event);
+  }
+  ef.events.push(...auto);ef.events.sort((a,b)=>a.announcedAt<b.announcedAt?1:-1);pf.pending.push(...pending);
+  if(discoverySuccess===0)errors.push('全部主要线索源失败');
+  if(found.size>0&&verificationSuccess===0)errors.push('所有新线索均未通过原帖核验');
+  health.status=errors.length?'error':attempted.some(s=>s.status==='error')?'degraded':'ok';
+  if(discoverySuccess>0&&(!found.size||verificationSuccess>0))health.lastSuccessAt=now;
+  if(args.has('--dry'))return{exitCode:errors.length?1:0,auto:auto.length,pending:pending.length,promoted,health,errors,events:ef};
+  // Persist the reminder only after confirmed delivery; a failed notification is retryable.
+  if(nudges.length&&!args.has('--no-feishu')){
+    try{await notify('【额度雷达】预告已满 24 小时，尚无明确时间/确认：\n'+nudges.map(e=>`${e.account} ${e.id}；人工确认：review.mjs edit ${e.id} --kind reset --at <ISO>`).join('\n'));for(const e of nudges)e.nudgedAt=now;}
+    catch(e){errors.push('预告提醒发送失败: '+safeError(e));}
+  }
+  if(JSON.stringify(ef.events)!==before){ef.updatedAt=now;write('events.json',ef);}
+  if(JSON.stringify(pf.pending)!==beforePending)write('pending.json',pf);
+  if(JSON.stringify(rf.rejected)!==beforeRejected)write('rejected.json',rf);
+  write('health.json',health);
+  const version=eventVersion(ef.events);let release=structuredClone(read('release.json',{}));let published=false,attemptedDeploy=false;
+  if(release.targetVersion!==version){release.targetVersion=version;write('release.json',release);}
+  if(release.deployedVersion!==version&&!args.has('--no-deploy')){
+    attemptedDeploy=true;release.lastAttemptAt=now;release.lastError=null;write('release.json',release);
+    try{await deploy();release=read('release.json',{});if(release.deployedVersion!==version)throw Error('部署未提供生产回读版本确认');published=true;log('生产版本回读确认 '+version);}
+    catch(e){release=structuredClone(read('release.json',release));release.targetVersion=version;release.lastAttemptAt=now;release.lastError=safeError(e);write('release.json',release);errors.push('生产发布失败: '+release.lastError);log(errors.at(-1));}
+  }
+  if((auto.length||pending.length||promoted||attemptedDeploy)&&!args.has('--no-feishu')){
+    const label=published?'生产已回读确认':release.deployedVersion===version?'生产版本一致':attemptedDeploy?'已入库，生产发布失败（将重试）':'已入库，待发布';
+    try{await notify(`【额度雷达】${label}\n新增 ${auto.length} 条；待办 ${pending.length} 条；证据更新 ${promoted} 条。\n${auto.map(e=>`[${e.kind}] ${e.account} ${bj(e.announcedAt,'md')} ${e.zh}`).join('\n')}`);}
+    catch(e){errors.push('状态通知失败: '+safeError(e));}
+  }
+  // Commit collected state even when deployment fails, then return failure to Actions/watchdog.
+  if(options.commit||process.env.GITHUB_ACTIONS){try{await(options.commit||commitData)();}catch(e){errors.push('状态提交失败: '+safeError(e));}}
+  for(const error of errors)log(error);
+  return{exitCode:errors.length?1:0,auto:auto.length,pending:pending.length,promoted,health,release,errors,published};
 }
-log(`新线索 ${found.size}，自动上线 ${auto.length}，待办 ${pend.length}`);
-for (const a of auto) log(` AUTO ${a.kind} ${a.account} ${bj(a.announcedAt)} | ${a.textEn.slice(0, 80).replace(/\n/g, " ")}`);
-for (const p of pend) log(` PEND ${p.guess} ${p.account} ${bj(p.announcedAt)} | ${p.textEn.slice(0, 80).replace(/\n/g, " ")}`);
-if (args.has("--dry")) process.exit(0);
-
-if (auto.length || promoted) { ef.events.push(...auto); ef.events.sort((a, b) => (a.announcedAt < b.announcedAt ? 1 : -1)); ef.updatedAt = new Date().toISOString(); writeJson("events.json", ef); }
-if (pend.length) { pf.pending.push(...pend); writeJson("pending.json", pf); }
-writeJson("rejected.json", rf);
-
-if ((auto.length || promoted) && !args.has("--no-deploy")) {
-  try { execFileSync("node", ["scripts/deploy.mjs"], { cwd: ROOT, stdio: "inherit", timeout: 360000, env: { ...process.env, PATH: (process.env.PATH || "") + ":/Users/kenyuanlin/.npm-global/bin:/opt/homebrew/bin:/usr/local/bin" } }); log("已自动发布生产（含 IndexNow）"); }
-  catch (e) { log("自动发布失败: " + e.message.slice(0, 200)); }
-}
-if ((auto.length || pend.length || promoted || nudges.length) && !args.has("--no-feishu")) {
-  const lines = [...auto.map((a) => `· 已上线 [${a.kind}] ${a.account} ${bj(a.announcedAt, "md")}：${a.textEn.slice(0, 70).replace(/\n/g, " ")}${a.pendingReset ? (a.expectedAt ? `｜读出预告时间 ${bj(a.expectedAt)}${a.expectedPrecision === "day" ? "（只知哪天）" : ""}，首页已倒计时` : "｜没读出时间，首页显示「生效时间未公布」；有时间就 review.mjs edit <id> --expect <ISO>") : ""}`), ...pend.map((p) => `· 待办 [${p.guess}] ${p.account} ${bj(p.announcedAt, "md")}：${p.textEn.slice(0, 70).replace(/\n/g, " ")}`)];
-  const extra = [...confirms.map((c) => `· 官方回复确认生效：${c.text.slice(0, 70).replace(/\n/g, " ")}（${bj(c.at)}）`), ...nudges.map((x) => `· 提醒：${x.account} 的重置公告已满 24 小时，官方没给时间也没确认，页面仍显示「已宣布」。确认到账了就 review.mjs edit ${x.id} --kind reset，或补 --expect`)];
-  lines.push(...extra);
-  const msg = `【额度雷达】哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条${promoted ? `，预告超时转正 ${promoted} 条` : ""}\n${lines.join("\n")}\n\n补中文：cd ~/Documents/GitHub/quota-radar && node scripts/review.mjs edit <id> --zh "..." --scope "..."\n待办：node scripts/review.mjs list`;
-  try { await sendFeishu(msg); log("飞书已通知"); } catch (e) { log("飞书失败: " + e.message.slice(0, 120)); }
-}
-
-// 云端：把 events/pending/rejected 的变化提交回仓库，作为下一次运行的状态
-if (process.env.GITHUB_ACTIONS && (auto.length || pend.length || found.size || promoted || nudges.length)) {
-  try {
-    execFileSync("git", ["config", "user.name", "quota-radar-bot"], { cwd: ROOT });
-    execFileSync("git", ["config", "user.email", "bot@airesetclock.com"], { cwd: ROOT });
-    execFileSync("git", ["add", "data/events.json", "data/pending.json", "data/rejected.json"], { cwd: ROOT });
-    const st = execFileSync("git", ["status", "--porcelain", "data"], { cwd: ROOT, encoding: "utf8" });
-    if (st.trim()) { execFileSync("git", ["commit", "-m", `哨兵：自动上线 ${auto.length} 条，待办 ${pend.length} 条，转正 ${promoted} 条`], { cwd: ROOT }); execFileSync("git", ["push"], { cwd: ROOT }); log("数据已提交回仓库"); }
-  } catch (e) { log("提交回仓库失败: " + e.message.slice(0, 160)); }
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+  try{const result=await runSentinel({args:process.argv.slice(2)});process.exitCode=result.exitCode;}
+  catch(e){console.error(safeError(e));process.exitCode=1;}
 }

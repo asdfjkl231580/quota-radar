@@ -1,36 +1,51 @@
-// 准时定时器（Vercel Pro 定时任务，每 10 分钟）：①看门狗 ②触发 GitHub 上的哨兵工作流
-// 原因：GitHub 自带定时只是「尽量跑」，9/26 实测说好 10 分钟一次，5 小时只跑了 2 次
-// 环境变量：CRON_SECRET（Vercel 调用时自动带上）、GH_DISPATCH_TOKEN（只授权 quota-radar 仓库 Actions 读写的专用钥匙）
-import { kv, feishu } from "./_kv.js";
-const REPO = "https://api.github.com/repos/asdfjkl231580/quota-radar";
+// Authenticated scheduler: check collection/release/production, then dispatch the next run.
+import { timingSafeEqual } from "node:crypto";
+import { fetchJson, notifyOnce } from "./_kv.js";
+import { githubHeaders, readHealth, REPO } from "./_health.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
-  if (process.env.CRON_SECRET && req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) return res.status(401).json({ ok: false });
-  const token = process.env.GH_DISPATCH_TOKEN;
-  if (!token) return res.status(500).json({ ok: false, error: "GH_DISPATCH_TOKEN 未配置" });
-  const gh = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "User-Agent": "airesetclock-cron", "X-GitHub-Api-Version": "2022-11-28" };
+  res.setHeader("Allow", "GET");
+  if (req.method !== "GET") return res.status(405).json({ ok: false, error: "method" });
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return res.status(503).json({ ok: false, error: "cron_not_configured" });
+  const given = Buffer.from(String(req.headers.authorization || "")), expected = Buffer.from(`Bearer ${secret}`);
+  if (given.length !== expected.length || !timingSafeEqual(given, expected)) return res.status(401).json({ ok: false, error: "unauthorized" });
+  if (!process.env.GH_DISPATCH_TOKEN) return res.status(503).json({ ok: false, error: "dispatch_not_configured" });
 
-  // ① 看门狗：哨兵上次成功超过 40 分钟 → 飞书告警（一小时最多一次）
-  let lastOkMin = null;
+  const gh = githubHeaders();
+  let health, lastOkMin = null;
+  const problems = [];
+  const checks = await Promise.allSettled([
+    readHealth(), fetchJson(`${REPO}/actions/workflows/sentinel.yml/runs?status=success&per_page=1`, { headers: gh }, "github_runs")
+  ]);
+  if (checks[0].status === "fulfilled") { health = checks[0].value; problems.push(...health.reasons); }
+  else problems.push("health_unavailable");
+  if (checks[1].status === "fulfilled") {
+    const last = checks[1].value?.workflow_runs?.[0];
+    const timestamp = Date.parse(last?.updated_at || last?.created_at);
+    if (Number.isFinite(timestamp)) lastOkMin = Math.floor((Date.now() - timestamp) / 60000);
+    if (lastOkMin === null || lastOkMin > 40 || lastOkMin < -1) problems.push("workflow_stale");
+  } else problems.push("workflow_unavailable");
+
+  // A broken watchdog must not prevent recovery dispatch, but must never return healthy.
+  let dispatched = false;
   try {
-    const j = await (await fetch(`${REPO}/actions/workflows/sentinel.yml/runs?status=success&per_page=1`, { headers: gh })).json();
-    const last = j.workflow_runs?.[0];
-    lastOkMin = last ? Math.round((Date.now() - new Date(last.created_at)) / 60000) : null;
-    if (lastOkMin === null || lastOkMin > 40) {
-      const [already] = await kv(["GET", "alert:sentinel"]);
-      if (!already) {
-        await kv(["SET", "alert:sentinel", "1", "EX", "3600"]);
-        await feishu(`【额度雷达·告警】哨兵已 ${lastOkMin ?? "很久"} 分钟没有成功运行，网站数据可能停更。\n查看：https://github.com/asdfjkl231580/quota-radar/actions`);
-      }
-    }
-  } catch (e) { /* 看门狗失败不影响触发 */ }
+    const response = await fetch(`${REPO}/actions/workflows/sentinel.yml/dispatches`, {
+      method: "POST", headers: { ...gh, "Content-Type": "application/json" },
+      body: JSON.stringify({ ref: "main", inputs: { tikhub: "false" } }), signal: AbortSignal.timeout(6000)
+    });
+    dispatched = response.status === 204;
+    if (!dispatched) problems.push("dispatch_failed");
+  } catch { problems.push("dispatch_unavailable"); }
 
-  // ② 触发哨兵
-  const r = await fetch(`${REPO}/actions/workflows/sentinel.yml/dispatches`, { method: "POST", headers: gh, body: JSON.stringify({ ref: "main", inputs: { tikhub: "false" } }) });
-  if (r.status !== 204) {
-    try { const [already] = await kv(["GET", "alert:dispatch"]); if (!already) { await kv(["SET", "alert:dispatch", "1", "EX", "3600"]); await feishu(`【额度雷达·告警】定时器触发哨兵失败（GitHub 返回 ${r.status}）。常见原因：GH_DISPATCH_TOKEN 过期（有效期 1 年，2027-09 到期）。`); } } catch (e) {}
-    return res.status(502).json({ ok: false, status: r.status, error: (await r.text()).slice(0, 200) });
+  let notification = null;
+  if (problems.length) {
+    try {
+      notification = await notifyOnce("pipeline:" + [...new Set(problems)].sort().join(":"), `【额度雷达·告警】检测到：${[...new Set(problems)].join("、")}。\n采集上次成功：${health?.collector.lastSuccessAt || "未知"}\n生产版本匹配：${health?.release.status === "ok" ? "是" : "否"}\n定时触发：${dispatched ? "成功" : "失败"}\n查看：https://airesetclock.com/status\n运行记录：https://github.com/asdfjkl231580/quota-radar/actions`);
+      if (!notification.delivered) problems.push("notification_pending");
+    } catch { notification = { delivered: false }; problems.push("notification_failed"); }
   }
-  return res.status(200).json({ ok: true, at: new Date().toISOString(), lastOkMin });
+  const ok = problems.length === 0;
+  return res.status(ok ? 200 : 503).json({ ok, dispatched, at: new Date().toISOString(), lastOkMin, problems: [...new Set(problems)], notification, health });
 }

@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-02T02:20:41.918Z",
+ "updatedAt": "2026-10-03T05:50:33.891Z",
  "events": [
   {
    "id": "2105843926221660585",
@@ -9,65 +9,62 @@
    "announcedAt": "2026-10-02T02:14:51.000Z",
    "textEn": "Global reset landing tomorrow 10am PST for all paid ChatGPT accounts. Apologies for the slow start with GPT-6.1 Sol, it's now back to running at expected speeds after the massive load spike in the first two days.",
    "kind": "reset",
-   "extraLinks": [],
-   "zh": "官方宣布全员重置（原文待整理）",
-   "detail": "",
-   "scope": "待核实",
+   "extraLinks": [
+    "https://x.com/thsottiaux/status/2106131810921136451"
+   ],
+   "zh": "ChatGPT 全部付费账户重置，官方已确认生效",
+   "detail": "官方在引用本公告的新帖中确认“Reset all propagated. Enjoy.”。以确认帖发布时间 2026 年 10 月 3 日 05:18 北京时间作为本站生效记时依据。先前的 PST 时区歧义已被后续确认取代，未用原定钟点推算到账。",
+   "scope": "ChatGPT 全部付费账户",
    "verified": true,
    "verifiedBy": "自动：didreset 线索 + 原帖核验",
-   "verifiedAt": "2026-10-02",
-   "confidence": "auto"
-  },
-  {
-   "id": "2105672058269212820",
-   "provider": "codex",
-   "account": "@thsottiaux",
-   "sourceUrl": "https://x.com/thsottiaux/status/2105672058269212820",
-   "announcedAt": "2026-10-01T14:51:54.000Z",
-   "textEn": "Because usage on your primary dot is virtually unlimited at the moment, I can’t really give a reset. I need to come up with something new fast.",
-   "kind": "reset",
-   "extraLinks": [],
-   "zh": "官方宣布全员重置（原文待整理）",
-   "detail": "",
-   "scope": "待核实",
-   "verified": true,
-   "verifiedBy": "自动：didreset 线索 + 原帖核验",
-   "verifiedAt": "2026-10-01",
-   "confidence": "auto"
-  },
-  {
-   "id": "2104823812042940713",
-   "provider": "codex",
-   "account": "@thsottiaux",
-   "sourceUrl": "https://x.com/thsottiaux/status/2104823812042940713",
-   "announcedAt": "2026-09-29T06:41:17.000Z",
-   "textEn": "Hi,\n\nTomorrow we are re-opening the Pro $200 subscriptions to new subscribers, but together with it we are also changing how we calculate the usage for it. In effect, if you do the math, it will net out at half the dollar in API spend compared to the old Pro $200 plan. \n\nNow that it's said, let me explain why this is happening and why you will still get more work done than if you were on the Pro $200 subscription one month ago.\n\n(a) We didn't want to compromise in other ways and are committing to not reintroducing the 5h limit, so that you can fully use the weekly usage when you want.\n(b) On the subscription, we guarantee that over time you always get more work done and with an increasing level of quality. This means that you will continue to get more value per dollar spent as a result of models getting more efficient and us passing down the improvements in the form of API price reductions.\n(c) We don't want to put an incentive on ourselves to artificially inflate the API list prices to make it look like you are getting a lot (and workaround it through discounts, etc). Instead we want to continue to both rapidly reduce prices and increase capabilities of models on the API. This week we introduced GPT-6 Sol and GPT-6 Luna at 50% of their previous price. Over time, we see prices go low enough that it makes sense for most to buy usage as needed without there being a significant gap between what you get in a subscription and what you get in the API for a dollar spent.\n(d) Tomorrow, we are adding more things to the subscription that won't draw on the usage, I won't reveal what that is yet.\n\nI wanted to be transparent before all the big announcements tomorrow. Lots of new exciting things are coming to the subscriptions that will make it super compelling, but I wanted to make sure to share this change ahead of time so you can all understand it before we shower you with good news.\n\nCodexingly,\nTibo",
-   "kind": "teaser",
-   "extraLinks": [],
-   "zh": "官方宣布即将重置（生效时间未公布）",
-   "detail": "",
-   "scope": "待核实",
-   "verified": true,
-   "verifiedBy": "自动：didreset 线索 + 原帖核验",
-   "verifiedAt": "2026-09-29",
-   "confidence": "auto"
-  },
-  {
-   "id": "2104641323198472430",
-   "provider": "claude",
-   "account": "@ClaudeDevs",
-   "sourceUrl": "https://x.com/ClaudeDevs/status/2104641323198472430",
-   "announcedAt": "2026-09-28T18:36:08.000Z",
-   "textEn": "Sonnet 5.5 is available now in the Claude Platform and Claude Code.\n\nWe granted all Pro, Max, and Team users a reset last Tuesday. If you haven’t used it yet, you can still apply it whenever you want, before Oct 22. https://clau.de/reset",
-   "kind": "reset",
-   "extraLinks": [],
-   "zh": "官方宣布全员重置（原文待整理）",
-   "detail": "",
-   "scope": "待核实",
-   "verified": true,
-   "verifiedBy": "自动：tikhub 线索 + 原帖核验",
-   "verifiedAt": "2026-09-29",
-   "confidence": "auto"
+   "verifiedAt": "2026-10-03",
+   "confidence": "auto",
+   "pendingReset": false,
+   "corrections": [
+    {
+     "at": "2026-10-02T07:41:55.774021Z",
+     "reason": "将来时公告被误分类为已完成重置；修正为待生效，并保留时区歧义。",
+     "originalEvent": {
+      "id": "2105843926221660585",
+      "provider": "codex",
+      "account": "@thsottiaux",
+      "sourceUrl": "https://x.com/thsottiaux/status/2105843926221660585",
+      "announcedAt": "2026-10-02T02:14:51.000Z",
+      "textEn": "Global reset landing tomorrow 10am PST for all paid ChatGPT accounts. Apologies for the slow start with GPT-6.1 Sol, it's now back to running at expected speeds after the massive load spike in the first two days.",
+      "kind": "reset",
+      "extraLinks": [],
+      "zh": "官方宣布全员重置（原文待整理）",
+      "detail": "",
+      "scope": "待核实",
+      "verified": true,
+      "verifiedBy": "自动：didreset 线索 + 原帖核验",
+      "verifiedAt": "2026-10-02",
+      "confidence": "auto"
+     }
+    },
+    {
+     "at": "2026-10-03T05:50:33.891Z",
+     "reason": "官方引用原公告确认重置已全部生效；更新摘要，保留原先排期时区歧义的更正历史。",
+     "previous": {
+      "zh": "官方预告将为 ChatGPT 付费账户重置，原文钟点的时区含义待确认（官方确认生效）",
+      "detail": "原文称 tomorrow 10am PST；公告时美西处于夏令时，PST 固定偏移与当地时间相差一小时。在官方确认前不自动填写精确倒计时。",
+      "expectedAmbiguity": "原文使用 PST，与该日期的美西当地时区相差一小时；需核实官方采用固定时区还是当地时间。"
+     }
+    }
+   ],
+   "effectiveAt": "2026-10-02T21:18:48.000Z",
+   "promotedAt": "2026-10-03T05:50:05.019Z",
+   "effectiveEvidence": {
+    "type": "official",
+    "at": "2026-10-02T21:18:48.000Z",
+    "sourceId": "2106131810921136451",
+    "url": "https://x.com/thsottiaux/status/2106131810921136451",
+    "relationship": "quote",
+    "quotedTweetId": "2105843926221660585",
+    "sourceText": "Reset all propagated. Enjoy."
+   },
+   "confirmedBy": "2106131810921136451",
+   "en": "Quota reset for all paid ChatGPT accounts; officially confirmed."
   },
   {
    "id": "2103911959544610829",

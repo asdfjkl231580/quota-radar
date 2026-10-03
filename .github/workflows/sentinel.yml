@@ -14,13 +14,14 @@ permissions: { contents: write }
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 1 }
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - run: npm i -g vercel@latest
+      - run: npm test
+      - run: npm i -g vercel@62.1.0
       - name: 哨兵
         env:
           TIKHUB_API_KEY: ${{ secrets.TIKHUB_API_KEY }}
