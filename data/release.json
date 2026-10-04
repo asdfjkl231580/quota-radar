@@ -1,6 +1,6 @@
 {
- "targetVersion": "sha256:9b3a85f876b123943d0bf868809257a58e79376956a12df37c73fcb28b60826c",
- "lastAttemptAt": "2026-10-03T06:00:41.705Z",
+ "targetVersion": "sha256:837e5ae5e6c0f251a0b280fd8c119539f49482fe5e6005ad91b2ff35f3264fb2",
+ "lastAttemptAt": "2026-10-04T05:00:44.011Z",
  "lastError": "Command failed: node scripts/deploy.mjs",
  "deployedVersion": "sha256:9b3a85f876b123943d0bf868809257a58e79376956a12df37c73fcb28b60826c",
  "deployedAt": "2026-10-03T06:00:30.735Z"
