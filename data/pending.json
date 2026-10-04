@@ -59,6 +59,30 @@
    "foundAt": "2026-10-03T06:41:10.757Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2106845738814849339",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2106845738814849339",
+   "announcedAt": "2026-10-04T20:35:42.000Z",
+   "textEn": "@poteto I challenge you to do the same\n\nhttps://x.com/thsottiaux/status/2106845241357824205?s=20",
+   "via": "didreset",
+   "foundAt": "2026-10-04T21:51:18.283Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2106845241357824205",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2106845241357824205",
+   "announcedAt": "2026-10-04T20:33:43.000Z",
+   "textEn": "Over the next 28 days, each day we’ll either ship one thing that is a clear improvement and relevant for most codex/work users or ship a full reset. Let the improvements begin.",
+   "via": "didreset",
+   "foundAt": "2026-10-04T21:51:18.283Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
