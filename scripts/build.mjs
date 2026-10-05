@@ -8,6 +8,8 @@ import path from "node:path";
 import { eventVersion } from "./snapshot.mjs";
 import { validateEvents } from "./validate-events.mjs";
 import { ROOT, readJson, KINDS, PROVIDERS, bj, daysAgo } from "./lib.mjs";
+import { eventPath, searchableEvent, eventArticle, breadcrumbs } from "./search-pages.mjs";
+import { enrichGuides } from "./guides.mjs";
 
 const DIST = path.join(ROOT, "dist");
 const site = readJson("site.json");
@@ -51,7 +53,7 @@ const L = {
     pTitle: { codex: `Codex 什么时候重置？官方送额度记录 | ${site.name}`, claude: `Claude 额度什么时候恢复？官方重置记录 | ${site.name}` },
     pDesc: (p) => `${PROVIDERS[p].full} 官方全员重置、重置卡、提额公告的中文记录，附原帖与适用套餐。`,
     pNow: (p) => `${PROVIDERS[p].zh} 现在的状态`, pAll: (p) => `${PROVIDERS[p].zh} 全部记录`, related: "相关问题",
-    pNote: { codex: "Codex 的送额度公告几乎全部来自 OpenAI Codex 负责人 @thsottiaux 的个人 X 账号。公告有时提前给出日期或时间，也可能只说稍后重置。预告、生效确认和重置卡分开展示。", claude: "Claude 的公告来自 @ClaudeDevs 官方账号，偶尔来自 Anthropic 员工。一般写明「5-hour and weekly」两个桶一起重置。" },
+    pNote: { codex: "Codex 的送额度公告几乎全部来自 OpenAI Codex 负责人 @thsottiaux 的个人 X 账号。公告有时提前给出日期或时间，也可能只说稍后重置。预告、生效确认和重置卡分开展示。", claude: "Claude 的公告来自 @ClaudeDevs 官方账号，偶尔来自 Anthropic 员工。每次恢复哪些额度窗口、适用于哪些账户，以该条公告和账户权益说明为准。" },
     faqTitle: `Codex / Claude 额度常见问题 | ${site.name}`, faqDesc: "额度消息来源、多久送一次、谁能收到、重置卡和直接重置的区别、怎么看剩余额度。", recentNews: "最近的官方动态", allRecords: "查看全部记录 →", otherQ: "其他问题 →",
     summary: (e) => e.zh, scope: (e) => e.scope, detail: (e) => e.detail || "",
     dateFallback: (iso, mode) => bj(iso, mode === "date" ? "md" : mode), tzFallback: "北京",
@@ -73,9 +75,9 @@ const L = {
     pTitle: { codex: "When does Codex reset? Official quota grants | Quota Radar", claude: "When does Claude quota reset? Official record | Quota Radar" },
     pDesc: (p) => `Official full resets, banked resets and quota boosts for ${PROVIDERS[p].full}, with source posts and eligible plans.`,
     pNow: (p) => `${PROVIDERS[p].zh} right now`, pAll: (p) => `All ${PROVIDERS[p].zh} events`, related: "Related questions",
-    pNote: { codex: "Almost every Codex quota announcement comes from @thsottiaux, who leads Codex at OpenAI, on his personal X account. Posts may announce a date or time in advance, or leave the timing open. We distinguish announcements, effective resets and banked resets.", claude: "Claude announcements come from the official @ClaudeDevs account, occasionally from Anthropic staff. They usually reset both the 5-hour and weekly buckets." },
+    pNote: { codex: "Almost every Codex quota announcement comes from @thsottiaux, who leads Codex at OpenAI, on his personal X account. Posts may announce a date or time in advance, or leave the timing open. We distinguish announcements, effective resets and banked resets.", claude: "Claude announcements come from the official @ClaudeDevs account, occasionally from Anthropic staff. The affected limits and eligible accounts depend on each announcement and the entitlement shown in your account." },
     faqTitle: "Codex / Claude quota FAQ | Quota Radar", faqDesc: "Where the data comes from, how often grants happen, who gets them, banked reset vs full reset, how to check your own quota.", recentNews: "Latest official updates", allRecords: "All events →", otherQ: "Other questions →",
-    summary: enSummary, scope: (e) => scopeEn(e.scope), detail: () => "",
+    summary: enSummary, scope: (e) => e.scopeEn || scopeEn(e.scope), detail: () => "",
     dateFallback: (iso, mode) => { const d = new Date(iso); const o = { timeZone: "UTC", month: "short", day: "numeric", hour12: false }; if (mode !== "date") { o.hour = "2-digit"; o.minute = "2-digit"; } if (mode === "full") o.year = "numeric"; return new Intl.DateTimeFormat("en-US", o).format(d) + (mode === "full" ? " UTC" : ""); }, tzFallback: "UTC",
   },
 };
@@ -104,6 +106,8 @@ const FAQ = {
   ],
 };
 
+
+enrichGuides(FAQ);
 
 const ABOUT = {
   zh: (a) => `<article class="q" style="margin-top:12px"><h1>关于额度雷达</h1>
@@ -237,7 +241,7 @@ function statusCard(T, p) {
 }
 function recentPanel(T, n = 4) {
   return `<section class="panel" aria-label="${T.recent}"><div class="ph">${SVG_CLOCK}${T.recent}<a class="more" href="${href(T, "/timeline")}">${T.viewAll}</a></div>
-<div class="rows">${events.filter((e) => REAL(e) || e.pendingReset).slice(0, n).map((e) => `<a class="row" href="${href(T, "/timeline")}#e${e.id}"><span class="d">${timeEl(T, e.announcedAt, "date")}</span><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${badge(T, e)}</span></a>`).join("")}</div></section>`;
+<div class="rows">${events.filter((e) => REAL(e) || e.pendingReset).slice(0, n).map((e) => `<a class="row" href="${href(T, eventPath(e))}"><span class="d">${timeEl(T, e.announcedAt, "date")}</span><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${badge(T, e)}</span></a>`).join("")}</div></section>`;
 }
 function faqPanel(T) {
   return `<section class="panel" aria-label="${T.faq}"><div class="ph">${SVG_Q}${T.faq}<a class="more" href="${href(T, "/faq")}">${T.all}</a></div>
@@ -259,7 +263,7 @@ function evidenceLabel(T, e) {
 function timeline(T, list, { filters = false, initial = 30 } = {}) {
   const items = list.map((e, i) => `<li id="e${e.id}" data-p="${e.provider}" class="${i >= initial ? "hid" : ""}">
   <div class="d"><span class="p ${e.provider}">${PROVIDERS[e.provider].zh}</span><span>${timeEl(T, e.announcedAt, "full")}</span>${badge(T, e)}</div>
-  <div class="t">${esc(T.summary(e))}</div>
+  <div class="t"><a href="${href(T, eventPath(e))}">${esc(T.summary(e))}</a></div>
   <div class="s">${T.scopeLbl}：${esc(T.scope(e))}${T.detail(e) ? " · " + esc(T.detail(e)) : ""} · ${esc(e.account)} · <a href="${esc(e.sourceUrl)}" target="_blank" rel="noopener">${T.source}</a>${(e.extraLinks || []).map((u, k) => ` <a href="${esc(u)}" target="_blank" rel="noopener">${T.source.replace(" ↗", "")} ${k + 2} ↗</a>`).join("")}</div>
   <div class="evidence-note">${T.verified}：${verificationDate(T, e.verifiedAt)} · ${e.confidence === "auto" ? T.automatic : e.confidence === "high" ? T.humanReview : (T.code === "zh" ? "审核状态未注明" : "Review status not specified")}<br>${T.evidence}：${esc(evidenceLabel(T, e))}${e.effectiveEvidence?.url ? ` · <a href="${esc(e.effectiveEvidence.url)}" target="_blank" rel="noopener">${T.source}</a>` : ""}${e.effectiveAt ? " · " + timeEl(T, e.effectiveAt, "full") : ""}</div>
   <details><summary>${T.tweetCard}</summary>${tweetCard(T, e)}</details>
@@ -290,7 +294,7 @@ function shareData(T) {
   };
   return { site: T.name, url: site.url + T.base, dataUpdatedAt: updatedAt || null, version: VERSION, buildAt: BUILT, codex: pick("codex"), claude: pick("claude"), kinds: T.kinds };
 }
-function page(T, { title, desc, path: p, active, body, jsonld }) {
+function page(T, { title, desc, path: p, active, body, jsonld, noindex = false }) {
   const base = site.url.replace(/\/$/, "");
   const url = base + href(T, p);
   const alt = base + (T.other.base + p).replace(/\/$/, "");
@@ -303,6 +307,7 @@ function page(T, { title, desc, path: p, active, body, jsonld }) {
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
+${noindex ? '<meta name="robots" content="noindex,follow">' : ''}
 <meta name="qr-data-version" content="${VERSION}">
 <link rel="canonical" href="${esc(url)}">
 <link rel="alternate" hreflang="${T.code === "zh" ? "zh-CN" : "en"}" href="${esc(url)}">
@@ -319,7 +324,7 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(
 <body data-units='${JSON.stringify(T.units)}' data-tzmsg="${T.tzSwitched}" data-tzlabels='${JSON.stringify(tzLabels)}'>
 <div class="page">
 <header class="top">
-  <div class="brand"><h1><a href="${href(T, "/")}">${esc(T.name)}</a></h1><span class="tag">${esc(T.tagline)}</span></div>
+  <div class="brand"><p class="brand-name"><a href="${href(T, "/")}">${esc(T.name)}</a></p><span class="tag">${esc(T.tagline)}</span></div>
   <button class="burger" aria-label="${T.menu}" aria-expanded="false" aria-controls="mainnav">${SVG_BURGER}</button>
   <nav class="main" id="mainnav">${T.nav.map(([h, t]) => `<a href="${href(T, h)}" class="${active === h ? "on" : ""}">${t}</a>`).join("")}<a class="lang" href="${(T.other.base + p).replace(/\/$/, "") || "/"}" hreflang="${T.other.code}">${T.other.label}</a><select class="tzsel" aria-label="${T.tz}">${tzOptions}</select></nav>
 </header>
@@ -347,7 +352,7 @@ for (const T of [L.zh, L.en]) {
   const dir = T.base.replace(/^\//, "");
   const file = (rel) => (dir ? dir + "/" : "") + rel;
   const hero = `<section class="hero">
-  <div><h2>${T.hero1}<br><span class="b">${T.hero2}</span></h2><p class="sub">${esc(T.tagline)}</p></div>
+  <div><h1>${T.hero1}<br><span class="b">${T.hero2}</span></h1><p class="sub">${esc(T.tagline)}</p></div>
   <div class="art"><span class="bolt" aria-hidden="true"></span><picture><source media="(min-width:769px)" type="image/webp" srcset="${T.code === "zh" ? "/assets/radar-mascot-sign.webp" : "/assets/radar-mascot-sign-en.webp"}"><source media="(min-width:769px)" srcset="${T.code === "zh" ? "/assets/radar-mascot-sign.png" : "/assets/radar-mascot-sign-en.png"}"><source type="image/webp" srcset="/assets/radar-mascot.webp"><img src="/assets/radar-mascot.png" alt="${esc(T.mascotAlt)}" width="900" height="603" fetchpriority="high"></picture></div>
 </section>`;
   out(file("index.html"), page(T, { title: T.title, desc: T.desc, path: "/", active: "/",
@@ -355,24 +360,32 @@ for (const T of [L.zh, L.en]) {
     jsonld: { "@context": "https://schema.org", "@type": "WebSite", name: T.name, url: site.url + T.base, inLanguage: T.locale, description: T.tagline } }));
 
   out(file("timeline.html"), page(T, { title: `${T.tlTitle} (${events.length}) | ${T.name}`, desc: T.tlDesc, path: "/timeline", active: "/",
-    body: `<h2 class="sec" style="margin-top:12px">${T.tlTitle}<small>${events.length} ${T.items}</small></h2>${timeline(T, events, { filters: true, initial: 30 })}` }));
+    body: `<h1 class="sec" style="margin-top:12px">${T.tlTitle}<small>${events.length} ${T.items}</small></h1>${timeline(T, events, { filters: true, initial: 30 })}` }));
 
   for (const p of ["codex", "claude"]) {
     const list = events.filter((e) => e.provider === p);
     out(file(`${p}.html`), page(T, { title: T.pTitle[p], desc: T.pDesc(p), path: `/${p}`, active: `/${p}`,
-      body: `<h2 class="sec" style="margin-top:12px">${T.pNow(p)}</h2><div class="quota-grid one">${statusCard(T, p)}</div><p class="note">${T.pNote[p]}</p>
+      body: `<h1 class="sec" style="margin-top:12px">${T.pNow(p)}</h1><div class="quota-grid one">${statusCard(T, p)}</div><p class="note">${T.pNote[p]}</p>
 <h2 class="sec">${T.pAll(p)}<small>${list.length} ${T.items}</small></h2>${timeline(T, list, { initial: 40 })}
-<h2 class="sec">${T.related}</h2><div class="faq">${FAQ[T.code].filter((f) => f.slug.includes(p) || f.slug.startsWith("chongzhi") || f.slug.startsWith("ruhe")).map((f) => `<details><summary>${esc(f.q)}</summary>${f.a}</details>`).join("")}</div>` }));
+<h2 class="sec">${T.related}</h2><div class="faq">${FAQ[T.code].filter((f) => f.slug.includes(p) || f.slug.startsWith("chongzhi") || f.slug.startsWith("ruhe")).map((f) => `<details><summary>${esc(f.q)}</summary>${f.a}<p class="perma"><a href="${href(T, "/q/" + f.slug)}">${T.openAlone}</a></p></details>`).join("")}</div>` }));
   }
 
   const faqLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQ[T.code].map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } })) };
   out(file("faq.html"), page(T, { title: T.faqTitle, desc: T.faqDesc, path: "/faq", active: "/faq",
-    body: `<h2 class="sec" style="margin-top:12px">${T.faq}</h2><div class="faq">${FAQ[T.code].map((f) => `<details id="${f.slug}" open><summary>${esc(f.q)}</summary>${f.a}<p class="perma"><a href="${href(T, "/q/" + f.slug)}">${T.openAlone}</a></p></details>`).join("")}</div>`, jsonld: faqLd }));
+    body: `<h1 class="sec" style="margin-top:12px">${T.faq}</h1><div class="faq">${FAQ[T.code].map((f) => `<details id="${f.slug}" open><summary>${esc(f.q)}</summary>${f.a}<p class="perma"><a href="${href(T, "/q/" + f.slug)}">${T.openAlone}</a></p></details>`).join("")}</div>`, jsonld: faqLd }));
 
   for (const f of FAQ[T.code]) {
     out(file(`q/${f.slug}.html`), page(T, { title: `${f.q} | ${T.name}`, desc: plain(f.a).slice(0, 120), path: `/q/${f.slug}`, active: "/faq",
-      body: `<article class="q" style="margin-top:12px"><h1>${esc(f.q)}</h1>${f.a}</article><h2 class="sec">${T.recentNews}</h2>${timeline(T, events.slice(0, 5), { initial: 5 })}<p style="margin-top:8px;font-size:14px"><a href="${href(T, "/timeline")}">${T.allRecords}</a> · <a href="${href(T, "/faq")}">${T.otherQ}</a></p>`,
-      jsonld: { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: [{ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: plain(f.a) } }] } }));
+      body: `<nav class="breadcrumbs" aria-label="${T.code === 'zh' ? '当前位置' : 'Breadcrumb'}"><a href="${href(T, '/')}">${T.nav[0][1]}</a> / <a href="${href(T, '/faq')}">${T.faq}</a></nav><article class="q guide" style="margin-top:12px"><h1>${esc(f.q)}</h1>${f.body || f.a}</article><h2 class="sec">${T.recentNews}</h2>${timeline(T, events.filter(searchableEvent).filter(e => !f.slug.includes('codex') && !f.slug.includes('claude') || f.slug.includes(e.provider)).slice(0, 5), { initial: 5 })}<p style="margin-top:8px;font-size:14px"><a href="${href(T, "/timeline")}">${T.allRecords}</a> · <a href="${href(T, "/faq")}">${T.otherQ}</a></p>`,
+      jsonld: breadcrumbs(site.url, [[T.name, href(T, '/')], [T.faq, href(T, '/faq')], [f.q, href(T, '/q/' + f.slug)]]) }));
+  }
+
+  for (const e of events) {
+    const title = `${PROVIDERS[e.provider].zh} · ${e.announcedAt.slice(0, 10)} · ${T.summary(e)} | ${T.name}`;
+    out(file(`events/${e.id}.html`), page(T, { title, desc: `${T.summary(e)} ${T.scopeLbl}: ${T.scope(e)}. ${e.confidence === 'auto' ? T.automatic : !searchableEvent(e) ? T.lowBadge : T.humanReview}`,
+      path: eventPath(e), active: '/' + e.provider, noindex: !searchableEvent(e),
+      body: eventArticle(T, e, { timeEl, verificationDate, evidenceLabel, badge, tweetCard, href }),
+      jsonld: breadcrumbs(site.url, [[T.name, href(T, '/')], [PROVIDERS[e.provider].zh, href(T, '/' + e.provider)], [T.summary(e), href(T, eventPath(e))]]) }));
   }
 
   out(file("about.html"), page(T, { title: `${T.about} | ${T.name}`, desc: T.desc, path: "/about", active: "",
@@ -380,11 +393,11 @@ for (const T of [L.zh, L.en]) {
 
   const documents = T.code === "zh" ? {
     method: `<h1>数据说明与纠错</h1><p class="lede">一条公告、一次到账、一张待领取的卡，是三件事。</p><h2>记录如何产生</h2><p>参考站接口和官方账号时间线提供线索；采集器回查原帖的账号、发布时间和完整正文。只有符合来源与分类规则的记录才进入公开时间线。无法确定的线索保留待处理，不应当作已发生重置。</p><p>「原帖核验」表示检查过来源，不代表核验了每个账户。标「待整理」的是自动收录摘要；未给明确适用范围时保留「待核实」，不能据此承诺你一定有额度。</p><h2>四种类型</h2><ul><li><b>全员重置：</b>按公告的适用范围恢复额度；「全员」仍受套餐和条件限制。</li><li><b>重置卡：</b>存入账户、需要手动使用；提醒领取旧卡不算一次新发卡。</li><li><b>提额：</b>限额或可用额度增加，不等同于重置。</li><li><b>预告：</b>未来计划，单独展示，不计入已发生记录。</li></ul><h2>时间依据</h2><p>优先采用关联的官方确认；其次是明确匹配该公告的第三方执行证据；最后才按官方预告时间记录。只给日期时保留日期精度，未给日期的预告不会因等待很久就变成已发生。按计划记时和第三方观察均有标识，不代表本站在你的账户上做过实测。</p><p>时间线的主日期是原帖发布时间，生效时间另列。原帖核验只有日期时不伪造钟点。「记录最近变更」是内容快照时间；没有新公告不代表采集失败。<a href="/status">状态页</a>说明当前可核对的范围。</p><h2>纠错和开放数据</h2><p>用右下角「留言」提交记录链接、错误点和原帖依据。更正后会更新本站数据版本；旧截图不会自动变化。可读取 <a href="/api/events.json">JSON</a> 或订阅 <a href="/rss.xml">RSS</a>，引用请注明本站和官方原帖；原帖版权归原作者。</p>`,
-    privacy: `<h1>隐私与服务边界</h1><p class="lede">公开信息免费。本站不接入你的 AI 账户。</p><h2>使用本站</h2><p>不需要注册，也不需要提交 OpenAI / Anthropic 的密码、Cookie 或 API Key。本站不能展示或恢复你的个人额度；公告适用范围、领取资格和实际到账以官方账户页面为准。本站与两家公司没有隶属关系。</p><h2>浏览与本地设置</h2><p>浏览器本地保存你选择的时区，刷新后沿用。页面使用 Vercel Web Analytics 和百度统计了解访问情况；托管和统计服务可能处理 IP、设备及页面访问等请求信息，其处理同时受各自服务规则约束。清除浏览器站点数据可重置本地偏好。</p><h2>留言和点击</h2><p>留言会把你填写的内容、可选联系方式、所在页面和语言发送到维护者的飞书运维收件处，用于处理反馈。请勿填写密码、密钥、订单付款信息等敏感内容。联系方式不是必填项。</p><p>「求重置」数字是点击次数，不是独立人数。接口用短期请求标识进行限流和批次去重；这不能证明有多少真实用户希望重置。提交失败会提示未计入，不保证所有离线点击均保存。</p><p>反馈处理依赖托管、计数和飞书服务。需要更正或删除已提交的信息，可通过「留言」说明提交时间和内容；维护者会据此核实处理，目前不承诺固定处理时限。</p><h2>当前服务与未来收费</h2><p>公告时间线、数据说明与公开查询当前免费。个性化提醒和工作流是后续可能收费的方向，目前尚未提供订阅或支付功能。未来如上线，会另行说明服务内容、价格、取消方式和数据处理规则。</p><p>自动摘要可能出错，第三方来源可能延迟，历史间隔不能用来预测下一次重置。本站不保证实时性、完整性或特定账户一定收到额度。</p>`,
+    privacy: `<h1>隐私与服务边界</h1><p class="lede">公开信息免费。本站不接入你的 AI 账户。</p><h2>使用本站</h2><p>不需要注册，也不需要提交 OpenAI / Anthropic 的密码、Cookie 或 API Key。本站不能展示或恢复你的个人额度；公告适用范围、领取资格和实际到账以官方账户页面为准。本站与两家公司没有隶属关系。</p><h2>浏览与本地设置</h2><p>浏览器本地保存你选择的时区，刷新后沿用。页面使用 Vercel Web Analytics 和百度统计了解访问情况；托管和统计服务可能处理 IP、设备及页面访问等请求信息，其处理同时受各自服务规则约束。清除浏览器站点数据可重置本地偏好。</p><h2>留言和点击</h2><p>留言会把你填写的内容、可选联系方式、所在页面和语言发送到维护者的飞书运维收件处，用于处理反馈。请勿填写密码、密钥、订单付款信息等敏感内容。联系方式不是必填项。</p><p>「求重置」数字是点击次数，不是独立人数。接口用短期请求标识进行限流和批次去重；这不能证明有多少真实用户希望重置。提交失败会提示未计入，不保证所有离线点击均保存。</p><p>反馈处理依赖托管、计数和飞书服务。需要更正或删除已提交的信息，可通过「留言」说明提交时间和内容；维护者会据此核实处理，目前不承诺固定处理时限。</p><h2>当前服务与未来收费</h2><p>公告时间线、数据说明与公开查询当前免费。本站正在探索广告、合作链接等公开网页商业模式，目前没有订阅或支付功能。未来如有广告或佣金链接，会作出明确标识；商业合作不应影响公告核验结论。</p><p>自动摘要可能出错，第三方来源可能延迟，历史间隔不能用来预测下一次重置。本站不保证实时性、完整性或特定账户一定收到额度。</p>`,
     status: `<h1>服务状态</h1><p class="lede">每天北京时间 09:30 检查一次官方额度消息；更新可能有延迟，非实时监控。</p><section class="health-panel" role="status"><h2>运行情况</h2><p data-health-summary>正在检查采集与发布状态…</p><ul data-health-reasons></ul><p data-health-times></p></section><dl class="status-facts"><dt>记录最近变更</dt><dd>${timeEl(T, updatedAt, "full")}</dd><dt>本站构建时间</dt><dd>${timeEl(T, BUILT, "full")}</dd><dt>公开记录</dt><dd>${events.length} 条</dd><dt>数据版本</dt><dd><code>${VERSION}</code></dd><dt>页面版本核对</dt><dd data-version-status>正在核对…</dd></dl><h2>这些信息能说明什么</h2><p>版本一致只说明当前页面匹配已发布数据，不代表最近一次采集、通知或部署全部成功。上方运行情况来自公开健康接口，检查采集心跳与线上版本是否匹配。下方构建信息来自静态快照。健康接口也有短暂缓存，并非账户到账证明。</p><p>记录没有变化可能是没有新公告，不能据此判断采集异常。若打开旧页面后有新的发布，页面会提示刷新。临时无法检查版本会明确显示，不会标为「一切正常」。</p><p><a href="/api/health">运行健康 JSON</a> · <a href="/api/status.json">构建快照 JSON</a> · <a href="/api/events.json">公开事件 JSON</a> · <a href="/method">数据口径</a></p><p>发现某条公告遗漏、过期或错误，请用「留言」附上原帖链接。</p>`
   } : {
     method: `<h1>Data method & corrections</h1><p class="lede">An announcement, an effective reset and a redeemable reset are different events.</p><h2>How records are collected</h2><p>Reference-site APIs and official account timelines provide leads. The collector checks the original author, timestamp and full text. Records must satisfy the source and classification rules before publication; ambiguous leads belong in the review queue.</p><p>“Source checked” verifies a post, not every user's account. “Auto” means the summary has not completed a separate summary and evidence review. Unspecified eligibility stays under review rather than promising quota to everyone.</p><h2>Types and timing</h2><ul><li><b>Full reset:</b> quota restored within the announcement's eligibility conditions.</li><li><b>Banked reset:</b> a grant that must be redeemed; a reminder about an old grant is not a new one.</li><li><b>Quota boost:</b> more allowance, not necessarily a reset.</li><li><b>Heads-up:</b> a future plan, excluded from completed-event counts.</li></ul><p>Related official confirmation takes priority, followed by matching third-party execution evidence, then the officially scheduled time. Day-only announcements keep their precision. Announcements without a time remain pending until there is evidence. Scheduled-time entries and third-party observations do not verify delivery to your account.</p><p>The timeline's main date is the post timestamp; effective times are listed separately. A date-only source check does not imply a precise check time. “Records last changed” describes the content snapshot, not collector health. See <a href="/en/status">service status</a>.</p><h2>Corrections and open data</h2><p>Use Feedback to send the affected record, correction and source link. Corrections update the data version; existing screenshots do not change. Use <a href="/api/events.json">JSON</a> or <a href="/en/rss.xml">RSS</a> with attribution to this site and the original post. Original posts remain their authors' work.</p>`,
-    privacy: `<h1>Privacy & service limits</h1><p class="lede">Public information is free. We do not connect to your AI account.</p><h2>Using the site</h2><p>No registration, OpenAI / Anthropic password, cookie or API key is required. We cannot show or restore your personal quota. Official account pages determine your eligibility and actual delivery. We are not affiliated with either company.</p><h2>Browsing and preferences</h2><p>Your selected time zone is stored locally in the browser. Vercel Web Analytics and Baidu Analytics help us understand visits; hosting and analytics services may process request information such as IP addresses, devices and page visits under their own rules. Clearing site data resets local preferences.</p><h2>Feedback and taps</h2><p>Feedback sends your message, optional contact details, page and language to the maintainer's Feishu operations inbox. Do not submit passwords, keys or payment information. Contact details are optional.</p><p>The reset button counts taps, not unique people. Short-lived request identifiers support rate limiting and batch deduplication. These counts are not a measure of real unique demand, and offline taps are not guaranteed to be saved.</p><p>Feedback relies on hosting and messaging services. To request correction or deletion of feedback, submit its approximate time and content through Feedback. We currently do not promise a fixed handling time.</p><h2>Free service and future plans</h2><p>The public timeline, data explanations and queries are free. Personalized alerts and workflows may become paid services later; subscriptions and payments are not available now. Any future launch will explain pricing, cancellation and data processing separately.</p><p>Automatic summaries can be wrong and sources can be delayed. Historical intervals do not predict future resets. We do not guarantee completeness, real-time delivery or quota for a specific account.</p>`,
+    privacy: `<h1>Privacy & service limits</h1><p class="lede">Public information is free. We do not connect to your AI account.</p><h2>Using the site</h2><p>No registration, OpenAI / Anthropic password, cookie or API key is required. We cannot show or restore your personal quota. Official account pages determine your eligibility and actual delivery. We are not affiliated with either company.</p><h2>Browsing and preferences</h2><p>Your selected time zone is stored locally in the browser. Vercel Web Analytics and Baidu Analytics help us understand visits; hosting and analytics services may process request information such as IP addresses, devices and page visits under their own rules. Clearing site data resets local preferences.</p><h2>Feedback and taps</h2><p>Feedback sends your message, optional contact details, page and language to the maintainer's Feishu operations inbox. Do not submit passwords, keys or payment information. Contact details are optional.</p><p>The reset button counts taps, not unique people. Short-lived request identifiers support rate limiting and batch deduplication. These counts are not a measure of real unique demand, and offline taps are not guaranteed to be saved.</p><p>Feedback relies on hosting and messaging services. To request correction or deletion of feedback, submit its approximate time and content through Feedback. We currently do not promise a fixed handling time.</p><h2>Free service and future plans</h2><p>The public timeline, data explanations and queries are free. We are exploring advertising and affiliate links; subscriptions and payments are not available now. Any ads or commission-bearing links will be labeled. Commercial relationships must not determine our evidence conclusions.</p><p>Automatic summaries can be wrong and sources can be delayed. Historical intervals do not predict future resets. We do not guarantee completeness, real-time delivery or quota for a specific account.</p>`,
     status: `<h1>Service status</h1><p class="lede">Official quota news is checked once daily at 09:30 Beijing time (01:30 UTC). Updates may be delayed; this is not real-time monitoring.</p><section class="health-panel" role="status"><h2>Operations</h2><p data-health-summary>Checking collection and publication…</p><ul data-health-reasons></ul><p data-health-times></p></section><dl class="status-facts"><dt>Records last changed</dt><dd>${timeEl(T, updatedAt, "full")}</dd><dt>Site built</dt><dd>${timeEl(T, BUILT, "full")}</dd><dt>Public records</dt><dd>${events.length}</dd><dt>Data version</dt><dd><code>${VERSION}</code></dd><dt>Page version check</dt><dd data-version-status>Checking…</dd></dl><h2>What this tells you</h2><p>A matching version only means this page matches the published data. It does not prove that collection, notifications or every deployment succeeded. The operations section checks the public health endpoint for collection heartbeats and deployed versions. Build details are a static snapshot. Health checks may be briefly cached and do not confirm quota delivery.</p><p>Unchanged records may mean no new announcements. An older page shows a refresh notice when a new version is published. Failed version checks are shown as unavailable, never as “all systems operational”.</p><p><a href="/api/health">Health JSON</a> · <a href="/api/status.json">Build snapshot JSON</a> · <a href="/api/events.json">Events JSON</a> · <a href="/en/method">Data method</a></p><p>For missing, outdated or incorrect announcements, use Feedback and include the source link.</p>`
   };
   for (const [slug, text] of Object.entries(documents)) {
@@ -395,21 +408,24 @@ for (const T of [L.zh, L.en]) {
   // RSS（两种语言）
   const base = site.url.replace(/\/$/, "");
   out(file("rss.xml"), `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>${esc(T.name)}</title><link>${base}${T.base}</link><description>${esc(T.tagline)}</description><language>${T.locale}</language>
-${events.slice(0, 50).map((e) => `<item><title>${esc(`[${PROVIDERS[e.provider].zh} · ${T.kinds[e.kind]}] ${T.summary(e)}`)}</title><link>${esc(e.sourceUrl)}</link><guid isPermaLink="false">${e.id}-${T.code}</guid><pubDate>${new Date(e.announcedAt).toUTCString()}</pubDate><description>${esc(`${T.scopeLbl}: ${T.scope(e)}. ${T.detail(e)} ${e.textEn}`)}</description></item>`).join("\n")}
+${events.filter(searchableEvent).slice(0, 50).map((e) => `<item><title>${esc(`[${PROVIDERS[e.provider].zh} · ${T.kinds[e.kind]}] ${T.summary(e)}`)}</title><link>${esc(base + href(T, eventPath(e)))}</link><guid isPermaLink="false">${e.id}-${T.code}</guid><pubDate>${new Date(e.announcedAt).toUTCString()}</pubDate><description>${esc(`<p>${esc(T.scopeLbl)}: ${esc(T.scope(e))}. ${esc(T.detail(e))}</p><p>${esc(e.textEn)}</p><p><a href="${esc(e.sourceUrl)}">${esc(T.source)}</a></p>`)}</description></item>`).join("\n")}
 </channel></rss>`);
 }
 
 // ───────── 机器可读（共用）─────────
 const base = site.url.replace(/\/$/, "");
 out("api/events.json", JSON.stringify({ site: site.name, url: site.url, version: VERSION, updatedAt: updatedAt || null, kinds: Object.fromEntries(Object.entries(KINDS).map(([k, v]) => [k, { zh: v.zh, en: L.en.kinds[k] || k }])),
-  events: events.map(({ textEn, ...e }) => ({ ...e, en: enSummary({ ...e, textEn }), scopeEn: scopeEn(e.scope) })) }, null, 1));
+  events: events.map(({ textEn, ...e }) => ({ ...e, en: enSummary({ ...e, textEn }), scopeEn: e.scopeEn || scopeEn(e.scope) })) }, null, 1));
 out("api/status.json", JSON.stringify({ schemaVersion: 1, version: VERSION, dataUpdatedAt: updatedAt || null, buildAt: BUILT, eventCount: events.length, source: "static-build", note: "Build snapshot only; not a live collector health check." }, null, 2));
 const urls = [];
-for (const T of [L.zh, L.en]) for (const u of ["/", "/timeline", "/codex", "/claude", "/faq", "/about", "/method", "/privacy", "/status", ...FAQ[T.code].map((f) => `/q/${f.slug}`)]) urls.push(href(T, u));
-out("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${base}${u}</loc><lastmod>${BUILT.slice(0, 10)}</lastmod></url>`).join("")}</urlset>`);
+for (const T of [L.zh, L.en]) for (const u of ["/", "/timeline", "/codex", "/claude", "/faq", "/about", "/method", "/privacy", "/status", ...FAQ[T.code].map((f) => `/q/${f.slug}`), ...events.filter(searchableEvent).map(eventPath)]) urls.push(href(T, u));
+// lastmod is optional; a build timestamp is not a trustworthy content change date.
+out("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${base}${u}</loc></url>`).join("")}</urlset>`);
 out("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${base}/sitemap.xml\n`);
-out("404.html", page(L.zh, { title: `页面不存在 | ${site.name}`, desc: "页面不存在", path: "/404", active: "",
+out("404.html", page(L.zh, { title: `页面不存在 | ${site.name}`, desc: "页面不存在", path: "/404", active: "", noindex: true,
   body: `<article class="q" style="margin-top:12px"><h1>这一页不存在</h1><p>可能链接打错了，或者这条记录已合并。</p><p><a href="/">回首页</a> · <a href="/timeline">全部记录</a> · <a href="/en">English</a></p></article>` }));
+out("en/404.html", page(L.en, { title: "Page not found | Quota Radar", desc: "Page not found", path: "/404", active: "", noindex: true,
+  body: `<article class="q" style="margin-top:12px"><h1>Page not found</h1><p>The link may be incorrect, or the record may have been merged.</p><p><a href="/en">Home</a> · <a href="/en/timeline">All events</a> · <a href="/">中文</a></p></article>` }));
 for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^[0-9a-f]{32}\.txt$/.test(f)) out(f, fs.readFileSync(path.join(ROOT, "site", f), "utf8"));
 // 百度站长验证文件原样进根目录（vercel.json 已关 cleanUrls，.html→308 的规则放过 baidu_verify_）
 for (const f of fs.readdirSync(path.join(ROOT, "site"))) if (/^baidu_verify_.*\.html$/.test(f)) out(f, fs.readFileSync(path.join(ROOT, "site", f), "utf8"));
