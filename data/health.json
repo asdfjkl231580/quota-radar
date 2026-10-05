@@ -2,43 +2,43 @@
  "schemaVersion": 1,
  "sources": {
   "lead:didreset:codex": {
-   "lastAttemptAt": "2026-10-05T12:30:42.543Z",
+   "lastAttemptAt": "2026-10-05T12:40:42.240Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-05T12:30:42.543Z",
+   "lastSuccessAt": "2026-10-05T12:40:42.240Z",
    "lastError": null,
    "items": 30
   },
   "lead:didreset:claude": {
-   "lastAttemptAt": "2026-10-05T12:30:42.543Z",
+   "lastAttemptAt": "2026-10-05T12:40:42.240Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-05T12:30:42.543Z",
+   "lastSuccessAt": "2026-10-05T12:40:42.240Z",
    "lastError": null,
    "items": 15
   },
   "lead:whenreset:codex": {
-   "lastAttemptAt": "2026-10-05T12:30:42.543Z",
+   "lastAttemptAt": "2026-10-05T12:40:42.240Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-05T12:30:42.543Z",
+   "lastSuccessAt": "2026-10-05T12:40:42.240Z",
    "lastError": null,
    "items": 20
   },
   "lead:codex-resets:codex": {
-   "lastAttemptAt": "2026-10-05T12:30:42.543Z",
+   "lastAttemptAt": "2026-10-05T12:40:42.240Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-05T12:30:42.543Z",
+   "lastSuccessAt": "2026-10-05T12:40:42.240Z",
    "lastError": null,
    "items": 30
   },
   "codex-resets:status": {
-   "lastAttemptAt": "2026-10-05T12:30:42.543Z",
+   "lastAttemptAt": "2026-10-05T12:40:42.240Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-05T12:30:42.543Z",
+   "lastSuccessAt": "2026-10-05T12:40:42.240Z",
    "lastError": null
   },
   "codex-resets:evidence": {
-   "lastAttemptAt": "2026-10-05T12:30:42.543Z",
+   "lastAttemptAt": "2026-10-05T12:40:42.240Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-05T12:30:42.543Z",
+   "lastSuccessAt": "2026-10-05T12:40:42.240Z",
    "lastError": null,
    "items": 20
   },
@@ -87,7 +87,7 @@
    "lastError": null
   }
  },
- "lastAttemptAt": "2026-10-05T12:30:42.543Z",
+ "lastAttemptAt": "2026-10-05T12:40:42.240Z",
  "status": "ok",
- "lastSuccessAt": "2026-10-05T12:30:42.543Z"
+ "lastSuccessAt": "2026-10-05T12:40:42.240Z"
 }
