@@ -1,5 +1,6 @@
 import test, { afterEach, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { kv, feishu, notifyOnce } from '../api/_kv.js';
 import { assessHealth } from '../api/_health.js';
 import { eventVersion } from '../scripts/snapshot.mjs';
@@ -154,14 +155,31 @@ test('health distinguishes missing data, failed collector, degradation and relea
   assert.equal(JSON.stringify(bad).includes('secret-upstream-body'),false);
 });
 
-function operationalFixture({badRelease=false,rejectAlert=false,dispatchStatus=204}={}) {
+test('daily collection stays healthy between runs but expires after the grace window', () => {
+  const now=Date.parse('2026-10-05T02:30:00Z');
+  const state=hours=>({...healthy(),lastAttemptAt:new Date(now-hours*3600000).toISOString(),lastSuccessAt:new Date(now-hours*3600000).toISOString()});
+  assert.equal(assessHealth(state(25),release(),live(),now).status,'ok');
+  assert.equal(assessHealth(state(26),release(),live(),now).status,'ok');
+  assert.ok(assessHealth(state(27),release(),live(),now).reasons.includes('collection_stale'));
+  assert.ok(assessHealth({...state(1),status:'error'},release(),live(),now).reasons.includes('collection_failed'));
+});
+
+test('only one daily scheduler can trigger paid collection; GitHub keeps manual dispatch', () => {
+  const config=JSON.parse(fs.readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
+  assert.deepEqual(config.crons,[{path:'/api/cron',schedule:'30 1 * * *'}]);
+  const workflow=fs.readFileSync(new URL('../.github/workflows/sentinel.yml',import.meta.url),'utf8');
+  assert.doesNotMatch(workflow,/^\s+schedule:/m);
+  assert.match(workflow,/workflow_dispatch:/);
+});
+
+function operationalFixture({badRelease=false,rejectAlert=false,dispatchStatus=204,ageHours=0}={}) {
   let dispatches=0;
   const fixture=redisFixture(async url => {
     const u=String(url);
-    if(u.includes('/main/data/health.json')) return json(healthy());
+    if(u.includes('/main/data/health.json')) return json({...healthy(),lastAttemptAt:new Date(Date.now()-ageHours*3600000).toISOString(),lastSuccessAt:new Date(Date.now()-ageHours*3600000).toISOString()});
     if(u.includes('/main/data/release.json')) return json({...release(), ...(badRelease ? {targetVersion:'sha256:'+'b'.repeat(64),lastError:'private token failure'}:{})});
     if(u.includes('/api/events.json')) return json(live());
-    if(u.includes('/runs?')) return json({workflow_runs:[{created_at:recent(),updated_at:recent()}]});
+    if(u.includes('/runs?')) return json({workflow_runs:[{created_at:new Date(Date.now()-ageHours*3600000).toISOString(),updated_at:new Date(Date.now()-ageHours*3600000).toISOString()}]});
     if(u.includes('/dispatches')) { dispatches++; return new Response(null,{status:dispatchStatus}); }
     if(u.includes('/auth/')) return json({code:0,tenant_access_token:'t'});
     if(u.includes('/im/')) return json(rejectAlert ? {code:230002} : {code:0,data:{message_id:'receipt'}});
@@ -191,6 +209,15 @@ test('healthy cron returns success after 204 dispatch; failed dispatch returns f
   let res=response(); await cron(req(),res); assert.equal(res.statusCode,200); assert.equal(res.body.ok,true);
   fixture=operationalFixture({dispatchStatus:401}); globalThis.fetch=fixture.fetch;
   res=response(); await cron(req(),res); assert.equal(res.statusCode,503); assert.ok(res.body.problems.includes('dispatch_failed'));
+});
+
+test('daily cron includes TikHub without falsely alarming on yesterday success', async () => {
+  const fixture=operationalFixture({ageHours:25}); globalThis.fetch=fixture.fetch;
+  const res=response(); await cron(req(),res);
+  assert.equal(res.statusCode,200); assert.deepEqual(res.body.problems,[]);
+  const dispatch=calls.find(c=>c.url.includes('/dispatches'));
+  assert.deepEqual(JSON.parse(dispatch.options.body),{ref:'main',inputs:{tikhub:'true'}});
+  assert.equal(fixture.dispatches(),1);
 });
 
 test('public health is read-only, sanitized and reuses fresh checks', async () => {

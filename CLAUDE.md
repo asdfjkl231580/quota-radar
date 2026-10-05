@@ -11,6 +11,7 @@
 - 前期调研：`~/Documents/2026年9月23日－Codex重置网站研究项目工程/`
 
 ## 当前交付状态（2026-10-05）
+- 用户确认低成本日更：每日09:30北京检查一次；状态页明确非实时。
 - 65项离线回归与构建通过；误报2106610099720720811已纠正归档，公开80条事件/34页。
 - GitHub VERCEL_TOKEN已换成用户创建的quota-radar项目范围Token，有效期至2027-01-03。只存GitHub Secret，勿回显或复制到文档。
 - 真实云端运行37313458418于21:00北京时间完成Vercel发布及正式域名JSON全文/首页版本回读，release.lastError已清空。替换凭据和实际部署均有证据，勿继续沿用此前“凭据待更换”的旧结论。
@@ -19,7 +20,7 @@
 
 ## 开发命令与维护口径
 - **哨兵主链路**：`node scripts/sentinel.mjs [--tikhub] [--dry] [--no-deploy] [--no-feishu]`。参考站提供线索，可选 TikHub 直查，fxtwitter 核验官方原帖；可明确分类的记录入库，不确定内容进待办。分类与时间、关联证据逻辑在 `scripts/pipeline.mjs`。自动入库条目 `confidence=auto`，页面标「待整理」；`review.mjs edit <id> --zh "..." --scope "..."` 补中文后提升为人工核实，再用 `npm run deploy` 发布。
-- **哨兵跑在 GitHub Actions（2026-09-26 起）**：仓库 https://github.com/asdfjkl231580/quota-radar（公开），工作流 `.github/workflows/sentinel.yml` 由 Vercel 定时任务 `api/cron.js` 每 10 分钟触发（Vercel 环境变量 GH_DISPATCH_TOKEN=仅授权本仓库 Actions 的 fine-grained 钥匙，用户 9/26 建，有效期 1 年；CRON_SECRET 同值存本机钥匙串 `airesetclock-cron-secret`，手动触发：`curl -H "Authorization: Bearer $(security find-generic-password -s airesetclock-cron-secret -w)" https://airesetclock.com/api/cron`。Vercel 加密变量 env pull 拿不到值），GitHub 自带定时每 2 小时兜底；**TikHub 直查 X 每天一次（09:30 北京，用户定），调度与授权不变**。密钥存仓库 Secrets；云端会把 `data/*.json` 状态变化 commit 回 main，**本地改数据前必须先 `git pull`**，改完 `git push`。本机 launchd 已卸载，勿再装。GitHub CLI 官方版在 `~/.local/bin/ghcli`（账号 asdfjkl231580）。按既有授权手动触发：`~/.local/bin/ghcli workflow run sentinel.yml --repo asdfjkl231580/quota-radar -f tikhub=true`。
+- **每日采集（用户2026-10-05明确要求）**：Vercel 的 /api/cron 在北京时间每天09:30（UTC 01:30）触发GitHub sentinel.yml，携带tikhub=true。一次检查免费线索、Tibo和ClaudeDevs；有关联待确认事件时沿用原有回复回查。GitHub原每两小时兜底与独立每日schedule均已移除，避免重复采集；workflow_dispatch保留，手动默认tikhub=false。勿恢复十分钟轮询、增加付费频率或另装本机launchd。GitHub将data/*.json状态写回main，本地改数据前先同步最新main；凭据存现有Secrets，不回显。
 - **预告与生效**：保留 2026-09-26 用户确定的三态。将来时重置记 `teaser + pendingReset`；官方给出无歧义钟点，才显示倒计时并到点按预告时间计；只给哪天，等美西当天结束再按预告口径计；无明确时间则不自动转正，满 24 小时提醒人工判断。原帖中的否定、历史领取提醒、与重置无关的模型发布时间不能当成新重置。
 - **严格关联确认**：确认内容须来自同一官方账号，时间不早于预告，并通过回复父帖、会话、引用帖 ID 或原帖链接明确关联该事件；还要命中实际完成语义并排除否定或疑问。不能仅凭同账号出现“is live / rolled out”就确认。带 TikHub 的轮次查回复，仍须核验原帖作者、正文及关联关系。
 - **时间与证据优先级**：人工纠正 > 官方确认 > codex-resets 执行观测 > 官方预告时间。更高优先级证据可更正已按较弱证据转正的时间，保留更正记录。无时区钟点、PST/PDT 与当日美西时区冲突、夏令时重复/不存在钟点及含糊日期，写入 `expectedAmbiguity`，不编造倒计时或自动转正。第三方排期只作参考，不能替代官方时间；不使用本人账号额度探针。
@@ -27,7 +28,7 @@
 - 线索源还包括 codex-resets.com 公开 API（`/api/v1/status` 的 `scheduled_reset` 用来核对预告时间），展示须注明来源（关于页已写）。
 - **发布状态**：`data/release.json` 的 `targetVersion` 是待发布事件快照，`deployedVersion/deployedAt` 只在生产读回成功后更新，`lastAttemptAt/lastError` 记录尝试与失败。版本由 `scripts/snapshot.mjs` 对原始事件计算；公开 API 事件是展示投影，不能直接用它重算原始版本。发布失败保留目标版本并返回失败；目标版本不同或lastError仍存在时，下轮即使没有新公告也会重试；不能只等待新事件触发发布。
 - **采集状态**：`data/health.json` 记录 `schemaVersion`、`lastAttemptAt`、`lastSuccessAt`、`status` 和各来源 `sources` 的状态、成功时间及错误。正常但没有新事件时，采集心跳仍前进；心跳本身不改变事件版本，也不触发整站发布。全部主要线索源失败或全部新线索核验失败，不能报成功。
-- **看门狗与公开状态**：`api/cron.js` 缺少 `CRON_SECRET` 时禁止触发；同时检查采集心跳、目标/已部署/生产版本及工作流状态，不再只看 workflow success。采集超过 40 分钟无成功、发布版本不匹配或触发失败需告警。`GET /api/health` 是脱敏只读入口，不发消息、不触发工作流；`/status` 展示采集和发布状态。`events.updatedAt` 是数据变更时间，陈旧不等于采集失败。
+- **看门狗与公开状态**：`api/cron.js` 缺少 `CRON_SECRET` 时禁止触发；同时检查采集心跳、目标/已部署/生产版本及工作流状态，不再只看 workflow success。每日采集超过 26 小时（含2小时宽限）无成功、发布版本不匹配或触发失败需告警。`GET /api/health` 是脱敏只读入口，不发消息、不触发工作流；`/status` 展示采集和发布状态。`events.updatedAt` 是数据变更时间，陈旧不等于采集失败。
 - **飞书回执**：云端 API 必须通过 HTTP、业务 code 和 `message_id` 校验；本地 Hermes 还须 `success=true` 且未 skipped。调用 `sendFeishu` 必须 `await`。看门狗取得回执后才写一小时去重标记，失败不得声称已送达；下划线 API helper 位于 `api/_kv.js`。
 - **求重置与反馈**：`api/beg.js` + `site/beg.js` 仍按最近一次送额度分轮，24 小时内为「谢谢重置」，数字是点击次数而非人数。计数存原有 Upstash，POST 必须带 provider、事件 id、mode、n 与 batchId；客户端串行发送，每批 ≤10，重试复用同一 batchId，服务端原子去重 24 小时；旧轮次拒绝计入新轮。每 IP 每分钟 ≤120；反馈采用共享 KV 原子限流（每 IP 每 10 分钟 5 条）。KV/消息失败返回不可用，不显示假零或假成功。
 - **统计（历史配置记录）**：Vercel Web Analytics 已开，脚本 `/_vercel/insights/script.js` 已埋；此前 Google 首页收录、sitemap 提交成功，百度 www 已验证。索引及流量结果需另行检查，不由本轮离线测试证明。

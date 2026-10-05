@@ -1,7 +1,7 @@
 // Authenticated scheduler: check collection/release/production, then dispatch the next run.
 import { timingSafeEqual } from "node:crypto";
 import { fetchJson, notifyOnce } from "./_kv.js";
-import { githubHeaders, readHealth, REPO } from "./_health.js";
+import { githubHeaders, readHealth, REPO, COLLECTION_MAX_AGE_MINUTES } from "./_health.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     const last = checks[1].value?.workflow_runs?.[0];
     const timestamp = Date.parse(last?.updated_at || last?.created_at);
     if (Number.isFinite(timestamp)) lastOkMin = Math.floor((Date.now() - timestamp) / 60000);
-    if (lastOkMin === null || lastOkMin > 40 || lastOkMin < -1) problems.push("workflow_stale");
+    if (lastOkMin === null || lastOkMin > COLLECTION_MAX_AGE_MINUTES || lastOkMin < -1) problems.push("workflow_stale");
   } else problems.push("workflow_unavailable");
 
   // A broken watchdog must not prevent recovery dispatch, but must never return healthy.
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(`${REPO}/actions/workflows/sentinel.yml/dispatches`, {
       method: "POST", headers: { ...gh, "Content-Type": "application/json" },
-      body: JSON.stringify({ ref: "main", inputs: { tikhub: "false" } }), signal: AbortSignal.timeout(6000)
+      body: JSON.stringify({ ref: "main", inputs: { tikhub: "true" } }), signal: AbortSignal.timeout(6000)
     });
     dispatched = response.status === 204;
     if (!dispatched) problems.push("dispatch_failed");
