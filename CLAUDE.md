@@ -10,10 +10,12 @@
 - 一页纸：`docs/plans/2026-09-24-一页纸-额度雷达.md`
 - 前期调研：`~/Documents/2026年9月23日－Codex重置网站研究项目工程/`
 
-## 当前交付状态（2026-10-03）
-- 本轮可靠性修复已在本地完成，`npm test` 的 **62 项离线测试通过**；包含分类、证据优先级、部署读回、API 失败处理和前端批次计数。此结果不是生产集成、真实飞书投递或支付验收。
-- **修复版已经正式发布并回读**。本次通过现有本机登录发布。GitHub Actions 的 `VERCEL_TOKEN` 仍失效，需按既有凭据管理流程轮换并验证真实云端部署；当前页面更新不等于自动发布凭据已恢复。
-- 上线完成条件：`npm run deploy` 通过生产域名快照和首页版本回读，`data/release.json` 记录已部署版本，再核对 `/api/health`、实际页面及后续定时采集。当前以上生产验收待完成。
+## 当前交付状态（2026-10-05）
+- 65项离线回归与构建通过；误报2106610099720720811已纠正归档，公开80条事件/34页。
+- GitHub VERCEL_TOKEN已换成用户创建的quota-radar项目范围Token，有效期至2027-01-03。只存GitHub Secret，勿回显或复制到文档。
+- 真实云端运行37313458418于21:00北京时间完成Vercel发布及正式域名JSON全文/首页版本回读，release.lastError已清空。替换凭据和实际部署均有证据，勿继续沿用此前“凭据待更换”的旧结论。
+- 21:06正式/api/health返回HTTP200、ok=true、reasons=[]，采集与发布正常，目标/已部署/正式版本一致。恢复后GitHub公开账本曾短暂读到旧缓存，已消退；验收存于Documents/2026年10月5日－额度雷达发布恢复项目工程/自动发布恢复验收.json。
+- 收费、真实反馈投递、生产计数Lua写入与国内微信实机验收，未由本轮密钥恢复覆盖。
 
 ## 开发命令与维护口径
 - **哨兵主链路**：`node scripts/sentinel.mjs [--tikhub] [--dry] [--no-deploy] [--no-feishu]`。参考站提供线索，可选 TikHub 直查，fxtwitter 核验官方原帖；可明确分类的记录入库，不确定内容进待办。分类与时间、关联证据逻辑在 `scripts/pipeline.mjs`。自动入库条目 `confidence=auto`，页面标「待整理」；`review.mjs edit <id> --zh "..." --scope "..."` 补中文后提升为人工核实，再用 `npm run deploy` 发布。
@@ -23,7 +25,7 @@
 - **时间与证据优先级**：人工纠正 > 官方确认 > codex-resets 执行观测 > 官方预告时间。更高优先级证据可更正已按较弱证据转正的时间，保留更正记录。无时区钟点、PST/PDT 与当日美西时区冲突、夏令时重复/不存在钟点及含糊日期，写入 `expectedAmbiguity`，不编造倒计时或自动转正。第三方排期只作参考，不能替代官方时间；不使用本人账号额度探针。
 - 人工维护：`node scripts/review.mjs list` / `approve <id> --kind reset --zh "..."` / `reject <id>`。预告时间用 `edit <id> --expect <ISO> [--precision day]`；改回预告用 `--pending`；人工确认完成用 `--kind reset --at <ISO>`，同时清理旧的预告状态，勿只手改 kind。
 - 线索源还包括 codex-resets.com 公开 API（`/api/v1/status` 的 `scheduled_reset` 用来核对预告时间），展示须注明来源（关于页已写）。
-- **发布状态**：`data/release.json` 的 `targetVersion` 是待发布事件快照，`deployedVersion/deployedAt` 只在生产读回成功后更新，`lastAttemptAt/lastError` 记录尝试与失败。版本由 `scripts/snapshot.mjs` 对原始事件计算；公开 API 事件是展示投影，不能直接用它重算原始版本。发布失败保留目标版本并返回失败，下轮即使没有新公告也会重试；不能只等待新事件触发发布。
+- **发布状态**：`data/release.json` 的 `targetVersion` 是待发布事件快照，`deployedVersion/deployedAt` 只在生产读回成功后更新，`lastAttemptAt/lastError` 记录尝试与失败。版本由 `scripts/snapshot.mjs` 对原始事件计算；公开 API 事件是展示投影，不能直接用它重算原始版本。发布失败保留目标版本并返回失败；目标版本不同或lastError仍存在时，下轮即使没有新公告也会重试；不能只等待新事件触发发布。
 - **采集状态**：`data/health.json` 记录 `schemaVersion`、`lastAttemptAt`、`lastSuccessAt`、`status` 和各来源 `sources` 的状态、成功时间及错误。正常但没有新事件时，采集心跳仍前进；心跳本身不改变事件版本，也不触发整站发布。全部主要线索源失败或全部新线索核验失败，不能报成功。
 - **看门狗与公开状态**：`api/cron.js` 缺少 `CRON_SECRET` 时禁止触发；同时检查采集心跳、目标/已部署/生产版本及工作流状态，不再只看 workflow success。采集超过 40 分钟无成功、发布版本不匹配或触发失败需告警。`GET /api/health` 是脱敏只读入口，不发消息、不触发工作流；`/status` 展示采集和发布状态。`events.updatedAt` 是数据变更时间，陈旧不等于采集失败。
 - **飞书回执**：云端 API 必须通过 HTTP、业务 code 和 `message_id` 校验；本地 Hermes 还须 `success=true` 且未 skipped。调用 `sendFeishu` 必须 `await`。看门狗取得回执后才写一小时去重标记，失败不得声称已送达；下划线 API helper 位于 `api/_kv.js`。
@@ -61,7 +63,7 @@
 - didreset 的 summary 有时是站方改写不是原文，种子数据一律以 fxtwitter 返回的原帖为准。
 
 
-## 2026-10-03 正式发布回读
+## 2026-10-03 正式发布回读（历史；凭据问题已于10月5日恢复）
 - 修复代码已合入 main；部署于 05:54 UTC 完成，airesetclock.com 的公开事件全文与首页版本回读通过。事件80条、页面34个。
 - 本地62项回归通过；GitHub 离线回归与构建 run 37101273405 成功。
 - 使用现有本机 Vercel 登录完成本次发布。GitHub Secrets 的 VERCEL_TOKEN 仍失效：CLI OAuth 无权签发长期token（403 Cannot create tokens for this app），需要账户持有人通过正规凭据页面轮换并更新同名Secret，再验收一次真实云端部署。不要把本机短期OAuth token复制到CI，不要因当前页面更新或健康接口正常而宣布自动部署已恢复。
