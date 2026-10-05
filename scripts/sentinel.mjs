@@ -131,7 +131,7 @@ export async function runSentinel(options={}){
   write('health.json',health);
   const version=eventVersion(ef.events);let release=structuredClone(read('release.json',{}));let published=false,attemptedDeploy=false;
   if(release.targetVersion!==version){release.targetVersion=version;write('release.json',release);}
-  if(release.deployedVersion!==version&&!args.has('--no-deploy')){
+  if((release.deployedVersion!==version||release.lastError)&&!args.has('--no-deploy')){
     attemptedDeploy=true;release.lastAttemptAt=now;release.lastError=null;write('release.json',release);
     try{await deploy();release=read('release.json',{});if(release.deployedVersion!==version)throw Error('部署未提供生产回读版本确认');published=true;log('生产版本回读确认 '+version);}
     catch(e){release=structuredClone(read('release.json',release));release.targetVersion=version;release.lastAttemptAt=now;release.lastError=safeError(e);write('release.json',release);errors.push('生产发布失败: '+release.lastError);log(errors.at(-1));}

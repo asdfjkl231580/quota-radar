@@ -155,6 +155,29 @@
     "verifiedVia": "fxtwitter",
     "verifiedAt": "2026-10-03T05:50:33.891Z"
    }
+  },
+  {
+   "id": "2106610099720720811",
+   "at": "2026-10-05T03:46:07.279Z",
+   "why": "产品研发方向声明，没有已生效提额或额度赠送；more usage 关键词误判",
+   "correction": true,
+   "originalEvent": {
+    "id": "2106610099720720811",
+    "provider": "codex",
+    "account": "@thsottiaux",
+    "sourceUrl": "https://x.com/thsottiaux/status/2106610099720720811",
+    "announcedAt": "2026-10-04T04:59:21.000Z",
+    "textEn": "All right, we’re locking in. Only things being worked on are simplifications, more efficiency for more usage, groundbreaking features or new models. \n\nSometimes you have to invest ahead of the curve, but feedback is clear that you all want things to get simpler. On it.",
+    "kind": "boost",
+    "extraLinks": [],
+    "zh": "官方提额或送额度（中文待整理）",
+    "detail": "",
+    "scope": "待核实",
+    "verified": true,
+    "verifiedBy": "自动：didreset 线索 + 原帖核验",
+    "verifiedAt": "2026-10-04",
+    "confidence": "auto"
+   }
   }
  ]
 }

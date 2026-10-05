@@ -39,6 +39,24 @@ test('new banked grant and real completed reset still publish, uncertain mention
   assert.equal(classify('Thinking about a reset.'),'unclear');
   assert.equal(classify('Tomorrow a new dashboard launches.'),'unclear');
 });
+test('roadmaps and benefit keywords cannot publish a quota boost',()=>{
+  const roadmap=original('2106610099720720811').textEn;
+  for(const text of [roadmap,'We will give subscribers a one-time credit tomorrow.','We are working on more usage.','More usage is our goal.','We might increase usage limits.','We did not increase usage limits.','Can users get free credits?','Free credits are planned.','Free credits are available next month.']) assert.equal(classify(text),'unclear',text);
+  for(const text of [original('2102871550974427462').textEn,original('1986863197803192782').textEn,'We increased usage limits by 50%.','Free credits are now available to all paid users.','You now get 2x the usual usage.','Pro plans get a one-time credit of $100.','Usage limits are now raised by 20%.']) assert.equal(classify(text),'boost',text);
+});
+test('a roadmap goes to review without changing the public clock or triggering deployment',async()=>{
+  const e=original('2106610099720720811');
+  const h=harness({lead:[{sourceUrl:e.sourceUrl}],tweets:{[e.id]:{id:e.id,author:'thsottiaux',text:e.textEn,createdAt:e.announcedAt,url:e.sourceUrl}}});
+  const r=await runSentinel(h.options);
+  assert.equal(r.auto,0);assert.equal(r.pending,1);assert.equal(h.db['events.json'].events.length,0);assert.equal(h.attempts,0);
+});
+test('a previous deployment error is retried even after a correction restores the deployed data version',async()=>{
+  const h=harness();h.db['release.json'].lastError='invalid deployment token';
+  await runSentinel(h.options);assert.equal(h.attempts,1);assert.equal(h.db['release.json'].lastError,null);
+  await runSentinel(h.options);assert.equal(h.attempts,1);
+  const paused=harness();paused.db['release.json'].lastError='invalid deployment token';paused.options.args=['--no-deploy'];
+  await runSentinel(paused.options);assert.equal(paused.attempts,0);assert.ok(paused.db['release.json'].lastError);
+});
 test('future reset sentence wins over unrelated now/have elsewhere',()=>{
   assert.equal(classify('We will reset limits tomorrow. We have now restored the dashboard.'),'teaser');
 });

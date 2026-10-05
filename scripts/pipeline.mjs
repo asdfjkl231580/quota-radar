@@ -5,7 +5,9 @@ const NEGATED = /\b(?:can't|cannot|can not|won't|will not|don't|do not|didn't|di
 const FUTURE = /\b(?:tomorrow|next week|later (?:today|tonight|this week)|coming soon|promis\w*|(?:will|we'll|going to|about to)[^.!?;]{0,24}reset|reset[^.!?;]{0,30}will|within|in \d+ (?:minute|hour)|on (?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)|land(?:s|ing)? (?:tomorrow|at|in|within|by|around)|propagat(?:ing|e) (?:over|in|to))\b/;
 const COMPLETE = /\b(?:all reset for|reset(?:s)? (?:all )?propagated|reset button pressed|(?:have|has|we've|i've) (?:now |just |also |again )?(?:been )?reset|(?:are|is) (?:now )?reset|(?:reset|limits?)[^.!?;]{0,45}(?:has landed|have landed|is done|completed|back to 100%)|(?:just |now )(?:reset|resetting)|reset (?:everyone|everybody|all|your|the|usage|rate)|resetting (?:everyone|everybody|all|your|the|usage|rate)|enjoy (?:a |the )?(?:nice |full |sweet )?reset)\b/;
 const BANKED = /\bbanked\b|into (?:your|the) (?:reset )?bank|reset (?:credit|to use (?:anytime|at your|whenever))|(?:a|one) reset (?:you can|to) use|(?:use|apply) it (?:anytime|whenever)/;
-const BOOST = /(?:limits? (?:increase|up|raised)|increase[sd]? (?:the )?(?:usage|limits|rate limits)|more usage|free credits?|one-time credit|goes? \d+% further|\d+x more usage|(?:lifting|lift) (?:the )?usage limits|2x the usual)/;
+// A benefit keyword is only a lead. Require a current allocation or completed change.
+const BOOST_UNCERTAIN = /\b(?:will|we'll|going to|plan(?:s|ned)? to|planning|planned|hope|aim|want|wish|working on|worked on|exploring|considering|could|may|might|would|should|tomorrow|soon|later|next (?:week|month|year|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|not|never|can't|cannot|won't|didn't|don't)\b/;
+const BOOST_CONFIRMED = /\b(?:increased|raised|lifted|doubled|tripled|boosted)\b[^.!?;]{0,45}\b(?:(?:usage|rate) limits?|limits?|allowance)\b|\b(?:usage|rate)?\s*limits?\s+(?:(?:are|have been|now)\s+)*(?:up|raised|increased|doubled|tripled)\b|\b(?:get|gets|receive|receives|received|giving|gave|granted|granting|added)\b[^.!?;]{0,60}\b(?:one-time credit|free credits?|more usage)\b|\b(?:free credits?|one-time credit)\b[^.!?;]{0,40}\b(?:available|added|granted)\b|\b\d+x more usage\s+(?:is\s+)?(?:now\s+)?included\b|\b(?:now|today)\b[^.!?;]{0,35}\b(?:get|includes?|have|has)\b[^.!?;]{0,35}\b(?:more usage|2x the usual)\b/;
 
 export function classify(text) {
   const t = normalize(text);
@@ -26,9 +28,7 @@ export function classify(text) {
     if (resetClauses.some(s => COMPLETE.test(s)) || (immediate&&/we (?:did|have|are)/.test(t))) return 'reset';
     return 'unclear';
   }
-  if (BOOST.test(t) && !/\b(?:won't|not|never)\b[^.!?;]{0,20}(?:increase|more usage|credit)/.test(t)) {
-    return FUTURE.test(clauses.find(s => BOOST.test(s)) || '') ? 'unclear' : 'boost';
-  }
+  if (clauses.some(s => !BOOST_UNCERTAIN.test(s) && BOOST_CONFIRMED.test(s) && !t.includes('?'))) return 'boost';
   return 'unclear';
 }
 
