@@ -116,7 +116,7 @@ const ABOUT = {
 <p><b>线索来源。</b>新公告的线索部分来自 <a href="https://codex-resets.com" target="_blank" rel="noopener">Codex Resets</a> 的公开接口，每条仍回 X 原帖核对后才收录。</p>
 <p><b>谁在维护。</b>${esc(a.owner)}。${a.contact ? `联系：<a href="${esc(a.contact)}">${esc(a.contactLabel || a.contact)}</a>。` : ""}发现错误或漏掉的公告，欢迎告诉我们。</p>
 <p><b>数据开放。</b><a href="/api/events.json">JSON</a>、<a href="/rss.xml">RSS</a>，可自由引用，注明来源即可。</p>
-<p><b>目前免费。</b>公开公告、时间线与规则说明免费提供。未来可能提供付费的个性化提醒和工作流服务，目前尚未开放订阅或收费。</p><p><a href="/method">数据说明与纠错方式</a> · <a href="/privacy">隐私与服务边界</a> · <a href="/status">服务状态</a></p>
+<p><b>目前免费。</b>公开公告、时间线与规则说明免费提供。后续探索广告和清楚标识的合作链接等网页收入，目前没有开放订阅或收费。</p><p><a href="/method">数据说明与纠错方式</a> · <a href="/privacy">隐私与服务边界</a> · <a href="/status">服务状态</a></p>
 <p><b>不隶属。</b>本站与 OpenAI、Anthropic 无关，Codex、Claude 为各自公司的商标。</p></article>`,
   en: (a) => `<article class="q" style="margin-top:12px"><h1>About Quota Radar</h1>
 <p><b>What this is.</b> OpenAI (Codex) and Anthropic (Claude) occasionally grant quota to users: full resets, banked resets, quota boosts. Announcements often appear on X. This site checks the source posts and records relevant events, so you can see at a glance when the last grant happened, what it was, and who got it.</p>
@@ -124,7 +124,7 @@ const ABOUT = {
 <p><b>Leads.</b> Some new-announcement leads come from the public API of <a href="https://codex-resets.com" target="_blank" rel="noopener">Codex Resets</a>; every event is still verified against the original post on X.</p>
 <p><b>Who runs it.</b> ${esc(a.ownerEn || a.owner)}. ${a.contact ? `Contact: <a href="${esc(a.contact)}">${esc(a.contactLabel || a.contact)}</a>.` : ""} Spotted an error or a missing announcement? Tell us.</p>
 <p><b>Open data.</b> <a href="/api/events.json">JSON</a>, <a href="/en/rss.xml">RSS</a>. Free to reuse with attribution.</p>
-<p><b>Currently free.</b> Public announcements, the timeline and explanations are free. Paid personalized alerts and workflows may be added later; subscriptions and payments are not available yet.</p><p><a href="/en/method">Data method and corrections</a> · <a href="/en/privacy">Privacy and service limits</a> · <a href="/en/status">Service status</a></p>
+<p><b>Currently free.</b> Public announcements, the timeline and explanations are free. We may explore clearly labeled advertising and affiliate links. Subscriptions and payments are not available.</p><p><a href="/en/method">Data method and corrections</a> · <a href="/en/privacy">Privacy and service limits</a> · <a href="/en/status">Service status</a></p>
 <p><b>Not affiliated</b> with OpenAI or Anthropic. Codex and Claude are trademarks of their respective owners.</p></article>`,
 };
 
