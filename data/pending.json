@@ -107,6 +107,42 @@
    "foundAt": "2026-10-07T01:30:44.578Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2107676072871600470",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2107676072871600470",
+   "announcedAt": "2026-10-07T03:35:09.000Z",
+   "textEn": "We shipped four things that were deemed good to great and some math proofs, but the vote is clear and the community demands a reset. I did calibrate it and it *seems* that the game is rigged in reset's favor, but such are the rules at the moment.\n\nTherefore ... the reset has been processed. Enjoy!",
+   "via": "didreset",
+   "foundAt": "2026-10-08T01:30:48.336Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2107913738791596286",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2107913738791596286",
+   "announcedAt": "2026-10-07T19:19:33.000Z",
+   "textEn": "Will be there by EOD PST.",
+   "via": "codex-resets",
+   "foundAt": "2026-10-08T01:30:48.336Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2107895957933408429",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2107895957933408429",
+   "announcedAt": "2026-10-07T18:08:53.000Z",
+   "textEn": "We’re rolling out monthly Claude Platform API credits for Max and Team plans:\n\nMax 5x: $100\nMax 20x: $200\nTeam: up to $500, pooled\n\nWorks on any model, including Haiku 5.5, in your code or third-party harnesses. \n\nHow it works and full terms: https://support.claude.com/en/articles/17154008-monthly-api-credits-for-max-and-team-plans",
+   "via": "tikhub",
+   "foundAt": "2026-10-08T01:30:48.336Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
