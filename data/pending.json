@@ -143,6 +143,78 @@
    "foundAt": "2026-10-08T01:30:48.336Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2108040921044639779",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2108040921044639779",
+   "announcedAt": "2026-10-08T03:44:55.000Z",
+   "textEn": "Confirmed landed across all accounts. How are we doing so far?",
+   "via": "whenreset",
+   "foundAt": "2026-10-09T01:30:47.987Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2108320296323477683",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2108320296323477683",
+   "announcedAt": "2026-10-08T22:15:03.000Z",
+   "textEn": "How to build automations with Claude Managed Agents: https://claude.dev/blog/building-effective-agent-automations/\n\nDeploy an agent that reads Slack/GitHub on a schedule (with credentials and memory) and posts updates. You can set it up with a Claude Code command and use the new API credits included in Max and Team.",
+   "via": "tikhub",
+   "foundAt": "2026-10-09T01:30:47.987Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2108287358374482381",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2108287358374482381",
+   "announcedAt": "2026-10-08T20:04:10.000Z",
+   "textEn": "ICYMI we've cut the price of Sonnet 5.5 cache reads in half.\n\nIn the Claude Platform, it's now $0.10 per million tokens (input is $2, output is $10). \n\nThis means Sonnet 5.5 now runs ~20% cheaper on most agentic work. \n\n(API only, no change to Claude Code usage limits.)",
+   "via": "tikhub",
+   "foundAt": "2026-10-09T01:30:47.987Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2108228396513996975",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2108228396513996975",
+   "announcedAt": "2026-10-08T16:09:53.000Z",
+   "textEn": "The quickest way to get started with these credits is using Claude Managed Agents. Use the claude-api skill in Claude Code to build an agent and run it with your credits: \n\n/claude-api managed-agents-onboard",
+   "via": "tikhub",
+   "foundAt": "2026-10-09T01:30:47.987Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2108228394156757299",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2108228394156757299",
+   "announcedAt": "2026-10-08T16:09:52.000Z",
+   "textEn": "Credits can be used with the Messages API, Claude Managed Agents, and the Agent SDK, but cannot be used with interactive Claude Code sessions. These credits also apply in third-party harnesses that accept a Claude API key.",
+   "via": "tikhub",
+   "foundAt": "2026-10-09T01:30:47.987Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2108228391404966005",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2108228391404966005",
+   "announcedAt": "2026-10-08T16:09:52.000Z",
+   "textEn": "Monthly API credits are now available on Max and Team plans: $100 on Max 5x, $200 on Max 20x, and up to $500 pooled on Team. Use them on any Claude model.\n\nHow it works and full terms: https://support.claude.com/en/articles/17154008-monthly-api-credits-for-max-and-team-plans",
+   "via": "tikhub",
+   "foundAt": "2026-10-09T01:30:47.987Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
