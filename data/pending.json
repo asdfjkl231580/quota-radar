@@ -215,6 +215,42 @@
    "foundAt": "2026-10-09T01:30:47.987Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2109045392684032299",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2109045392684032299",
+   "announcedAt": "2026-10-10T22:16:20.000Z",
+   "textEn": "Global reset by EOD. May the tokens do good things for you.",
+   "via": "codex-resets",
+   "foundAt": "2026-10-11T01:30:44.291Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2109090080497508356",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2109090080497508356",
+   "announcedAt": "2026-10-11T01:13:54.000Z",
+   "textEn": "The day we reach perfection it will be resets from there onwards",
+   "via": "tikhub",
+   "foundAt": "2026-10-11T01:30:44.291Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2109045220411351517",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2109045220411351517",
+   "announcedAt": "2026-10-10T22:15:39.000Z",
+   "textEn": "Day 6/ Reset",
+   "via": "tikhub",
+   "foundAt": "2026-10-11T01:30:44.291Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
