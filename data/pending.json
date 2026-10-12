@@ -251,6 +251,30 @@
    "foundAt": "2026-10-11T01:30:44.291Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2109132167112782291",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2109132167112782291",
+   "announcedAt": "2026-10-11T04:01:09.000Z",
+   "textEn": "Put the reset in the bag. All propagated.",
+   "via": "didreset",
+   "foundAt": "2026-10-12T01:30:46.335Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2109439315570999598",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2109439315570999598",
+   "announcedAt": "2026-10-12T00:21:38.000Z",
+   "textEn": "The results of this poll has gotten me confused. I definitely thought it would sway much more favorably in the 2X direction across Pro 100/200/500 at the cost of bringing back 5h limits in order to smoothen the demand curve.",
+   "via": "tikhub",
+   "foundAt": "2026-10-12T01:30:46.335Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
