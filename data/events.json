@@ -1,6 +1,24 @@
 {
- "updatedAt": "2026-10-08T01:30:48.336Z",
+ "updatedAt": "2026-10-13T01:30:45.120Z",
  "events": [
+  {
+   "id": "2109812360596865224",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2109812360596865224",
+   "announcedAt": "2026-10-13T01:03:59.000Z",
+   "textEn": "Global reset landing by EOD PST time. Enjoy",
+   "kind": "teaser",
+   "extraLinks": [],
+   "zh": "官方宣布即将重置（生效时间未公布）",
+   "detail": "",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：didreset 线索 + 原帖核验",
+   "verifiedAt": "2026-10-13",
+   "confidence": "auto",
+   "pendingReset": true
+  },
   {
    "id": "2107913674593644711",
    "provider": "codex",
