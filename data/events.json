@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-13T01:30:45.120Z",
+ "updatedAt": "2026-10-14T01:30:51.333Z",
  "events": [
   {
    "id": "2109812360596865224",
@@ -17,7 +17,8 @@
    "verifiedBy": "自动：didreset 线索 + 原帖核验",
    "verifiedAt": "2026-10-13",
    "confidence": "auto",
-   "pendingReset": true
+   "pendingReset": true,
+   "nudgedAt": "2026-10-14T01:30:51.333Z"
   },
   {
    "id": "2107913674593644711",

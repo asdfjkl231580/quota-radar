@@ -287,6 +287,18 @@
    "foundAt": "2026-10-13T01:30:45.120Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2109873287853707513",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2109873287853707513",
+   "announcedAt": "2026-10-13T05:06:06.000Z",
+   "textEn": "What would you like with your side of reset? It's done.",
+   "via": "didreset",
+   "foundAt": "2026-10-14T01:30:51.333Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
