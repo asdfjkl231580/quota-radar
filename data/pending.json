@@ -299,6 +299,66 @@
    "foundAt": "2026-10-14T01:30:51.333Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2110595554036400151",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2110595554036400151",
+   "announcedAt": "2026-10-15T04:56:07.000Z",
+   "textEn": "Landing within the next 2 hours",
+   "via": "didreset",
+   "foundAt": "2026-10-16T01:30:48.468Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2110618732666257557",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2110618732666257557",
+   "announcedAt": "2026-10-15T06:28:13.000Z",
+   "textEn": "Done and dusted",
+   "via": "whenreset",
+   "foundAt": "2026-10-16T01:30:48.468Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2110595484180214059",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2110595484180214059",
+   "announcedAt": "2026-10-15T04:55:51.000Z",
+   "textEn": "The reports of my reset button being lost are greatly exaggerated\n\nDay 10/ Reset",
+   "via": "tikhub",
+   "foundAt": "2026-10-16T01:30:48.468Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2110866213266203118",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2110866213266203118",
+   "announcedAt": "2026-10-15T22:51:37.000Z",
+   "textEn": "Eligible Claude Enterprise orgs can claim at least $10,000 in Code Review credits by Jan 15. Credits expire 30 days after you claim them.\n\nTerms: https://support.claude.com/en/articles/17603594-free-code-review-promotional-credits-for-claude-enterprise",
+   "via": "tikhub",
+   "foundAt": "2026-10-16T01:30:48.468Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2110825294655562048",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2110825294655562048",
+   "announcedAt": "2026-10-15T20:09:02.000Z",
+   "textEn": "Opus 5.5 fast mode in the Claude Platform is no longer in research preview, and we’ve removed the waitlist!\n\nIt’s the same Opus 5.5 but up to 2.5x faster, at $8 / $40 per million tokens.\n\nIt's also available in Microsoft Foundry (Hosted on Azure), with Google Cloud coming soon.\n\nFast mode in Claude Code remains unchanged, and uses extra usage credits.\n\nSee our docs here:\nhttps://platform.claude.com/docs/en/build-with-claude/fast-mode\n\nhttps://x.com/ClaudeDevs/status/2054266327771275435?s=20",
+   "via": "tikhub",
+   "foundAt": "2026-10-16T01:30:48.468Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
