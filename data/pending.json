@@ -359,6 +359,30 @@
    "foundAt": "2026-10-16T01:30:48.468Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2111492673890824348",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2111492673890824348",
+   "announcedAt": "2026-10-17T16:20:57.000Z",
+   "textEn": "Day 13/ Le limit reset",
+   "via": "didreset",
+   "foundAt": "2026-10-18T01:30:44.288Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2111566005684289735",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2111566005684289735",
+   "announcedAt": "2026-10-17T21:12:21.000Z",
+   "textEn": "Done",
+   "via": "whenreset",
+   "foundAt": "2026-10-18T01:30:44.288Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
