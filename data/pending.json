@@ -407,6 +407,18 @@
    "foundAt": "2026-10-19T01:30:45.162Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2112034063934742720",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2112034063934742720",
+   "announcedAt": "2026-10-19T04:12:15.000Z",
+   "textEn": "Our team worked with OpenCode to have their users who are also OpenAI API customers back in business and any credits refunded which would have been drawn in the attack.\n\nAlso, you can request Daybreak Blue access to use our cyber permissive setup for defense. Do not wait until you have to deal with an incident. We’re here to help.",
+   "via": "tikhub",
+   "foundAt": "2026-10-20T01:30:48.052Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
