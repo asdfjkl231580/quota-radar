@@ -419,6 +419,30 @@
    "foundAt": "2026-10-20T01:30:48.052Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2112432076767289678",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2112432076767289678",
+   "announcedAt": "2026-10-20T06:33:48.000Z",
+   "textEn": "Day 15/ Nevermind, we're still cooking... and reset. Enjoy.",
+   "via": "whenreset",
+   "foundAt": "2026-10-21T01:30:46.505Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2112592264686149749",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2112592264686149749",
+   "announcedAt": "2026-10-20T17:10:20.000Z",
+   "textEn": "There were reports of usage draining faster than anticipated for some users over the weekend. We've identified approximately 40,000 accounts that had an inconsistency on which usage limits where the actual usage that was applied did not correspond to their actual selected plan. We are reaching out individually to all these users and have corrected the issue. If this affected you, we'll add credits to your account. Sorry we got this wrong.",
+   "via": "tikhub",
+   "foundAt": "2026-10-21T01:30:46.505Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
