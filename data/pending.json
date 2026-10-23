@@ -443,6 +443,30 @@
    "foundAt": "2026-10-21T01:30:46.505Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2113162413008884099",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2113162413008884099",
+   "announcedAt": "2026-10-22T06:55:54.000Z",
+   "textEn": "Lands tomorrow before 10am PST.",
+   "via": "codex-resets",
+   "foundAt": "2026-10-23T01:30:44.322Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2113162277688070445",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2113162277688070445",
+   "announcedAt": "2026-10-22T06:55:22.000Z",
+   "textEn": "Day 17/ Bet you thought we forgot, but no, it’s reset day today.\n\nAlso good time to remind you to get Daybreak Blue access, it only takes 15 mins and you don’t want to have to do it in the middle of an incident.",
+   "via": "tikhub",
+   "foundAt": "2026-10-23T01:30:44.322Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
