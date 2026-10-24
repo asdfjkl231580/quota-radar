@@ -2,43 +2,43 @@
  "schemaVersion": 1,
  "sources": {
   "lead:didreset:codex": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null,
    "items": 30
   },
   "lead:didreset:claude": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null,
    "items": 14
   },
   "lead:whenreset:codex": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null,
    "items": 20
   },
   "lead:codex-resets:codex": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null,
    "items": 30
   },
   "codex-resets:status": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null
   },
   "codex-resets:evidence": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null,
    "items": 20
   },
@@ -49,18 +49,18 @@
    "lastError": null
   },
   "tikhub:thsottiaux": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null,
    "items": 20
   },
   "tikhub:ClaudeDevs": {
-   "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
    "status": "ok",
-   "lastSuccessAt": "2026-10-23T01:30:44.322Z",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
    "lastError": null,
-   "items": 20
+   "items": 19
   },
   "fx:2106233145163141249": {
    "lastAttemptAt": "2026-10-03T06:41:10.757Z",
@@ -296,9 +296,27 @@
    "status": "ok",
    "lastSuccessAt": "2026-10-23T01:30:44.322Z",
    "lastError": null
+  },
+  "fx:2113492502355562875": {
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
+   "lastError": null
+  },
+  "fx:2113770862860222611": {
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
+   "lastError": null
+  },
+  "fx:2113492187770175603": {
+   "lastAttemptAt": "2026-10-24T01:30:43.576Z",
+   "status": "ok",
+   "lastSuccessAt": "2026-10-24T01:30:43.576Z",
+   "lastError": null
   }
  },
- "lastAttemptAt": "2026-10-23T01:30:44.322Z",
+ "lastAttemptAt": "2026-10-24T01:30:43.576Z",
  "status": "ok",
- "lastSuccessAt": "2026-10-23T01:30:44.322Z"
+ "lastSuccessAt": "2026-10-24T01:30:43.576Z"
 }
