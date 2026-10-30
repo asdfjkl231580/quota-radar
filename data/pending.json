@@ -563,6 +563,30 @@
    "foundAt": "2026-10-29T01:30:49.258Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2115850175868727621",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2115850175868727621",
+   "announcedAt": "2026-10-29T16:56:07.000Z",
+   "textEn": "Day 25/\n\nWe are doubling all usage limits for all Pro 100/200/500 tiers and Business Premium, effective today.\n\nWe heard your kind feedback and won’t be reducing usage limits for Pro 200, so your Work and Codex usage will stay the same. We’re also going to continue offering extended limits for dots for now, and usage of your dot will still continue to be separate from your default usage.\n\nAnd we'll of course also keep shipping better models and other efficiency improvements that increase your effective usage over time.",
+   "via": "tikhub",
+   "foundAt": "2026-10-30T01:30:43.968Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2115851621137784832",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2115851621137784832",
+   "announcedAt": "2026-10-29T17:01:51.000Z",
+   "textEn": "Graduating from The Reset Company to The Token Company.",
+   "via": "tikhub",
+   "foundAt": "2026-10-30T01:30:43.968Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
