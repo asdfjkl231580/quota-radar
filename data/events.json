@@ -1,6 +1,23 @@
 {
- "updatedAt": "2026-10-14T01:30:51.333Z",
+ "updatedAt": "2026-11-01T01:30:47.148Z",
  "events": [
+  {
+   "id": "2116405414921384099",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2116405414921384099",
+   "announcedAt": "2026-10-31T05:42:26.000Z",
+   "textEn": "Day 26/ You can now easily switch between multiple accounts on mobile, and coming soon to desktop too. Next two days will be resets… banked… do with this what you may 👀.\n\nhttps://help.openai.com/en/articles/20001068-using-multiple-chatgpt-accounts-on-web-and-mobile",
+   "kind": "banked",
+   "extraLinks": [],
+   "zh": "官方发放重置卡（中文待整理）",
+   "detail": "",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：tikhub 线索 + 原帖核验",
+   "verifiedAt": "2026-11-01",
+   "confidence": "auto"
+  },
   {
    "id": "2109812360596865224",
    "provider": "codex",

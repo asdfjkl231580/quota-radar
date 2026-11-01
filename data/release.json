@@ -1,7 +1,7 @@
 {
- "targetVersion": "sha256:1220807d1f2c83d0da0cd9d4ff2a7adf91c5165cb175925935162478d589f3ea",
- "lastAttemptAt": "2026-10-14T01:31:02.931Z",
+ "targetVersion": "sha256:582ff8898c5295cb67b49db94d216c9ea1a7072359d57763d569f43e82a13251",
+ "lastAttemptAt": "2026-11-01T01:30:54.861Z",
  "lastError": null,
- "deployedVersion": "sha256:1220807d1f2c83d0da0cd9d4ff2a7adf91c5165cb175925935162478d589f3ea",
- "deployedAt": "2026-10-14T01:31:19.667Z"
+ "deployedVersion": "sha256:582ff8898c5295cb67b49db94d216c9ea1a7072359d57763d569f43e82a13251",
+ "deployedAt": "2026-11-01T01:31:13.411Z"
 }
