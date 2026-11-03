@@ -611,6 +611,18 @@
    "foundAt": "2026-11-02T01:30:42.510Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2117283124833055196",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2117283124833055196",
+   "announcedAt": "2026-11-02T15:50:08.000Z",
+   "textEn": "Fellow resetters, heads up that we're working on expanding the family of frontier models that power dots, including GPT-6 Astra and GPT-6.1 Terra and some others in the future. Terra brings speed and a nice personality upgrade, and will help us bring dots to more people.",
+   "via": "tikhub",
+   "foundAt": "2026-11-03T01:30:48.794Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
