@@ -623,6 +623,18 @@
    "foundAt": "2026-11-03T01:30:48.794Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2117670664262009016",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2117670664262009016",
+   "announcedAt": "2026-11-03T17:30:05.000Z",
+   "textEn": "And a few smaller ones:\n\n- Cloud sessions now start setting up while you’re still typing your prompt, so there's less waiting after you hit send\n- You can click any line in a cloud session's diff and leave a comment, and it goes to Claude with your next message\n- Max, Ultra and Team plans now include a monthly API credit for building with the Claude API and Agent SDK\n- MCP servers that support it can ask you a follow-up question mid-task, and run long jobs in the background",
+   "via": "tikhub",
+   "foundAt": "2026-11-04T01:30:42.453Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
