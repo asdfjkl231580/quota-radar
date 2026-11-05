@@ -635,6 +635,18 @@
    "foundAt": "2026-11-04T01:30:42.453Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2118063143167693011",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2118063143167693011",
+   "announcedAt": "2026-11-04T19:29:39.000Z",
+   "textEn": "Background subagents in Claude Code now use less of your usage limit.\n\nA running subagent updates its status line every 30 seconds, and each update used to re-read its whole conversation. Now Haiku 5.5 writes it from short notes instead, so each update costs about 99% less.",
+   "via": "tikhub",
+   "foundAt": "2026-11-05T01:30:42.077Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
