@@ -659,6 +659,18 @@
    "foundAt": "2026-11-09T01:30:43.932Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2119868704544711108",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2119868704544711108",
+   "announcedAt": "2026-11-09T19:04:19.000Z",
+   "textEn": "We're giving Ultra and Team Premium users Fable resets based on how long you've subscribed:\n\n<6 mo: 1\n6–12 mo: 2\n>12 mo: 3\n\nUse them anytime by March 8.\n\nPro and Team Standard get a week to try Fable 5.2, up to half your weekly limit, plus one reset. https://support.claude.com/en/articles/17506494",
+   "via": "didreset",
+   "foundAt": "2026-11-10T01:30:42.982Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
