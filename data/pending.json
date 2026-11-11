@@ -671,6 +671,30 @@
    "foundAt": "2026-11-10T01:30:42.982Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2120278551840920014",
+   "provider": "claude",
+   "account": "@lydiahallie",
+   "sourceUrl": "https://x.com/lydiahallie/status/2120278551840920014",
+   "announcedAt": "2026-11-10T22:12:54.000Z",
+   "textEn": "Enjoy the reset 🧡 \n\nWe also changed the UI to show the exact expiry time so you don't miss it, and it's (hopefully) more clear now what the Fable reset does!",
+   "via": "didreset",
+   "foundAt": "2026-11-11T01:30:46.334Z",
+   "zhDraft": "",
+   "guess": "unclear"
+  },
+  {
+   "id": "2120275296637321476",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2120275296637321476",
+   "announcedAt": "2026-11-10T21:59:58.000Z",
+   "textEn": "We've given all Pro, Max, Ultra, and Team users one free full reset, across all models and limits. Use it anytime before December 10 at 2:00PM PT.\n\nWe recently fixed a few small issues that used more limits than intended, and the Fable resets didn't do much for those of you who'd already hit your weekly limits for all models. While these issues didn't affect everyone, we want to make up for the trouble.\n\nYou'll find it in Settings > Usage, or at http://clau.de/reset.",
+   "via": "didreset",
+   "foundAt": "2026-11-11T01:30:46.334Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
