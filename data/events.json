@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-13T01:30:43.527Z",
+ "updatedAt": "2026-11-14T01:30:46.682Z",
  "events": [
   {
    "id": "2120999993079451919",
@@ -8,20 +8,30 @@
    "sourceUrl": "https://x.com/thsottiaux/status/2120999993079451919",
    "announcedAt": "2026-11-12T21:59:39.000Z",
    "textEn": "We shipped some good updates to dots today and the banked reset has been activated and should land in everyones accounts sometime soon!",
-   "kind": "teaser",
+   "kind": "banked",
    "extraLinks": [],
-   "zh": "官方宣布即将重置（生效时间未公布）",
+   "zh": "官方宣布即将重置（第三方观测到账）",
    "detail": "",
    "scope": "待核实",
    "verified": true,
    "verifiedBy": "自动：didreset 线索 + 原帖核验",
    "verifiedAt": "2026-11-13",
    "confidence": "auto",
-   "pendingReset": true,
+   "pendingReset": false,
    "expectedAt": "2026-11-12T08:00:00.000Z",
    "expectedUntil": "2026-11-13T08:00:00.000Z",
    "expectedPrecision": "day",
-   "expectedFrom": "official"
+   "expectedFrom": "official",
+   "effectiveAt": "2026-11-14T01:30:46.682Z",
+   "promotedAt": "2026-11-14T01:30:46.682Z",
+   "effectiveEvidence": {
+    "type": "observed",
+    "at": "2026-11-14T01:30:46.682Z",
+    "url": "https://codex-resets.com",
+    "sourceId": "2120999993079451919",
+    "note": "第三方标记已执行；时间为本站发现时间"
+   },
+   "observedAt": "2026-11-14T01:30:46.682Z"
   },
   {
    "id": "2120410480204525936",
