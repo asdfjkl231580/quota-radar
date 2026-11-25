@@ -1,6 +1,23 @@
 {
- "updatedAt": "2026-11-14T01:30:46.682Z",
+ "updatedAt": "2026-11-25T01:30:47.342Z",
  "events": [
+  {
+   "id": "2125299248782778588",
+   "provider": "codex",
+   "account": "@thsottiaux",
+   "sourceUrl": "https://x.com/thsottiaux/status/2125299248782778588",
+   "announcedAt": "2026-11-24T18:43:21.000Z",
+   "textEn": "To all the ChatGPT Business teams out there. We have two small things for you, a banked reset and fast mode at no extra charge through Dec 31. Have fun!",
+   "kind": "banked",
+   "extraLinks": [],
+   "zh": "官方发放重置卡（中文待整理）",
+   "detail": "",
+   "scope": "待核实",
+   "verified": true,
+   "verifiedBy": "自动：whenreset 线索 + 原帖核验",
+   "verifiedAt": "2026-11-25",
+   "confidence": "auto"
+  },
   {
    "id": "2120999993079451919",
    "provider": "codex",

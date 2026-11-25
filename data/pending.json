@@ -707,6 +707,18 @@
    "foundAt": "2026-11-13T01:30:43.527Z",
    "zhDraft": "",
    "guess": "unclear"
+  },
+  {
+   "id": "2125315493771059685",
+   "provider": "claude",
+   "account": "@ClaudeDevs",
+   "sourceUrl": "https://x.com/ClaudeDevs/status/2125315493771059685",
+   "announcedAt": "2026-11-24T19:47:54.000Z",
+   "textEn": "You don't have to package or sign the app, or set up an API key. Building the app and any calls it makes to Claude count toward your usage limits.\n\nIt's in beta on all plans in Claude Desktop (on Enterprise, an owner needs to switch it on first).\nhttps://claude.com/resources/articles/install-as-app",
+   "via": "tikhub",
+   "foundAt": "2026-11-25T01:30:47.342Z",
+   "zhDraft": "",
+   "guess": "unclear"
   }
  ]
 }
