@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27T01:30:41.591Z",
+ "updatedAt": "2026-11-28T01:30:41.475Z",
  "events": [
   {
    "id": "2125853628250599730",
@@ -34,7 +34,8 @@
    "verifiedBy": "自动：tikhub 线索 + 原帖核验",
    "verifiedAt": "2026-11-27",
    "confidence": "auto",
-   "pendingReset": true
+   "pendingReset": true,
+   "nudgedAt": "2026-11-28T01:30:41.475Z"
   },
   {
    "id": "2125299248782778588",
